@@ -1,0 +1,321 @@
+{
+  
+  // ------------------------------------------------
+
+  theme-name: Default
+  
+  // ------------------------------------------------
+
+  variables: {
+    
+    // ------------------------------------------------
+    
+    $selection-color: [ 255, 255, 255, 50 ]
+    $text-light: [ 216, 216, 214 ]
+    $text-dark: [ 156, 156, 154 ]
+
+    // ------------------------------------------------
+
+    $text-area: {
+      font: $main-font
+      text-color: $text-light
+      selection-color: $selection-color
+      caret-color: $text-light
+    }
+
+    // ------------------------------------------------
+    
+    $main-text: {
+      font: $main-font
+      text-position: [ 0, 2 ]
+      text-color: $text-light
+    }
+    
+    $dark-text: {
+      extends: $main-text
+      text-color: $text-dark
+    }
+
+    // ------------------------------------------------
+
+    $text-button: {
+      extends: $dark-text
+
+      hovering: {
+        text-color: $text-light
+      }
+    }
+
+    $text-toggle: {
+      extends: $dark-text
+
+      selected: {
+        text-color: $text-light
+      }
+    }
+
+    // ------------------------------------------------
+
+    $light-button: {
+      extends: $main-text
+      
+      background-color: {
+        transition: 50
+        color: [ 89, 89, 89 ]
+        selected: [ 117, 117, 115 ]
+        hovering: [ 117, 117, 115 ]
+      }
+
+      text-color: {
+        transition: 50
+        color: $text-dark
+        selected: $text-light
+      }
+    }
+
+    $dark-button: {
+      extends: $main-text
+      
+      background-color: {
+        transition: 50
+        color: [ 40, 40, 40 ]
+        selected: [ 48, 48, 48 ]
+        hovering: [ 48, 48, 48 ]
+      }
+
+      text-color: {
+        transition: 50
+        color: $text-dark
+        selected: $text-light
+      }
+    }
+
+    // ------------------------------------------------
+
+    // Little base class for easy modification of knobs
+    $knob: {}
+
+    // ------------------------------------------------
+
+    $blue-knob: {
+      extends: $knob
+      image: knobs/blue-knob.png
+      frames: 293
+      frames-per-row: 10
+      image-size: [ 100, 100 ]
+    }
+
+    $blue-knob-bi: {
+      extends: $blue-knob
+      image: knobs/blue-knob-bi.png
+    }
+    
+    // ------------------------------------------------
+
+    $yellow-knob: {
+      extends: $knob
+      image: knobs/yellow-knob.png
+      frames: 181
+      frames-per-row: 10
+      image-size: [ 68, 68 ]
+    }
+
+    $yellow-knob-bi: {
+      extends: $yellow-knob
+      image: knobs/yellow-knob-bi.png
+    }
+    
+    // ------------------------------------------------
+
+    $red-knob: {
+      extends: $knob
+      image: knobs/red-knob.png
+      frames: 213
+      frames-per-row: 10
+      image-size: [ 76, 76 ]
+    }
+
+    $red-knob-bi: {
+      extends: $red-knob
+      image: knobs/red-knob-bi.png
+    }
+    
+    // ------------------------------------------------
+
+    $slider: {
+      extends: $knob
+      image: knobs/slider.png
+      frames: 148
+      frames-per-row: 148
+      image-size: [ 30, 300 ]
+    }
+
+    $slider-bi: {
+      extends: $slider
+      image: knobs/slider-bi.png
+    }
+    
+    // ------------------------------------------------
+
+    $param-value: {
+      extends: [ "$main-text", "$knob" ]
+      text: $value
+      text-align: center
+    }
+
+    $param-value-dark: {
+      extends: $param-value
+      text-color: $text-dark
+    }
+    
+    
+    // ------------------------------------------------
+
+    $number: {
+      extends: [ "$main-text", "$knob" ]
+      text: $frame
+      text-align: center
+    }
+
+    $number-dark: {
+      extends: $param-value
+      text-color: $text-dark
+    }
+    
+    // ------------------------------------------------
+
+    $pitch-number: {
+      detune: {
+        image: knobs/number.png
+        frames: 100
+        image-size: [ 26, 22 ]
+      }
+
+      transpose: {
+        image: knobs/number.png
+        frames: 100
+        image-size: [ 26, 22 ]
+      }
+
+      sign: {
+        image: knobs/sign.png
+        frames: 2
+        frames-per-row: 2
+        image-size: [ 10, 22 ]
+      }
+    }
+
+    $pitch-number-dark: {
+      extends: $pitch-number
+
+      detune: {
+        image: knobs/number-dark.png
+      }
+
+      transpose: {
+        image: knobs/number-dark.png
+      }
+
+      sign: {
+        image: knobs/sign-dark.png
+      }
+    }
+
+    // ------------------------------------------------
+
+    $points-small: {
+      image: points/white.png
+      image-offset: [40, 80]
+
+      selected: { image-offset: [40, 160] }
+      hovering: { image-offset: [40, 40] }
+      pressed: { image-offset: [40, 0] }
+    }
+
+    $points: {
+      image: points/white.png
+      image-offset: [0, 80]
+
+      selected: { image-offset: [0, 160] }
+      hovering: { image-offset: [0, 40] }
+      pressed: { image-offset: [0, 0] }
+    }
+    
+    // ------------------------------------------------
+
+    $red-points-small: {
+      extends: $points-small
+      image: points/red.png
+    }
+
+    $red-points: {
+      extends: $points
+      image: points/red.png
+    }
+
+    // ------------------------------------------------
+
+    $yellow-points-small: {
+      extends: $points-small
+      image: points/yellow.png
+    }
+
+    $yellow-points: {
+      extends: $points
+      image: points/yellow.png
+    }
+    
+    // ------------------------------------------------
+
+    $main-font: {
+      map: fonts/map.png
+      description: fonts/map.json
+    }
+
+    $small-font: {
+      map: fonts/small-map.png
+      description: fonts/small-map.json
+    }
+
+    $main-font-2: {
+      font: fonts/font.ttf
+      font-size: 18
+    }
+    
+    // ------------------------------------------------
+
+  }
+
+  // ------------------------------------------------
+
+  font: $main-font
+  font-small: $small-font 
+
+  // ------------------------------------------------
+
+  background: background.png
+
+  // ------------------------------------------------
+
+  tooltip: {
+    background: {
+      image: tooltip.png
+      edges: [ 4, 4, 4, 4 ]
+    }
+    font: $main-font
+    text-color: $text-light
+  }
+
+  // ------------------------------------------------
+
+  scrollbar: {
+    background-color: [ 102, 102, 100 ]
+
+    hovering: { background-color: [ 112, 112, 111 ] }
+  }
+
+  knob: $blue-knob
+  
+  // ------------------------------------------------
+
+}

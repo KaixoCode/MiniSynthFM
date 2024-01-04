@@ -1,0 +1,90 @@
+<module name="Synth" var-name="Synth" interface="normal">
+
+  <!-- ================================================ -->
+
+  <param name="Pitch Bend Parameter"
+         default="0.5"/>
+  
+  <!-- ================================================ -->
+
+  <module name="Oscillator" short-name="Osc" count="3">
+    <param name="Volume"
+           description="Oscillator volume."
+           default="0"
+           transform="Decibel[0.f, 1.9952623149688795f]"
+           format="Decibels"/>
+
+    <param name="Tune"
+           description="Oscillator tune."
+           default="0"
+           transform="Range[-12.f, 12.f]"
+           format="Pitch"/>
+  </module>
+
+  <!-- ================================================ -->
+
+  <param name="Voices" 
+         default="8" 
+         steps="8" 
+         transform="Integer[1, 8]"
+         format="Integer"/>
+
+  <param name="Legato" 
+         default="1" 
+         steps="2" 
+         transform="Group[2]" 
+         format="Group[Off, On]"/>
+
+  <!-- ================================================ -->
+
+  <module name="Lfo" count="2">
+    <param name="Time"
+           default="8000"
+           transform="InvPower[128000.f, 1.f, 4.f]"
+           format="Time"/>
+
+    <param name="Tempo"
+           default="0.5"
+           steps="13"
+           transform="Group[13]"
+           format="Group[Freeze, 32/1, 16/1, 8/1, 4/1, 2/1, 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64]"/>
+
+    <param name="Synced"
+           default="0"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Off, On]"/>
+
+    <param name="Depth"
+           default="100"
+           transform="Range[0.f, 100.f]"
+           format="Percent"/>
+  </module>
+
+  <!-- ================================================ -->
+
+  <module name="Envelope" short-name="Env" count="2">
+    <param name="Attack"
+           default="1"
+           transform="Power[0.f, 20000.f, 4.f]"
+           format="Time"/>
+
+    <param name="Decay"
+           default="200"
+           transform="Power[0.f, 20000.f, 4.f]"
+           format="Time"/>
+
+    <param name="Sustain"
+           default="100"
+           transform="Range[0.f, 100.f]"
+           format="Percent"/>
+
+    <param name="Release"
+           default="60"
+           transform="Power[0.f, 20000.f, 4.f]"
+           format="Time"/>
+  </module>
+
+  <!-- ================================================ -->
+
+</module>

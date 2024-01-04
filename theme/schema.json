@@ -1,0 +1,40 @@
+{
+  "envelope": {
+    "parameters": {
+      "attack": "drawable",
+      "decay": "drawable",
+      "sustain": "drawable",
+      "release": "drawable"
+    }
+  },
+  "lfo": {
+    "parameters": {
+      "time": "drawable",
+      "synced": "drawable",
+      "tempo": "drawable",
+      "depth": "drawable"
+    }
+  },
+  "global": {
+    "parameters": {
+      "volume": "drawable",
+      "glide": "drawable",
+      "transpose": {
+        "sign": "drawable",
+        "detune": "drawable",
+        "transpose": "drawable"
+      },
+      "legato": "drawable",
+      "voices": "drawable",
+      "quality": "drawable"
+    }
+  },
+  "knob": "drawable",
+  "tooltip": {
+    "text-color": "color",
+    "font": "font",
+    "background": "drawable"
+  },
+  "background": "drawable",
+  "scrollbar": "drawable"
+}
