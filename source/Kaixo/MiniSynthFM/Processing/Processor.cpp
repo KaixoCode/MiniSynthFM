@@ -11,6 +11,7 @@ namespace Kaixo::Processing {
 
     MiniSynthFMProcessor::MiniSynthFMProcessor() {
         registerModule(parameters);
+        registerModule(voices[0]);
     }
 
     // ------------------------------------------------
@@ -19,7 +20,9 @@ namespace Kaixo::Processing {
         for (std::size_t i = 0; i < inputBuffer().size(); ++i) {
             parameters.process();
 
-            // outputBuffer()[i] = ...;
+            voices[0].process();
+
+            outputBuffer()[i] = voices[0].output;
         }
     }
 

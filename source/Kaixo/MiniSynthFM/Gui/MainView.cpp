@@ -37,6 +37,58 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
+        add<Knob>({ 0, 0, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.oscillator[0].tune
+        });
+        
+        add<Knob>({ 0, 50, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.oscillator[1].tune
+        });
+        
+        add<Knob>({ 0, 100, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.oscillator[2].tune
+        });
+        
+        add<Knob>({ 50, 0, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.oscillator[0].volume
+        });
+        
+        add<Knob>({ 50, 50, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.oscillator[1].volume
+        });
+        
+        add<Knob>({ 50, 100, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.oscillator[2].volume
+        });
+        
+        add<Knob>({ 100, 0, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.envelope[0].attack
+        });
+        
+        add<Knob>({ 100, 50, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.envelope[0].decay
+        });
+        
+        add<Knob>({ 100, 100, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.envelope[0].sustain
+        });
+        
+        add<Knob>({ 100, 150, 50, 50 }, {
+            .graphics = T.knob,
+            .param = Synth.envelope[0].release
+        });
+
+        // ------------------------------------------------
+        
     }
 
     // ------------------------------------------------
