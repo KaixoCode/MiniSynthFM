@@ -70,25 +70,25 @@
            default="1"
            transform="Power[0.f, 20000.f, 4.f]"
            format="Time"
-           interface="$self.voices[0].envelope[$envelope].attack($value * $value * $value * $value * 20000)"/>
+           interface="$self.params.envelope[$envelope].attack($value * $value * $value * $value * 20000)"/>
 
     <param name="Decay"
            default="200"
            transform="Power[0.f, 20000.f, 4.f]"
            format="Time"
-           interface="$self.voices[0].envelope[$envelope].decay($value * $value * $value * $value * 20000)"/>
+           interface="$self.params.envelope[$envelope].decay($value * $value * $value * $value * 20000)"/>
 
     <param name="Sustain"
            default="100"
            transform="Range[0.f, 100.f]"
            format="Percent"
-           interface="$self.voices[0].envelope[$envelope].sustain($value)"/>
+           interface="$self.params.envelope[$envelope].sustain($value)"/>
 
     <param name="Release"
            default="60"
            transform="Power[0.f, 20000.f, 4.f]"
            format="Time"
-           interface="$self.voices[0].envelope[$envelope].release($value * $value * $value * $value * 20000)"/>
+           interface="$self.params.envelope[$envelope].release($value * $value * $value * $value * 20000)"/>
   </module>
 
   <!-- ================================================ -->
