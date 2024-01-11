@@ -13,14 +13,14 @@
            default="0"
            transform="Decibel[0.f, 1.9952623149688795f]"
            format="Decibels"
-           interface="$self.voices[0].oscillator[$oscillator].volume($value * 2)"/>
+           interface="$self.params.oscillator[$oscillator].volume($value * 2)"/>
 
     <param name="Tune"
            description="Oscillator tune."
            default="0"
            transform="Range[-12.f, 12.f]"
            format="Pitch"
-           interface="$self.voices[0].oscillator[$oscillator].tune($value * 24 - 12)"/>
+           interface="$self.params.oscillator[$oscillator].tune($value * 24 - 12)"/>
   </module>
 
   <!-- ================================================ -->

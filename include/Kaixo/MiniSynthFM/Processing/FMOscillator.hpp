@@ -15,12 +15,46 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    enum class Waveform { Sine, Triangle, Saw, Square, Amount };
+
+    // ------------------------------------------------
+    
+    struct FMOscillatorParameters : public Module {
+
+        // ------------------------------------------------
+
+        void volume(float v) { m_Volume = v; }
+        void tune(Note t) { m_Tune = t; }
+
+        void waveform(Waveform wf) { m_Waveform = wf; }
+        void waveform(float val) { m_Waveform = normalToIndex(val, Waveform::Amount); }
+
+        // ------------------------------------------------
+    private:
+        float m_Volume;
+        Note m_Tune;
+        Waveform m_Waveform;
+
+        // ------------------------------------------------
+        
+        friend class FMOscillator;
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+
     class FMOscillator : public Module {
     public:
 
         // ------------------------------------------------
-
-        enum class Waveform { Sine, Triangle, Saw, Square, Amount };
+        
+        FMOscillatorParameters& params;
+        
+        // ------------------------------------------------
+        
+        FMOscillator(FMOscillatorParameters& p) : params(p) {}
 
         // ------------------------------------------------
 
@@ -34,34 +68,15 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void note(float note) {
-            if (m_Note != note) {
-                m_Note = note;
-                updateFrequency();
-            }
-        }
+        void note(float note) { m_Note = note; }
 
-        void tune(float noteOffset) {
-            if (m_Tune != noteOffset) {
-                m_Tune = noteOffset;
-                updateFrequency();
-            }
-        }
-
-        void fm(float phase) {
-            m_PhaseModulation += phase;
-        }
-
-        void volume(float v) { m_Volume = v; }
-
-        void waveform(Waveform wf) { m_Waveform = wf; }
-        void waveform(float val) { m_Waveform = normalToIndex(val, Waveform::Amount); }
+        void fm(float phase) { m_PhaseModulation += phase; }
 
         // ------------------------------------------------
 
         float at(float p) {
             // requires 0 <= p <= 1
-            switch (m_Waveform) {
+            switch (params.m_Waveform) {
             case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
             case Waveform::Triangle: return 0;
             case Waveform::Saw: return Math::Fast::saw(p, m_Frequency / sampleRate());
@@ -72,9 +87,10 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         void process() override {
+            updateFrequency();
             float phase = m_Phase + m_PhaseModulation;
             float wave = at(Math::Fast::fmod1(phase + 10));
-            output = wave * m_Volume;
+            output = wave * params.m_Volume;
             m_Phase = Math::Fast::fmod1(m_Phase + m_Frequency / sampleRate());
             m_PhaseModulation = 0;
         }
@@ -85,21 +101,15 @@ namespace Kaixo::Processing {
         float m_Phase = 0;
         float m_PhaseModulation = 0;
         float m_Frequency = 440;
-        float m_Volume = 1;
-
-        // ------------------------------------------------
-
-        Waveform m_Waveform = Waveform::Sine;
 
         // ------------------------------------------------
 
         Note m_Note = 0;
-        Note m_Tune = 0;
 
         // ------------------------------------------------
 
         void updateFrequency() {
-            m_Frequency = noteToFreq(m_Note + m_Tune);
+            m_Frequency = noteToFreq(m_Note + params.m_Tune);
         }
 
         // ------------------------------------------------
