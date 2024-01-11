@@ -18,7 +18,13 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::process() {
-        voices.process();
+        for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
+            parameters.process();
+            for (auto& voice : voices) {
+                voice.process();
+                outputBuffer()[i] += voice.result;
+            }
+        }
     }
 
     // ------------------------------------------------

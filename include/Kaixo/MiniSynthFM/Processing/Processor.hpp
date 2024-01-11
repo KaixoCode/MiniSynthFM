@@ -41,7 +41,7 @@ namespace Kaixo::Processing {
 
         VoiceParameters params;
         
-        VoiceBank<MiniSynthFMVoice, Voices, true> voices{ params, params, params, params, params, params, params, params };
+        VoiceBank<MiniSynthFMVoice, Voices> voices{ params, params, params, params, params, params, params, params };
 
         // ------------------------------------------------
 

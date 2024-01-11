@@ -19,38 +19,14 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void attack(float millis) {
-            if (m_AttackMillis != millis) {
-                m_AttackMillis = millis;
-                updateAttack();
-            }
-        }
-
-        void decay(float millis) {
-            if (m_DecayMillis != millis) {
-                m_DecayMillis = millis;
-                updateDecay();
-            }
-        }
-
-        void release(float millis) {
-            if (m_ReleaseMillis != millis) {
-                m_ReleaseMillis = millis;
-                updateRelease();
-            }
-        }
-
-        void sustain(float level) { m_Sustain = level; }
+        void attack(float millis);
+        void decay(float millis);
+        void release(float millis);
+        void sustain(float level);
 
         // ------------------------------------------------
 
-        void prepare(double sampleRate, std::size_t maxBufferSize) override {
-            Module::prepare(sampleRate, maxBufferSize);
-
-            updateAttack();
-            updateDecay();
-            updateRelease();
-        }
+        void prepare(double sampleRate, std::size_t maxBufferSize) override;
 
         // ------------------------------------------------
 
@@ -96,7 +72,7 @@ namespace Kaixo::Processing {
         
         // ------------------------------------------------
 
-        ADSREnvelope(ADSREnvelopeParameters& p) : params(p) {}
+        ADSREnvelope(ADSREnvelopeParameters& p);
 
         // ------------------------------------------------
 
@@ -109,74 +85,14 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void gate(bool gate) {
-            if (gate) trigger();
-            else release();
-        }
-
-        void release() {
-            if (m_State != State::Idle) {
-                m_State = State::Release;
-                m_Phase = 0;
-                m_ReleaseValue = output;
-            }
-        }
-
-        void trigger() {
-            m_State = State::Attack;
-            m_Phase = 0;
-            m_AttackValue = output;
-        }
+        void gate(bool gate);
+        void release();
+        void trigger();
 
         // ------------------------------------------------
 
-        void process() override {
-            switch (m_State) {
-            case State::Idle: output = 0; break;
-            case State::Sustain: output = params.m_Sustain; break;
-            case State::Attack:
-                m_Phase += 1 / params.m_Attack;
-                if (m_Phase >= 1.0) {
-                    output = 1;
-                    m_Phase = 0;
-                    m_State = State::Decay;
-                }
-                else {
-                    output = m_AttackValue + (1 - m_AttackValue) * m_Phase;
-                }
-                break;
-            case State::Decay:
-                m_Phase += 1 / params.m_Decay;
-                if (m_Phase >= 1.0) {
-                    output = params.m_Sustain;
-                    m_Phase = 0;
-                    m_State = State::Sustain;
-                }
-                else {
-                    output = 1 - (1 - params.m_Sustain) * m_Phase;
-                }
-                break;
-            case State::Release:
-                m_Phase += 1 / params.m_Release;
-                if (m_Phase >= 1.0) {
-                    output = 0;
-                    m_Phase = 0;
-                    m_State = State::Idle;
-                }
-                else {
-                    output = m_ReleaseValue - m_ReleaseValue * m_Phase;
-                }
-                break;
-            }
-        }
-
-        void reset() override {
-            Module::reset();
-
-            m_State = State::Idle;
-            m_Phase = 0;
-            output = 0;
-        }
+        void process() override;
+        void reset() override;
 
         // ------------------------------------------------
 

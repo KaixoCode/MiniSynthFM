@@ -1,0 +1,55 @@
+
+// ------------------------------------------------
+
+#include "Kaixo/MiniSynthFM/Processing/FMOscillator.hpp"
+
+// ------------------------------------------------
+
+namespace Kaixo::Processing {
+
+    // ------------------------------------------------
+
+    FMOscillator::FMOscillator(FMOscillatorParameters& p) 
+        : params(p) 
+    {}
+
+    // ------------------------------------------------
+
+    void FMOscillator::trigger() {
+        m_Phase = 0;
+    }
+
+    // ------------------------------------------------
+
+    void FMOscillator::process() {
+        updateFrequency();
+        float phase = m_Phase + m_PhaseModulation;
+        float wave = at(Math::Fast::fmod1(phase + 10));
+        output = wave * params.m_Volume;
+        m_Phase = Math::Fast::fmod1(m_Phase + m_Frequency / sampleRate());
+        m_PhaseModulation = 0;
+    }
+
+    // ------------------------------------------------
+
+    void FMOscillator::updateFrequency() {
+        m_Frequency = noteToFreq(m_Note + params.m_Tune);
+    }
+
+    // ------------------------------------------------
+
+    float FMOscillator::at(float p) {
+        // requires 0 <= p <= 1
+        switch (params.m_Waveform) {
+        case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
+        case Waveform::Triangle: return 0;
+        case Waveform::Saw: return Math::Fast::saw(p, m_Frequency / sampleRate());
+        case Waveform::Square: return 0;
+        }
+    }
+
+    // ------------------------------------------------
+
+}
+
+// ------------------------------------------------

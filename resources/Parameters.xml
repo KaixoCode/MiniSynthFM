@@ -7,20 +7,32 @@
   
   <!-- ================================================ -->
 
-  <module name="Oscillator" short-name="Osc" count="3">
+  <module name="Operator" short-name="Op" var-name="oscillator" count="3">
     <param name="Volume"
-           description="Oscillator volume."
+           description="Operator volume."
            default="0"
            transform="Decibel[0.f, 1.9952623149688795f]"
            format="Decibels"
            interface="$self.params.oscillator[$oscillator].volume($value * 2)"/>
 
     <param name="Tune"
-           description="Oscillator tune."
+           description="Operator tune."
            default="0"
            transform="Range[-12.f, 12.f]"
            format="Pitch"
            interface="$self.params.oscillator[$oscillator].tune($value * 24 - 12)"/>
+
+    <param name="FM"
+           description="Operator FM."
+           default="0"
+           transform="Range[0.f, 100.f]"
+           format="Percent"
+           interface="$self.params.fm[$oscillator] = $value * 4">
+      <index if="$oscillator=0" name="FM -> Op 3"></index>
+      <index if="$oscillator=1" name="FM -> Op 1"></index>
+      <index if="$oscillator=2" name="FM -> Op 2"></index>
+    </param>
+      
   </module>
 
   <!-- ================================================ -->
