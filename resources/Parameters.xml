@@ -7,7 +7,7 @@
   
   <!-- ================================================ -->
 
-  <module name="Operator" short-name="Op" var-name="oscillator" count="3">
+  <module name="Operator" short-name="Op" var-name="oscillator" count="3">    
     <param name="Volume"
            description="Operator volume."
            default="0"
@@ -22,6 +22,11 @@
            format="Pitch"
            interface="$self.params.oscillator[$oscillator].tune($value * 24 - 12)"/>
 
+    <param name="Octave"
+           default="0" 
+           transform="Group[5]"
+           format="Group[-2, -1, 0, 1, 2]"/>
+    
     <param name="FM"
            description="Operator FM."
            default="0"
@@ -78,6 +83,11 @@
   <!-- ================================================ -->
 
   <module name="Envelope" short-name="Env" count="2">
+    <param name="Loop"
+           default="0"
+           transform="Group[2]"
+           format="Group[Off, On]"/>
+    
     <param name="Attack"
            default="1"
            transform="Power[0.f, 20000.f, 4.f]"
@@ -103,6 +113,21 @@
            interface="$self.params.envelope[$envelope].release($value * $value * $value * $value * 20000)"/>
   </module>
 
+  <!-- ================================================ -->
+
+  <module name="Filter">
+    <param name="Frequency"
+           short-name="Freq"
+           default="16000"
+           transform="Power[10.f, 16000.f, 4.f]"
+           format="Frequency"/>
+
+    <param name="Type"
+           default="2"
+           transform="Range[0.f, 2.f]"
+           format="GroupMix[HP, BP, LP]"/>
+  </module>
+  
   <!-- ================================================ -->
 
 </module>
