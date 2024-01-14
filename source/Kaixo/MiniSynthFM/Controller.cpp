@@ -20,6 +20,10 @@ namespace Kaixo {
         Gui::T.initialize();
 
         // ------------------------------------------------
+        
+        linkPitchWheel(Synth.pitchBendParameter);
+
+        // ------------------------------------------------
 
     }
 

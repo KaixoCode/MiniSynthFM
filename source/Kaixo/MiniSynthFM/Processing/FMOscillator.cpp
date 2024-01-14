@@ -22,10 +22,16 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void FMOscillator::process() {
+        auto timer = 10 * sampleRate() / 1000.;
+        if (m_Counter++ > timer) {
+            m_RandomTune = m_Random.next();
+            m_Counter = 0;
+        }
+
         updateFrequency();
         float phase = m_Phase + m_PhaseModulation;
-        float wave = at(Math::Fast::fmod1(phase + 10));
-        output = wave * params.m_Volume;
+        output = at(Math::Fast::fmod1(phase + 10));
+        fmOutput = fmAt(Math::Fast::fmod1(phase + 10));
         m_Phase = Math::Fast::fmod1(m_Phase + m_Frequency / sampleRate());
         m_PhaseModulation = 0;
     }
@@ -33,7 +39,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void FMOscillator::updateFrequency() {
-        m_Frequency = noteToFreq(m_Note + params.m_Tune);
+        m_Frequency = noteToFreq(m_Note + params.m_Tune + params.m_Octave * 12 + m_RandomTune * 0.1 - 0.05);
     }
 
     // ------------------------------------------------
@@ -42,9 +48,19 @@ namespace Kaixo::Processing {
         // requires 0 <= p <= 1
         switch (params.m_Waveform) {
         case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
-        case Waveform::Triangle: return 0;
-        case Waveform::Saw: return Math::Fast::saw(p, m_Frequency / sampleRate());
-        case Waveform::Square: return 0;
+        case Waveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * p);
+        case Waveform::Saw: return Math::Fast::saw(p, Math::Fast::max(1.5 * m_Frequency / sampleRate(), 0.002));
+        case Waveform::Square: return p > 0.5 ? 1 : -1;
+        }
+    }
+
+    float FMOscillator::fmAt(float p) {
+        // requires 0 <= p <= 1
+        switch (params.m_Waveform) {
+        case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
+        case Waveform::Triangle: return 2 * (2 * p - 1) * ((2 * p - 1) * Math::Fast::sign(0.5 - p) + 1);
+        case Waveform::Saw: return 4 * (p - p * p);
+        case Waveform::Square: return 1 - Math::Fast::abs(2 - 4 * p);
         }
     }
 

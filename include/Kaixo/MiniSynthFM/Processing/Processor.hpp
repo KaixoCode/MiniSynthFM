@@ -49,6 +49,27 @@ namespace Kaixo::Processing {
     
     // ------------------------------------------------
 
+    class EnvelopeInterface : public TypedInterface<float()> {
+    public:
+
+        // ------------------------------------------------
+
+        struct Settings {
+            std::size_t index;
+        } settings;
+
+        // ------------------------------------------------
+
+        float operator()() override {
+            return self<MiniSynthFMProcessor>().voices.lastTriggered().envelope[settings.index].output;
+        }
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+
 }
     
 // ------------------------------------------------

@@ -30,11 +30,14 @@
     }
   },
   "knob": "drawable",
+  "slider": "drawable",
+  "led": "drawable",
   "tooltip": {
     "text-color": "color",
     "font": "font",
     "background": "drawable"
   },
+  "text": "text-area",
   "background": "drawable",
   "scrollbar": "drawable"
 }

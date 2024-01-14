@@ -72,6 +72,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void ADSREnvelope::process() {
+        auto powerPhase = (1 - (1 - m_Phase) * (1 - m_Phase) * (1 - m_Phase) * (1 - m_Phase));
         switch (m_State) {
         case State::Idle: output = 0; break;
         case State::Sustain: output = params.m_Sustain; break;
@@ -82,7 +83,7 @@ namespace Kaixo::Processing {
                 m_Phase = 0;
                 m_State = State::Decay;
             } else {
-                output = m_AttackValue + (1 - m_AttackValue) * m_Phase;
+                output = m_AttackValue + (1 - m_AttackValue) * powerPhase;
             }
             break;
         case State::Decay:
@@ -92,7 +93,7 @@ namespace Kaixo::Processing {
                 m_Phase = 0;
                 m_State = State::Sustain;
             } else {
-                output = 1 - (1 - params.m_Sustain) * m_Phase;
+                output = 1 - (1 - params.m_Sustain) * powerPhase;
             }
             break;
         case State::Release:
@@ -102,7 +103,7 @@ namespace Kaixo::Processing {
                 m_Phase = 0;
                 m_State = State::Idle;
             } else {
-                output = m_ReleaseValue - m_ReleaseValue * m_Phase;
+                output = m_ReleaseValue - m_ReleaseValue * powerPhase;
             }
             break;
         }

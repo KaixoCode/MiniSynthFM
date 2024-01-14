@@ -4,6 +4,7 @@
 
 #include "Kaixo/Core/Definitions.hpp"
 #include "Kaixo/Core/Processing/Module.hpp"
+#include "Kaixo/Core/Processing/Random.hpp"
 
 // ------------------------------------------------
 
@@ -23,17 +24,17 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void volume(float v) { m_Volume = v; }
         void tune(Note t) { m_Tune = t; }
+        void octave(int o) { m_Octave = o; }
 
         void waveform(Waveform wf) { m_Waveform = wf; }
         void waveform(float val) { m_Waveform = normalToIndex(val, Waveform::Amount); }
 
         // ------------------------------------------------
     private:
-        float m_Volume;
-        Note m_Tune;
-        Waveform m_Waveform;
+        Note m_Tune = 0;
+        int m_Octave = 0;
+        Waveform m_Waveform = Waveform::Sine;
 
         // ------------------------------------------------
         
@@ -59,6 +60,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         float output{};
+        float fmOutput{};
 
         // ------------------------------------------------
 
@@ -85,12 +87,19 @@ namespace Kaixo::Processing {
         Note m_Note = 0;
 
         // ------------------------------------------------
+        
+        Random m_Random;
+        float m_RandomTune = 0;
+        std::size_t m_Counter = 0;
+
+        // ------------------------------------------------
 
         void updateFrequency();
 
         // ------------------------------------------------
 
         float at(float p);
+        float fmAt(float p);
 
         // ------------------------------------------------
 

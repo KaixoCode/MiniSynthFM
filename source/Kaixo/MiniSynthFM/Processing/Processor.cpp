@@ -13,6 +13,8 @@ namespace Kaixo::Processing {
         registerModule(parameters);
         registerModule(params);
         registerModule(voices);
+
+        registerInterface<EnvelopeInterface>();
     }
 
     // ------------------------------------------------
