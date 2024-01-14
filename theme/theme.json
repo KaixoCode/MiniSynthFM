@@ -302,8 +302,8 @@
         text: {
           font: $main-font
           color: $text-dark
-          content: "$name"
-          position: [ 0, 57 ]
+          content: "$short-name"
+          position: [ 0, 60 ]
           align: center 
         }
 
@@ -341,8 +341,8 @@
         text: {
           font: $main-font
           color: $text-dark
-          content: "$name"
-          position: [ 0, 23 ]
+          content: "$short-name"
+          position: [ 0, 22 ]
           align: center
         }
 
@@ -362,8 +362,139 @@
       source: knobs/led.png
       frames: 100
       frames-per-row: 10
-      size: [ 12, 12 ]
+      size: [ 13, 13 ]
     }
+  }
+
+  toggle: {
+    extends: $knob
+
+    layers: {
+      toggle: {
+        image: {
+          source: knobs/toggle.png
+          size: [ 29, 19 ]
+          position: [ 0, 2 ]
+        }
+
+        selected: {
+          image-offset: [0, 19]
+        }
+      }
+
+      name: {
+        text: {
+          font: $main-font
+          color: $text-dark
+          content: "$short-name" 
+          position: [ 34, 6 ]
+          align: top-left
+        }
+      }
+    }
+  }
+
+  threeway-toggle: {
+    extends: $knob
+
+    layers: {
+      toggle: {
+        image: {
+          source: knobs/threeway-toggle.png
+          size: [ 29, 19 ]
+          frames: 3
+          position: [ 0, 2 ]
+        }
+      }
+
+      name: {
+        text: {
+          font: $main-font
+          color: $text-dark
+          content: "$short-name" 
+          position: [ 34, 6 ]
+          align: top-left
+        }
+      }
+    }
+  }
+
+  output-jack: {
+    extends: $knob
+
+    layers: {
+      jack: {
+        image: {
+          source: knobs/jack.png
+          position: [ 21, 4 ]
+        }
+      }
+
+      name: {
+        image: {
+          source: knobs/out-jack-text-background.png
+          position: [12, 32]
+          size: [40, 15]
+          edges: [2, 2, 2, 2]
+        }
+
+        text: {
+          content: Out
+          font: $main-font
+          color: [37, 37, 37]
+          align: center
+          position: [0, 16]
+        }
+      }
+    }
+  }
+
+  input-jack: {
+    extends: $knob
+
+    layers: {
+      jack: {
+        image: {
+          source: knobs/jack.png
+          position: [ 21, 4 ]
+        }
+      }
+
+      name: {
+        text: {
+          content: $text
+          font: $main-font
+          color: $text-dark
+          align: center
+          position: [0, 16]
+        }
+      }
+    }
+  }
+
+  cable1: {
+    end: knobs/cable1.png
+    color: [214, 92, 92]
+  }
+
+  cable2: {
+    end: knobs/cable2.png
+    color: [214, 181, 92]
+  }
+
+  cable3: {
+    end: knobs/cable3.png
+    color: [99, 214, 92]
+  }
+
+  cable4: {
+    end: knobs/cable4.png
+    color: [92, 158, 214]
+  }
+
+  cable5: {
+    end: knobs/cable5.png
+    color: [140, 92, 214]
   }
 
   text: $text-area

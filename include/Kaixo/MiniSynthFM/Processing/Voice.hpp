@@ -27,6 +27,7 @@ namespace Kaixo::Processing {
         float frequency;
         float resonance;
         float drive;
+        bool enable;
 
         // ------------------------------------------------
 
@@ -53,6 +54,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
         
         void process() override;
+        void prepare(double sampleRate, std::size_t maxBufferSize) override;
 
         // ------------------------------------------------
         
@@ -66,6 +68,8 @@ namespace Kaixo::Processing {
         Random m_Random{};
         std::size_t m_Counter = 0;
         float m_RandomFreq{};
+        float m_FrequencyModulation{};
+        float m_Ratio = 0.99;
 
         // ------------------------------------------------
 
@@ -88,7 +92,13 @@ namespace Kaixo::Processing {
         float volume[Oscillators]{};
         float envelopeLevel[Envelopes]{};
 
+        bool outputOscillator[Oscillators]{};
+
         float pitchBend = 0;
+
+        // ------------------------------------------------
+        
+        bool routing[(int)ModSource::Amount][(int)ModDestination::Amount]{};
 
         // ------------------------------------------------
 
@@ -121,6 +131,8 @@ namespace Kaixo::Processing {
         void release() override;
 
         // ------------------------------------------------
+
+        void doModulations();
 
         void process() override;
 

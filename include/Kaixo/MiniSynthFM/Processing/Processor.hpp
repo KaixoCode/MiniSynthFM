@@ -49,7 +49,7 @@ namespace Kaixo::Processing {
     
     // ------------------------------------------------
 
-    class EnvelopeInterface : public TypedInterface<float()> {
+    class EnvelopeInterface : public SynchronousInterface<float()> {
     public:
 
         // ------------------------------------------------
@@ -60,8 +60,44 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float operator()() override {
+        float call() override {
             return self<MiniSynthFMProcessor>().voices.lastTriggered().envelope[settings.index].output;
+        }
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+    
+    class LfoInterface : public SynchronousInterface<float()> {
+    public:
+
+        // ------------------------------------------------
+
+        struct Settings {
+            std::size_t index;
+        } settings;
+
+        // ------------------------------------------------
+
+        float call() override {
+            return self<MiniSynthFMProcessor>().voices.lastTriggered().envelope[settings.index].output;
+        }
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+    
+    class ModInterface : public SynchronousInterface<void(ModSource, ModDestination, bool)> {
+    public:
+
+        // ------------------------------------------------
+
+        void call(ModSource source, ModDestination destination, bool val) override {
+            self<MiniSynthFMProcessor>().params.routing[(int)source][(int)destination] = val;
         }
 
         // ------------------------------------------------

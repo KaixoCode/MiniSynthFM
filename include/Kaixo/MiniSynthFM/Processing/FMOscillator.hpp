@@ -76,11 +76,17 @@ namespace Kaixo::Processing {
         void process() override;
 
         // ------------------------------------------------
+        
+        void hardSync(FMOscillator& osc);
+        void resetPhase();
+
+        // ------------------------------------------------
 
     private:
         float m_Phase = 0;
         float m_PhaseModulation = 0;
         float m_Frequency = 440;
+        bool m_DidCycle = false;
 
         // ------------------------------------------------
 

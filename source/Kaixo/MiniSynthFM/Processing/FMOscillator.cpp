@@ -29,17 +29,35 @@ namespace Kaixo::Processing {
         }
 
         updateFrequency();
+        float delta = m_Frequency / sampleRate();
         float phase = m_Phase + m_PhaseModulation;
         output = at(Math::Fast::fmod1(phase + 10));
         fmOutput = fmAt(Math::Fast::fmod1(phase + 10));
-        m_Phase = Math::Fast::fmod1(m_Phase + m_Frequency / sampleRate());
+        m_Phase = Math::Fast::fmod1(m_Phase + delta);
         m_PhaseModulation = 0;
+
+        m_DidCycle = m_Phase < delta;
+    }
+
+    // ------------------------------------------------
+    
+    void FMOscillator::hardSync(FMOscillator& osc) {
+        if (osc.m_DidCycle) {
+            float ratio = m_Frequency / osc.m_Frequency;
+            m_Phase = Math::Fast::fmod1(osc.m_Phase * ratio);
+        }
+    }
+
+    // ------------------------------------------------
+    
+    void FMOscillator::resetPhase() {
+        m_Phase = 0;
     }
 
     // ------------------------------------------------
 
     void FMOscillator::updateFrequency() {
-        m_Frequency = noteToFreq(m_Note + params.m_Tune + params.m_Octave * 12 + m_RandomTune * 0.1 - 0.05);
+        m_Frequency = noteToFreq(m_Note + params.m_Tune + params.m_Octave * 12 + m_RandomTune * 0.05 - 0.025);
     }
 
     // ------------------------------------------------

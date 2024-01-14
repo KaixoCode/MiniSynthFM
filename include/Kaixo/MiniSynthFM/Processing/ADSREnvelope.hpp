@@ -19,6 +19,10 @@ namespace Kaixo::Processing {
     struct ADSREnvelopeParameters : public Module {
 
         // ------------------------------------------------
+        
+        bool loop = false;
+
+        // ------------------------------------------------
 
         void attack(float millis);
         void decay(float millis);

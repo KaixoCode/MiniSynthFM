@@ -30,8 +30,18 @@
     }
   },
   "knob": "drawable",
+  "cable1": { "color": "color", "end": "drawable" },
+  "cable2": { "color": "color", "end": "drawable" },
+  "cable3": { "color": "color", "end": "drawable" },
+  "cable4": { "color": "color", "end": "drawable" },
+  "cable5": { "color": "color", "end": "drawable" },
   "slider": "drawable",
   "led": "drawable",
+  "input-jack": "drawable",
+  "textless-input-jack": "drawable",
+  "output-jack": "drawable",
+  "toggle": "drawable",
+  "threeway-toggle": "drawable",
   "tooltip": {
     "text-color": "color",
     "font": "font",

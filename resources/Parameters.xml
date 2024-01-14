@@ -10,28 +10,24 @@
 
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">
     <param name="Volume"
-           description="Operator volume."
            default="0"
            transform="Decibel[0.f, 1.9952623149688795f]"
            format="Decibels"
            interface="$self.params.volume[$oscillator] = $value * 2">
-      <index if="$oscillator=1" default="-INFINITY"/>
-      <index if="$oscillator=2" default="-INFINITY"/>
     </param>
 
     <param name="Tune"
-           description="Operator tune."
            default="0"
            transform="Range[-12.f, 12.f]"
            format="Pitch"
            interface="$self.params.oscillator[$oscillator].tune($value * 24 - 12)"/>
 
     <param name="Octave"
-           default="2" 
-           steps="5"
-           transform="Group[5]"
-           format="Group[-2, -1, 0, 1, 2]"
-           interface="$self.params.oscillator[$oscillator].octave(normalToIndex($value, 5) - 2)"/>
+           default="1" 
+           steps="3"
+           transform="Group[3]"
+           format="Group[-1, 0, 1]"
+           interface="$self.params.oscillator[$oscillator].octave(normalToIndex($value, 3) - 1)"/>
     
     <param name="Wave"
            default="0" 
@@ -41,16 +37,20 @@
            interface="$self.params.oscillator[$oscillator].waveform($value)"/>
     
     <param name="FM" var-name="fm"
-           description="Operator FM."
-           default="0"
+           default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
-           interface="$self.params.fm[$oscillator] = $value * 4">
-      <index if="$oscillator=0" name="FM -> Op 3"></index>
-      <index if="$oscillator=1" name="FM -> Op 1"></index>
-      <index if="$oscillator=2" name="FM -> Op 2"></index>
+           interface="$self.params.fm[$oscillator] = $value * 4"/>
+
+    <param name="Output"
+           default="1"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.params.outputOscillator[$oscillator] = $value > 0.5">
+      <index if="oscillator=1 or oscillator=2" default="0"/>
     </param>
-      
+
   </module>
 
   <!-- ================================================ -->
@@ -69,28 +69,36 @@
 
   <!-- ================================================ -->
 
-  <module name="Lfo" count="2">
+  <module name="Lfo" count="1" namespace="{name}" short-namespace="{short-name}">
     <param name="Time"
-           default="8000"
-           transform="InvPower[128000.f, 1.f, 4.f]"
-           format="Time"/>
-
-    <param name="Tempo"
-           default="0.5"
-           steps="13"
-           transform="Group[13]"
-           format="Group[Freeze, 32/1, 16/1, 8/1, 4/1, 2/1, 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64]"/>
-
-    <param name="Synced"
-           default="0"
-           steps="2"
-           transform="Group[2]"
-           format="Group[Off, On]"/>
+           default="1"
+           transform="Power[0.05f, 100.f, 4.f]"
+           format="Frequency"/>
 
     <param name="Depth"
            default="100"
            transform="Range[0.f, 100.f]"
            format="Percent"/>
+
+    <param name="Synced"
+           short-name="Sync"
+           default="0"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Off, On]"/>
+
+    <param name="Tempo"
+           default="6"
+           steps="13"
+           transform="Group[13]"
+           format="Group[Freeze, 32/1, 16/1, 8/1, 4/1, 2/1, 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64]"/>
+
+    <param name="Waveform"
+           short-name="Wave"
+           default="0"
+           steps="6"
+           transform="Group[6]"
+           format="Group[Sine, Triangle, Saw, Square, Quantized, Noise]"/>
   </module>
 
   <!-- ================================================ -->
@@ -99,25 +107,26 @@
     <param name="Loop"
            default="0"
            transform="Group[2]"
-           format="Group[Off, On]"/>
+           format="Group[Off, On]"
+           interface="$self.params.envelope[$envelope].loop = $value > 0.5"/>
 
     <param name="Level"
-           default="100"
+           default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.envelopeLevel[$envelope] = $value"/>
 
     <param name="Attack"
-           default="1"
-           transform="Power[1.f, 5000.f, 2.f]"
+           default="10"
+           transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[$envelope].attack($value * $value * 4999 + 1)"/>
+           interface="$self.params.envelope[$envelope].attack($value * $value * 4990 + 10)"/>
 
     <param name="Decay"
            default="200"
-           transform="Power[1.f, 5000.f, 2.f]"
+           transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[$envelope].decay($value * $value * 4999 + 1)"/>
+           interface="$self.params.envelope[$envelope].decay($value * $value * 4990 + 10)"/>
 
     <param name="Sustain"
            default="100"
@@ -127,16 +136,23 @@
 
     <param name="Release"
            default="60"
-           transform="Power[1.f, 5000.f, 2.f]"
+           transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[$envelope].release($value * $value * 4999 + 1)"/>
+           interface="$self.params.envelope[$envelope].release($value * $value * 4990 + 10)"/>
   </module>
 
   <!-- ================================================ -->
 
   <module name="Filter">
-    <param name="Frequency"
-           short-name="Freq"
+    <param name="Enable"
+           default="1"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.params.filter.enable = $value > 0.5"/>
+
+    <param name="Cutoff"
+           var-name="frequency"
+           short-name="Cutoff"
            default="16000"
            transform="Log[60.f, 16000.f]"
            format="Frequency"
