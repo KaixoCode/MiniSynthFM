@@ -68,10 +68,6 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        Note note = 64;
-
-        // ------------------------------------------------
-
         void trigger() override;
         void release() override;
 

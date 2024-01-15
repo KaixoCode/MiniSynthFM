@@ -17,6 +17,8 @@ namespace Kaixo::Processing {
         registerInterface<EnvelopeInterface>();
         registerInterface<LfoInterface>();
         registerInterface<ModInterface>();
+        registerInterface<PianoInterfaceImpl>();
+        registerInterface<PianoPressInterface>();
     }
 
     // ------------------------------------------------

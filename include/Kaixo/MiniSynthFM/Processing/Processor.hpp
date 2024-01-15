@@ -106,6 +106,55 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    class PianoInterface : public Processing::Interface {
+    public:
+
+        // ------------------------------------------------
+
+        virtual bool pressed(Note note) = 0;
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+    
+    class PianoInterfaceImpl : public PianoInterface {
+    public:
+
+        // ------------------------------------------------
+
+        bool pressed(Note note) {
+            for (auto& voice : self<MiniSynthFMProcessor>().voices) {
+                if (voice.note == note) return true;
+            }
+
+            return false;
+        }
+        
+        // ------------------------------------------------
+
+    };
+
+    class PianoPressInterface : public AsyncInterface<void(Note, bool)> {
+    public:
+        
+        // ------------------------------------------------
+
+        void call(Note note, bool press) override {
+            if (press) {
+                self<MiniSynthFMProcessor>().noteOn(note, 1, 0);
+            } else {
+                self<MiniSynthFMProcessor>().noteOff(note, 1, 0);
+            }
+        }
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+
 }
     
 // ------------------------------------------------

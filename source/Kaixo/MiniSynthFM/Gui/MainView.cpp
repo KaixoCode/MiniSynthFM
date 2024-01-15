@@ -35,20 +35,29 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            Note start = 0; // Starting note
+            Note start = 1; // Starting note
             std::size_t notes = 0;
 
             // ------------------------------------------------
             
+            Processing::InterfaceStorage<Processing::PianoInterface> interface;
+            Processing::InterfaceStorage<Processing::AsyncInterface<void(Note, bool)>> press;
+
+            // ------------------------------------------------
+
             struct Key {
                 Point<> size = { 30, 100 };
                 Theme::Drawable graphics;
             };
 
             // ------------------------------------------------
-            
+
             Key white{.size = { 30, 100 } };
             Key black{.size = { 30,  60 } };
+
+            // ------------------------------------------------
+            
+            Coord spacing = 5;
 
             // ------------------------------------------------
 
@@ -84,7 +93,49 @@ namespace Kaixo::Gui {
 
             Key(Context c, Settings s)
                 : View(c), settings(std::move(s)) 
-            {}
+            {
+                wantsIdle(true);
+            }
+
+            // ------------------------------------------------
+            
+            void paint(juce::Graphics& g) override {
+                if (settings.type == Type::White) {
+                    settings.piano.settings.white.graphics.draw({
+                        .graphics = g,
+                        .bounds = localDimensions(),
+                        .state = state(),
+                        //.text = ... TODO: note as text
+                    });
+                } else {
+                    settings.piano.settings.black.graphics.draw({
+                        .graphics = g,
+                        .bounds = localDimensions(),
+                        .state = state(),
+                        //.text = ... TODO: note as text
+                    });
+                }
+            }
+
+            // ------------------------------------------------
+            
+            void mouseDown(const juce::MouseEvent& event) override {
+                settings.piano.settings.press(settings.note, true);
+            }
+            
+            void mouseUp(const juce::MouseEvent& event) override {
+                settings.piano.settings.press(settings.note, false);
+            }
+            
+            // ------------------------------------------------
+            
+            void onIdle() override {
+                bool _pressed = settings.piano.settings.interface->pressed(settings.note);
+                if (pressed() != _pressed) {
+                    pressed(_pressed);
+                    repaint();
+                }
+            }
 
             // ------------------------------------------------
 
@@ -95,10 +146,35 @@ namespace Kaixo::Gui {
         Piano(Context c, Settings s)
             : View(c), settings(std::move(s))
         {
+            Coord x = 0;
             for (std::size_t i = 0; i < settings.notes; ++i) {
                 Note note = settings.start + i;
-                Key::Type type = isBlack(note) ? Key::Type::Black : Key::Type::White;
+                
+                if (isWhite(note)) {
+                    add<Key>({ x, 0, settings.white.size.x(), settings.white.size.y() }, {
+                        .piano = *this,
+                        .type = Key::Type::White,
+                        .note = note
+                    });
 
+                    x += settings.white.size.x() + settings.spacing;
+                }
+            }
+            x = 0;
+            for (std::size_t i = 0; i < settings.notes; ++i) {
+                Note note = settings.start + i;
+                
+                if (isBlack(note)) {
+                    Coord offset = settings.white.size.x() + settings.spacing / 2
+                                 - settings.black.size.x() / 2;
+                    add<Key>({ x + offset, 0, settings.black.size.x(), settings.black.size.y() }, {
+                        .piano = *this,
+                        .type = Key::Type::Black,
+                        .note = note
+                    });
+                } else {
+                    x += settings.white.size.x() + settings.spacing;
+                }
             }
         }
 
@@ -402,6 +478,21 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
         }
+
+        // ------------------------------------------------
+        
+        add<Piano>({ 170, 405, 1020, 200 }, {
+            .notes = 12 * 4,
+            .interface = context.interface<Processing::PianoInterfaceImpl>(),
+            .press = context.interface<Processing::PianoPressInterface>(),
+            .white = {
+                .size = { 30, 200 }
+            },
+            .black = {
+                .size = { 23, 120 }
+            },
+            .spacing = 5,
+        });
 
         // ------------------------------------------------
         
