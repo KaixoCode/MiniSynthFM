@@ -25,6 +25,103 @@
 namespace Kaixo::Gui {
 
     // ------------------------------------------------
+    
+    class Piano : public View {
+    public:
+
+        // ------------------------------------------------
+        
+        struct Settings {
+
+            // ------------------------------------------------
+
+            Note start = 0; // Starting note
+            std::size_t notes = 0;
+
+            // ------------------------------------------------
+            
+            struct Key {
+                Point<> size = { 30, 100 };
+                Theme::Drawable graphics;
+            };
+
+            // ------------------------------------------------
+            
+            Key white{.size = { 30, 100 } };
+            Key black{.size = { 30,  60 } };
+
+            // ------------------------------------------------
+
+        } settings;
+
+        // ------------------------------------------------
+        
+        class Key : public View {
+        public:
+
+            // ------------------------------------------------
+            
+            enum class Type { White, Black };
+
+            // ------------------------------------------------
+            
+            struct Settings {
+
+                // ------------------------------------------------
+
+                Piano& piano;
+                Type type;
+
+                // ------------------------------------------------
+                
+                Note note;
+
+                // ------------------------------------------------
+
+            } settings;
+
+            // ------------------------------------------------
+
+            Key(Context c, Settings s)
+                : View(c), settings(std::move(s)) 
+            {}
+
+            // ------------------------------------------------
+
+        };
+
+        // ------------------------------------------------
+
+        Piano(Context c, Settings s)
+            : View(c), settings(std::move(s))
+        {
+            for (std::size_t i = 0; i < settings.notes; ++i) {
+                Note note = settings.start + i;
+                Key::Type type = isBlack(note) ? Key::Type::Black : Key::Type::White;
+
+            }
+        }
+
+        // ------------------------------------------------
+    
+    private:
+
+        // ------------------------------------------------
+
+        Note inOctave(Note note) const { return Math::Fast::fmod(note, 12); }
+
+        bool isBlack(Note note) const {
+            Note x = inOctave(note);
+            return int((x < 5 ? -x : x) + (x > 4)) % 2;
+        }
+
+        bool isWhite(int note) const { return !isBlack(note); }
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
 
     MainView::MainView(Context c)
         : View(c)
