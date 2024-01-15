@@ -126,7 +126,7 @@ namespace Kaixo::Processing {
 
         bool pressed(Note note) {
             for (auto& voice : self<MiniSynthFMProcessor>().voices) {
-                if (voice.note == note) return true;
+                if (voice.pressed && voice.note == note) return true;
             }
 
             return false;

@@ -131,6 +131,10 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
+            bool changing();
+
+            // ------------------------------------------------
+
             friend class PatchBay;
 
             // ------------------------------------------------
@@ -167,6 +171,7 @@ namespace Kaixo::Gui {
             Theme::Drawable end;
             Theme::Color color;
         } m_CableGraphics[5];
+        bool m_Changing = false;
 
         // ------------------------------------------------
 
@@ -174,6 +179,10 @@ namespace Kaixo::Gui {
         void addConnection(Connection& con);
         void removeConnection(Connection& con);
         void modifyConnection(Connection& con, bool enable);
+
+        // ------------------------------------------------
+        
+        bool changing();
 
         // ------------------------------------------------
 

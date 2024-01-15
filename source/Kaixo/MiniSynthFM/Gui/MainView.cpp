@@ -47,13 +47,13 @@ namespace Kaixo::Gui {
 
             struct Key {
                 Point<> size = { 30, 100 };
-                Theme::Drawable graphics;
+                Theme::DrawableElement& graphics;
             };
 
             // ------------------------------------------------
 
-            Key white{.size = { 30, 100 } };
-            Key black{.size = { 30,  60 } };
+            Key white;
+            Key black;
 
             // ------------------------------------------------
             
@@ -83,6 +83,10 @@ namespace Kaixo::Gui {
 
                 // ------------------------------------------------
                 
+                Theme::Drawable graphics;
+
+                // ------------------------------------------------
+                
                 Note note;
 
                 // ------------------------------------------------
@@ -94,27 +98,19 @@ namespace Kaixo::Gui {
             Key(Context c, Settings s)
                 : View(c), settings(std::move(s)) 
             {
+                animation(settings.graphics);
                 wantsIdle(true);
             }
 
             // ------------------------------------------------
             
             void paint(juce::Graphics& g) override {
-                if (settings.type == Type::White) {
-                    settings.piano.settings.white.graphics.draw({
-                        .graphics = g,
-                        .bounds = localDimensions(),
-                        .state = state(),
-                        //.text = ... TODO: note as text
-                    });
-                } else {
-                    settings.piano.settings.black.graphics.draw({
-                        .graphics = g,
-                        .bounds = localDimensions(),
-                        .state = state(),
-                        //.text = ... TODO: note as text
-                    });
-                }
+                settings.graphics.draw({
+                    .graphics = g,
+                    .bounds = localDimensions(),
+                    .state = state(),
+                    //.text = ... TODO: note as text
+                });
             }
 
             // ------------------------------------------------
@@ -130,6 +126,7 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
             
             void onIdle() override {
+                View::onIdle();
                 bool _pressed = settings.piano.settings.interface->pressed(settings.note);
                 if (pressed() != _pressed) {
                     pressed(_pressed);
@@ -154,6 +151,7 @@ namespace Kaixo::Gui {
                     add<Key>({ x, 0, settings.white.size.x(), settings.white.size.y() }, {
                         .piano = *this,
                         .type = Key::Type::White,
+                        .graphics = settings.white.graphics,
                         .note = note
                     });
 
@@ -165,11 +163,11 @@ namespace Kaixo::Gui {
                 Note note = settings.start + i;
                 
                 if (isBlack(note)) {
-                    Coord offset = settings.white.size.x() + settings.spacing / 2
-                                 - settings.black.size.x() / 2;
-                    add<Key>({ x + offset, 0, settings.black.size.x(), settings.black.size.y() }, {
+                    Coord offset = settings.spacing / 2 + settings.black.size.x() / 2;
+                    add<Key>({ x - offset, 0, settings.black.size.x(), settings.black.size.y() }, {
                         .piano = *this,
                         .type = Key::Type::Black,
+                        .graphics = settings.black.graphics,
                         .note = note
                     });
                 } else {
@@ -481,15 +479,18 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        add<Piano>({ 170, 405, 1020, 200 }, {
-            .notes = 12 * 4,
+        add<Piano>({ 180, 493, 1020, 200 }, {
+            .start = 36,
+            .notes = 12 * 4 + 1, // 4 octaves + C
             .interface = context.interface<Processing::PianoInterfaceImpl>(),
             .press = context.interface<Processing::PianoPressInterface>(),
             .white = {
-                .size = { 30, 200 }
+                .size = { 30, 200 },
+                .graphics = T.whiteKey
             },
             .black = {
-                .size = { 23, 120 }
+                .size = { 23, 120 },
+                .graphics = T.blackKey
             },
             .spacing = 5,
         });

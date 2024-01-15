@@ -42,6 +42,8 @@
   "output-jack": "drawable",
   "toggle": "drawable",
   "threeway-toggle": "drawable",
+  "black-key": "drawable",
+  "white-key": "drawable",
   "tooltip": {
     "text-color": "color",
     "font": "font",

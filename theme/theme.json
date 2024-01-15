@@ -497,6 +497,26 @@
     color: [140, 92, 214]
   }
 
+  white-key: {
+    background-color: {
+      value: [211, 211, 211]
+      transition: 50
+      
+      hovering: [180, 180, 180]
+      pressed: [150, 150, 150]
+    }
+  }
+
+  black-key: {
+    background-color: {
+      value: [22, 22, 22] 
+      transition: 50
+
+      hovering: [40, 40, 40]
+      pressed: [60, 60, 60]
+    }
+  }
+
   text: $text-area
 
   // ------------------------------------------------

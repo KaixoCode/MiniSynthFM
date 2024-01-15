@@ -144,6 +144,19 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+    bool PatchBay::Connection::changing() {
+        // If it's currently being moved, it's changing
+        if (end == npos && begin != npos) return true;
+        // Otherwise, if any segment is moving, it's changing
+        for (auto& segment : m_Segments) {
+            if (Math::Fast::abs(segment.vy) > 0.01)
+                return true;
+        }
+        return false;
+    }
+
+    // ------------------------------------------------
+
     PatchBay::PatchBay(Context c)
         : View(c)
     {   // Patch bay is just functionality and visuals, 
@@ -161,7 +174,7 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void PatchBay::onIdle() {
-        repaint();
+        if (changing()) repaint();
     }
 
     // ------------------------------------------------
@@ -176,11 +189,13 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void PatchBay::beginCable(JackId id) {
+        m_Changing = true;
         m_CurrentConnection.begin = id;
         m_CurrentConnection.end = npos;
     }
 
     void PatchBay::removeCable(JackId id) {
+        m_Changing = true;
         for (std::size_t i = m_Connections.size(); i > 0; --i) {
             auto& connection = m_Connections[i - 1];
             bool isBegin = connection.begin == id;
@@ -197,10 +212,12 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::moveCable(Point<> to) {
+        m_Changing = true;
         m_LastMousePosition = to;
     }
 
     bool PatchBay::finishCable() {
+        m_Changing = true;
         if (m_CurrentConnection.begin == npos) return false;
         // Find which jack hovering over
         for (JackId id = 0; id < m_Jacks.size(); ++id) {
@@ -255,6 +272,21 @@ namespace Kaixo::Gui {
         if (source == ModSource::None || destination == ModDestination::None) return;
 
         context.interface<Processing::ModInterface>()->call(source, destination, enable);
+    }
+
+    // ------------------------------------------------
+
+    bool PatchBay::changing() {
+        if (!m_Changing) return false;
+
+        if (m_CurrentConnection.changing()) return true;
+
+        for (auto& connection : m_Connections) {
+            if (connection.changing()) return true;
+        }
+
+        m_Changing = false;
+        return false;
     }
 
     // ------------------------------------------------
