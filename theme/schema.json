@@ -30,6 +30,8 @@
     }
   },
   "knob": "drawable",
+  "knob-bi": "drawable",
+  "waveform-knob1": "drawable",
   "cable1": { "color": "color", "end": "drawable" },
   "cable2": { "color": "color", "end": "drawable" },
   "cable3": { "color": "color", "end": "drawable" },

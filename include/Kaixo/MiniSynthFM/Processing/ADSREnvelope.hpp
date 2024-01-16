@@ -21,6 +21,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
         
         bool loop = false;
+        bool trigger = false; // Trigger mode (attack -> release, no sustain)
 
         // ------------------------------------------------
 
@@ -36,17 +37,16 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
     private:
-        float m_AttackMillis;
-        float m_DecayMillis;
-        float m_SustainMillis;
-        float m_ReleaseMillis;
+        float m_AttackMillis = 10;
+        float m_DecayMillis = 10;
+        float m_ReleaseMillis = 10;
 
         // ------------------------------------------------
 
-        float m_Attack;
-        float m_Decay;
-        float m_Sustain;
-        float m_Release;
+        float m_Attack = 0;
+        float m_Decay = 0;
+        float m_Sustain = 1;
+        float m_Release = 0;
 
         // ------------------------------------------------
 

@@ -12,14 +12,16 @@ namespace Kaixo {
 	
 	constexpr std::size_t Voices = 8;
 	constexpr std::size_t Oscillators = 3;
-	constexpr std::size_t Envelopes = 2;
+	constexpr std::size_t ADSREnvelopes = 2;
+	constexpr std::size_t ADEnvelopes = 1;
+	constexpr std::size_t Envelopes = 3;
 	constexpr std::size_t Lfos = 1;
 
 	// ------------------------------------------------
 	
 	enum class ModSource { 
 		Op1, Op2, Op3, 
-		Envelope1, Envelope2, 
+		Envelope1, Envelope2, Envelope3,
 		LFO, 
 		Amount, None 
 	};

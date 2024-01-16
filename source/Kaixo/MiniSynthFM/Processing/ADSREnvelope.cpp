@@ -83,7 +83,10 @@ namespace Kaixo::Processing {
             if (m_Phase >= 1.0) {
                 output = 1;
                 m_Phase = 0;
-                m_State = State::Decay;
+                if (params.trigger) { 
+                    m_State = State::Release; 
+                    m_ReleaseValue = output;
+                } else m_State = State::Decay;
             } else {
                 auto powerPhase = (1 - (1 - m_Phase) * (1 - m_Phase));
                 output = m_AttackValue + (1 - m_AttackValue) * powerPhase;

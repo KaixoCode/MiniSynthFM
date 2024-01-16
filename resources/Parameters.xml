@@ -141,6 +141,32 @@
            interface="$self.params.envelope[$envelope].release($value * $value * 4990 + 10)"/>
   </module>
 
+  <module name="Gain">
+    <param name="Gate"
+           default="0"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.params.envelope[2].trigger = !($value > 0.5)"/>
+
+    <param name="Level"
+           default="50"
+           transform="Range[0.f, 100.f]"
+           format="Percent"
+           interface="$self.params.envelopeLevel[2] = $value"/>
+
+    <param name="Attack"
+           default="10"
+           transform="Power[10.f, 5000.f, 2.f]"
+           format="Time"
+           interface="$self.params.envelope[2].attack($value * $value * 4990 + 10)"/>
+
+    <param name="Decay"
+           default="200"
+           transform="Power[10.f, 5000.f, 2.f]"
+           format="Time"
+           interface="$self.params.envelope[2].release($value * $value * 4990 + 10)"/>
+  </module>
+
   <!-- ================================================ -->
 
   <module name="Filter">

@@ -80,7 +80,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         FMOscillator oscillator[Oscillators]{ params.oscillator[0], params.oscillator[1], params.oscillator[2] };
-        ADSREnvelope envelope[Envelopes]{ params.envelope[0], params.envelope[1] };
+        ADSREnvelope envelope[Envelopes]{ params.envelope[0], params.envelope[1], params.envelope[2] };
         CustomFilter filter{ params.filter };
 
         // ------------------------------------------------

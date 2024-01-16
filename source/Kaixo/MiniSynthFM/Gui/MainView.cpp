@@ -268,14 +268,14 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             add<Knob>({ 37 + i * 280, 244, 64, 64 }, {
-                .graphics = T.knob,
+                .graphics = T.knobBi,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].volume
             });
             
             add<Knob>({ 37 + i * 280, 308, 64, 64 }, {
-                .graphics = T.knob,
+                .graphics = T.waveformKnob1,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].wave
@@ -289,7 +289,7 @@ namespace Kaixo::Gui {
             });
             
             add<Knob>({ 103 + i * 280, 244, 64, 64 }, {
-                .graphics = T.knob,
+                .graphics = T.knobBi,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].tune
@@ -413,7 +413,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        for (std::size_t i = 0; i < Envelopes; ++i) {
+        for (std::size_t i = 0; i < ADSREnvelopes; ++i) {
             add<Knob>({ 880, 71 + i * 180, 64, 64 }, {
                 .graphics = T.knob,
                 .tooltipName = false,
@@ -477,6 +477,52 @@ namespace Kaixo::Gui {
 
         }
 
+        // ------------------------------------------------
+        add<Knob>({ 941, 396, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.gain.level
+        });
+                        
+        add<Knob>({ 1006, 396, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.gain.attack
+        });
+
+        add<Knob>({ 1071, 396, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.gain.decay
+        });
+
+        // ------------------------------------------------
+            
+        add<Jack>({ 1136, 408, 64, 52 }, {
+            .graphics = T.outputJack,
+            .type = Jack::Type::Output,
+            .patchBay = patchBay,
+            .source = ModSource::Envelope3
+        });
+            
+        // ------------------------------------------------
+            
+        add<Button>({ 876, 415, 64, 45 }, {
+            .graphics = T.toggle,
+            .behaviour = Button::Behaviour::Toggle,
+            .param = Synth.gain.gate
+        });
+            
+        // ------------------------------------------------
+
+        add<Led>({ 1182, 398, 13, 13 }, {
+            .graphics = T.led,
+            .value = context.interface<Processing::EnvelopeInterface>({ .index = 2 })
+        });
+            
         // ------------------------------------------------
         
         add<Piano>({ 180, 493, 1020, 200 }, {

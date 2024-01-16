@@ -39,6 +39,7 @@ namespace Kaixo::Processing {
     void MiniSynthFMVoice::doModulations() {
         auto env1level = envelope[0].output * params.envelopeLevel[0];
         auto env2level = envelope[1].output * params.envelopeLevel[1];
+        auto env3level = envelope[2].output * params.envelopeLevel[2];
         
         auto lfolevel = 0;
 
@@ -50,59 +51,50 @@ namespace Kaixo::Processing {
         auto op2fm = oscillator[1].fmOutput * params.volume[1];
         auto op3fm = oscillator[2].fmOutput * params.volume[2];
         
-        auto getEnv1 = [&](ModDestination dest) { return params.routing[(int)ModSource::Envelope1][(int)dest] * env1level; };
-        auto getEnv2 = [&](ModDestination dest) { return params.routing[(int)ModSource::Envelope2][(int)dest] * env2level; };
-        auto getLfo = [&](ModDestination dest) { return params.routing[(int)ModSource::LFO][(int)dest] * lfolevel; };
-        auto getOp1 = [&](ModDestination dest) { return params.routing[(int)ModSource::Op1][(int)dest] * op1level; };
-        auto getOp2 = [&](ModDestination dest) { return params.routing[(int)ModSource::Op2][(int)dest] * op2level; };
-        auto getOp3 = [&](ModDestination dest) { return params.routing[(int)ModSource::Op3][(int)dest] * op3level; };
+        auto getEnv1  = [&](ModDestination dest) { return params.routing[(int)ModSource::Envelope1][(int)dest] * env1level; };
+        auto getEnv2  = [&](ModDestination dest) { return params.routing[(int)ModSource::Envelope2][(int)dest] * env2level; };
+        auto getEnv3  = [&](ModDestination dest) { return params.routing[(int)ModSource::Envelope3][(int)dest] * env3level; };
+        auto getLfo   = [&](ModDestination dest) { return params.routing[(int)ModSource::LFO][(int)dest] * lfolevel; };
+        auto getOp1   = [&](ModDestination dest) { return params.routing[(int)ModSource::Op1][(int)dest] * op1level; };
+        auto getOp2   = [&](ModDestination dest) { return params.routing[(int)ModSource::Op2][(int)dest] * op2level; };
+        auto getOp3   = [&](ModDestination dest) { return params.routing[(int)ModSource::Op3][(int)dest] * op3level; };
         auto getOp1FM = [&](ModDestination dest) { return params.routing[(int)ModSource::Op1][(int)dest] * op1fm; };
         auto getOp2FM = [&](ModDestination dest) { return params.routing[(int)ModSource::Op2][(int)dest] * op2fm; };
         auto getOp3FM = [&](ModDestination dest) { return params.routing[(int)ModSource::Op3][(int)dest] * op3fm; };
 
-        auto getAll = [&](ModDestination dest) {
+        auto getAllM = [&](ModDestination dest) {
             float amount = 1;
             if (params.routing[(int)ModSource::Envelope1][(int)dest]) amount *= env1level;
             if (params.routing[(int)ModSource::Envelope2][(int)dest]) amount *= env2level;
+            if (params.routing[(int)ModSource::Envelope3][(int)dest]) amount *= env3level;
             if (params.routing[(int)ModSource::LFO][(int)dest]) amount *= lfolevel;
             if (params.routing[(int)ModSource::Op1][(int)dest]) amount *= op1level;
             if (params.routing[(int)ModSource::Op2][(int)dest]) amount *= op2level;
             if (params.routing[(int)ModSource::Op3][(int)dest]) amount *= op3level;
             return amount;
         };
+        
+        auto getAllA = [&](ModDestination dest) {
+            return getOp1(dest) + getOp2(dest) + getOp3(dest) +
+                   getEnv1(dest) + getEnv2(dest) + getEnv3(dest) +
+                   getLfo(dest);
+        };
+        
+        auto getAllANoOp = [&](ModDestination dest) {
+            return getEnv1(dest) + getEnv2(dest) + getEnv3(dest) + getLfo(dest);
+        };
+        
+        auto getAllOpFM = [&](ModDestination dest) {
+            return getOp1FM(dest) + getOp2FM(dest) + getOp3FM(dest);
+        };
 
-        oscillator[0].note(note + params.pitchBend * 24 - 12 + 24 * Math::Fast::clamp(
-            getEnv1(ModDestination::Op1FM) +
-            getEnv2(ModDestination::Op1FM) +
-            getLfo(ModDestination::Op1FM), -1, 1));
-        
-        oscillator[1].note(note + params.pitchBend * 24 - 12 + 24 * Math::Fast::clamp(
-            getEnv1(ModDestination::Op2FM) +
-            getEnv2(ModDestination::Op2FM) +
-            getLfo(ModDestination::Op2FM), -1, 1));
-        
-        oscillator[2].note(note + params.pitchBend * 24 - 12 + 24 * Math::Fast::clamp(
-            getEnv1(ModDestination::Op3FM) +
-            getEnv2(ModDestination::Op3FM) +
-            getLfo(ModDestination::Op3FM), -1, 1));
+        oscillator[0].note(note + params.pitchBend * 24 - 12 + 24 * Math::Fast::clamp(getAllANoOp(ModDestination::Op1FM), -1, 1));
+        oscillator[1].note(note + params.pitchBend * 24 - 12 + 24 * Math::Fast::clamp(getAllANoOp(ModDestination::Op2FM), -1, 1));
+        oscillator[2].note(note + params.pitchBend * 24 - 12 + 24 * Math::Fast::clamp(getAllANoOp(ModDestination::Op3FM), -1, 1));
 
-        oscillator[0].fm(params.fm[0] * getAll(ModDestination::Op1Amount) * (
-            getOp1FM(ModDestination::Op1FM) +
-            getOp2FM(ModDestination::Op1FM) +
-            getOp3FM(ModDestination::Op1FM) 
-        ));
-        
-        oscillator[1].fm(params.fm[1] * getAll(ModDestination::Op2Amount) * (
-            getOp1FM(ModDestination::Op2FM) +
-            getOp2FM(ModDestination::Op2FM) +
-            getOp3FM(ModDestination::Op2FM)
-        ));
-        
-        oscillator[2].fm(params.fm[2] * getAll(ModDestination::Op3Amount) * (
-            getOp1FM(ModDestination::Op3FM) +
-            getOp2FM(ModDestination::Op3FM) +
-            getOp3FM(ModDestination::Op3FM)
-        ));
+        oscillator[0].fm(params.fm[0] * getAllM(ModDestination::Op1Amount) * (getAllOpFM(ModDestination::Op1FM)));
+        oscillator[1].fm(params.fm[1] * getAllM(ModDestination::Op2Amount) * (getAllOpFM(ModDestination::Op2FM)));
+        oscillator[2].fm(params.fm[2] * getAllM(ModDestination::Op3Amount) * (getAllOpFM(ModDestination::Op3FM)));
 
         if (getOp1(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[0]);
         if (getOp2(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[1]);
@@ -114,13 +106,7 @@ namespace Kaixo::Processing {
         if (getOp2(ModDestination::Op3Sync)) oscillator[2].hardSync(oscillator[1]);
         if (getOp3(ModDestination::Op3Sync)) oscillator[2].hardSync(oscillator[2]);
 
-        filter.frequencyModulation =
-            getOp1(ModDestination::FilterFreq) +
-            getOp2(ModDestination::FilterFreq) +
-            getOp3(ModDestination::FilterFreq) +
-            getEnv1(ModDestination::FilterFreq) +
-            getEnv2(ModDestination::FilterFreq) +
-            getLfo(ModDestination::FilterFreq);
+        filter.frequencyModulation = getAllA(ModDestination::FilterFreq);
     }
 
     // ------------------------------------------------
@@ -140,7 +126,7 @@ namespace Kaixo::Processing {
         filter.input = result;
 
         filter.process();
-        result = filter.output * envelope[0].output * params.envelopeLevel[0];
+        result = filter.output * envelope[2].output * params.envelopeLevel[2];
     }
 
     // ------------------------------------------------

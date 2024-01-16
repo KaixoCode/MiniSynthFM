@@ -355,6 +355,83 @@
     }
   }
 
+  knob-bi: {
+    extends: $knob 
+
+    layers: {
+      background: {
+        image: {
+          source: knobs/main-knob-bg-bi.png
+          position: [ 8, 1 ]
+          frames: 21
+          size: [ 47, 38 ]
+        }
+      }
+      main: {
+        image: {
+          source: knobs/main-knob.png
+          frames: 181
+          frames-per-row: 10
+          size: [ 27, 27 ]
+          position: [ 18, 11 ]
+        }
+      }
+      name: {
+        text: {
+          font: $main-font
+          color: $text-dark
+          content: "$short-name"
+          position: [ 0, 22 ]
+          align: center
+        }
+
+        hovering: {
+          text: {
+            content: "$value"
+          }
+        }
+      }
+    }
+  }
+
+  waveform-knob1: { 
+    extends: $knob
+
+    layers: {
+      background: {
+        image: { 
+          source: knobs/waveforms.png
+          frames: 4
+          size: [ 64, 64 ]
+        }
+      }
+      main: {
+        image: {
+          source: knobs/main-knob.png
+          frames: 181
+          frames-per-row: 10
+          size: [ 27, 27 ]
+          position: [ 18, 11 ]
+        }
+      }
+      name: {
+        text: {
+          font: $main-font
+          color: $text-dark
+          content: "$short-name"
+          position: [ 0, 22 ]
+          align: center
+        }
+
+        hovering: {
+          text: {
+            content: "$value"
+          }
+        }
+      }
+    }
+  }
+
   led: {
     extends: $knob
 
