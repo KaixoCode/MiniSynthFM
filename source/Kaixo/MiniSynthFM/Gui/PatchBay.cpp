@@ -144,6 +144,24 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+    ModSource PatchBay::Connection::source(PatchBay& self) {
+        if (self.m_Jacks[begin]->settings.source != ModSource::None) 
+            return self.m_Jacks[begin]->settings.source;
+        if (self.m_Jacks[end]->settings.source != ModSource::None) 
+            return self.m_Jacks[end]->settings.source;
+        return ModSource::None;
+    }
+
+    ModDestination PatchBay::Connection::destination(PatchBay& self) {
+        if (self.m_Jacks[begin]->settings.destination != ModDestination::None) 
+            return self.m_Jacks[begin]->settings.destination;
+        if (self.m_Jacks[end]->settings.destination != ModDestination::None) 
+            return self.m_Jacks[end]->settings.destination;
+        return ModDestination::None;
+    }
+
+    // ------------------------------------------------
+
     bool PatchBay::Connection::changing() {
         // If it's currently being moved, it's changing
         if (end == npos && begin != npos) return true;
@@ -251,6 +269,7 @@ namespace Kaixo::Gui {
     void PatchBay::presetLoaded() {
         auto& data = context.data<ControllerData>().connections;
         m_Connections.clear();
+        m_Changing = true;
 
         for (auto& connection : data) {
             auto& c = m_Connections.emplace_back();
@@ -278,14 +297,21 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::addConnection(Connection& con) {
-        // Todo:
         context.data<ControllerData>().connections.push_back({
-                
+            .source = con.source(*this),
+            .destination = con.destination(*this),
+            .color = static_cast<int>(con.m_Color)
         });
         modifyConnection(con, true);
     }
 
     void PatchBay::removeConnection(Connection& con) {
+        std::erase_if(context.data<ControllerData>().connections,
+            [&](ControllerData::Connection& el) {
+                return el.destination == con.destination(*this) 
+                    && el.source == con.source(*this);
+            });
+
         modifyConnection(con, false);
     }
 

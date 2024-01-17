@@ -112,8 +112,16 @@ namespace Kaixo {
 
 		// ------------------------------------------------
 		
+		ControllerData() { init(); }
+
+		// ------------------------------------------------
+		
 		void init() override {
 			connections.clear();
+			connections.push_back({
+				.source = ModSource::Envelope1,
+				.destination = ModDestination::FilterFreq
+			});
 		}
 		
 		basic_json serialize() override {

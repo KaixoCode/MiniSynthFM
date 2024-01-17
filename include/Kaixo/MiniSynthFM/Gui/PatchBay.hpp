@@ -46,8 +46,8 @@ namespace Kaixo::Gui {
 
                 // ------------------------------------------------
 
-                ModSource source;
-                ModDestination destination;
+                ModSource source = ModSource::None;
+                ModDestination destination = ModDestination::None;
 
                 // ------------------------------------------------
 
@@ -117,6 +117,11 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void paint(juce::Graphics& g, Point<> mouse, PatchBay& self);
+
+            // ------------------------------------------------
+            
+            ModSource source(PatchBay& self);
+            ModDestination destination(PatchBay& self);
 
             // ------------------------------------------------
 
