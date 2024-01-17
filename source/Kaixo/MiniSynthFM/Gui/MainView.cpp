@@ -478,6 +478,7 @@ namespace Kaixo::Gui {
         }
 
         // ------------------------------------------------
+
         add<Knob>({ 941, 396, 64, 64 }, {
             .graphics = T.knob,
             .tooltipName = false,

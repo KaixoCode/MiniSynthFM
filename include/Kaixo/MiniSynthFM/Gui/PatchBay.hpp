@@ -15,7 +15,7 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    class PatchBay : public View {
+    class PatchBay : public View, public PresetListener {
     public:
 
         // ------------------------------------------------
@@ -84,6 +84,10 @@ namespace Kaixo::Gui {
 
         private:
             PatchBay::JackId m_Id = npos;
+
+            // ------------------------------------------------
+            
+            friend class PatchBay;
 
             // ------------------------------------------------
 
@@ -159,6 +163,10 @@ namespace Kaixo::Gui {
         void removeCable(JackId id);
         void moveCable(Point<> to);
         bool finishCable();
+
+        // ------------------------------------------------
+        
+        void presetLoaded() override;
 
         // ------------------------------------------------
 

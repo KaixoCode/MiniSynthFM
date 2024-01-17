@@ -247,6 +247,29 @@ namespace Kaixo::Gui {
     }
 
     // ------------------------------------------------
+    
+    void PatchBay::presetLoaded() {
+        auto& data = context.data<ControllerData>().connections;
+        m_Connections.clear();
+
+        for (auto& connection : data) {
+            auto& c = m_Connections.emplace_back();
+
+            for (auto& jack : m_Jacks) {
+                if (jack->settings.source == connection.source) {
+                    c.begin = jack->m_Id;
+                }
+
+                if (jack->settings.destination == connection.destination) {
+                    c.end = jack->m_Id;
+                }
+            }
+
+            c.m_Color = connection.color;
+        }
+    }
+
+    // ------------------------------------------------
 
     void PatchBay::addCurrentConnection() {
         m_Connections.push_back(m_CurrentConnection);
@@ -255,6 +278,10 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::addConnection(Connection& con) {
+        // Todo:
+        context.data<ControllerData>().connections.push_back({
+                
+        });
         modifyConnection(con, true);
     }
 
