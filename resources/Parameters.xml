@@ -70,35 +70,41 @@
   <!-- ================================================ -->
 
   <module name="Lfo" count="1" namespace="{name}" short-namespace="{short-name}">
-    <param name="Time"
+    <param name="Frequency"
+           short-name="Freq"
            default="1"
            transform="Power[0.05f, 100.f, 4.f]"
-           format="Frequency"/>
+           format="Frequency"
+           interface="$self.params.lfo[$lfo].frequency($value * $value * $value * $value * 99.95 + 0.05)"/>
 
     <param name="Depth"
            default="100"
            transform="Range[0.f, 100.f]"
-           format="Percent"/>
+           format="Percent"
+           interface="$self.params.lfoLevel[$lfo] = $value"/>
 
     <param name="Synced"
            short-name="Sync"
            default="0"
            steps="2"
            transform="Group[2]"
-           format="Group[Off, On]"/>
+           format="Group[Off, On]"
+           interface="$self.params.lfo[$lfo].synched($value > 0.5)"/>
 
     <param name="Tempo"
-           default="6"
-           steps="13"
-           transform="Group[13]"
-           format="Group[Freeze, 32/1, 16/1, 8/1, 4/1, 2/1, 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64]"/>
+           default="5"
+           steps="12"
+           transform="Group[12]"
+           format="Group[32/1, 16/1, 8/1, 4/1, 2/1, 1/1, 1/2, 1/4, 1/8, 1/16, 1/32, 1/64]"
+           interface="$self.params.lfo[$lfo].tempo($value)"/>
 
     <param name="Waveform"
            short-name="Wave"
            default="0"
            steps="6"
            transform="Group[6]"
-           format="Group[Sine, Triangle, Saw, Square, Quantized, Noise]"/>
+           format="Group[Sine, Triangle, Saw, Square, Quantized, Noise]"
+           interface="$self.params.lfo[$lfo].waveform($value)"/>
   </module>
 
   <!-- ================================================ -->

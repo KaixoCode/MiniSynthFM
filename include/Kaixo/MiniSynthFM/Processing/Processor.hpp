@@ -88,7 +88,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         float call() override {
-            return self<MiniSynthFMProcessor>().voices.lastTriggered().envelope[settings.index].output;
+            return self<MiniSynthFMProcessor>().voices.lastTriggered().lfo[settings.index].output * 0.5 + 0.5;
         }
 
         // ------------------------------------------------

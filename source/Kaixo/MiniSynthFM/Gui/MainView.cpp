@@ -369,12 +369,19 @@ namespace Kaixo::Gui {
                 .param = Synth.lfo[i].depth
             });
             
-            add<Knob>({ 264, 64, 64, 64 }, {
+            lfoFrequencyTempo[i].add(0, add<Knob>({264, 64, 64, 64}, {
                 .graphics = T.knob,
                 .tooltipName = false,
                 .tooltipValue = false,
-                .param = Synth.lfo[i].time
-            });
+                .param = Synth.lfo[i].frequency
+            }));
+
+            lfoFrequencyTempo[i].add(1, add<Knob>({264, 64, 64, 64}, {
+                .graphics = T.knob,
+                .tooltipName = false,
+                .tooltipValue = false,
+                .param = Synth.lfo[i].tempo
+            }));
 
             add<Knob>({ 195, 128, 64, 64 }, {
                 .graphics = T.knob,
@@ -386,6 +393,9 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             add<Button>({ 239, 33, 75, 23 }, {
+                .callback = [&, i](bool val) {
+                    lfoFrequencyTempo[i].select(val);
+                },
                 .graphics = T.toggle,
                 .behaviour = Button::Behaviour::Toggle,
                 .param = Synth.lfo[i].synced

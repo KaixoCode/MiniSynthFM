@@ -10,6 +10,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     VoiceParameters::VoiceParameters() {
+        for (auto& lfo : lfo) registerModule(lfo);
         for (auto& env : envelope) registerModule(env);
         for (auto& osc : oscillator) registerModule(osc);
         registerModule(filter);
@@ -18,6 +19,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     MiniSynthFMVoice::MiniSynthFMVoice(VoiceParameters& p) : params(p) {
+        for (auto& lfo : lfo) registerModule(lfo);
         for (auto& osc : oscillator) registerModule(osc);
         for (auto& env : envelope) registerModule(env);
         registerModule(filter);
@@ -28,6 +30,7 @@ namespace Kaixo::Processing {
     void MiniSynthFMVoice::trigger() {
         for (auto& osc : oscillator) osc.trigger();
         for (auto& env : envelope) env.trigger();
+        for (auto& lfo : envelope) lfo.trigger();
     }
 
     void MiniSynthFMVoice::release() {
@@ -41,7 +44,7 @@ namespace Kaixo::Processing {
         auto env2level = envelope[1].output * params.envelopeLevel[1];
         auto env3level = envelope[2].output * params.envelopeLevel[2];
         
-        auto lfolevel = 0;
+        auto lfolevel = lfo[0].output * params.lfoLevel[0];
 
         auto op1level = oscillator[0].output * params.volume[0];
         auto op2level = oscillator[1].output * params.volume[1];
@@ -112,6 +115,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMVoice::process() {
+        for (auto& lfo : lfo) lfo.process();
         for (auto& env : envelope) env.process();
 
         doModulations();

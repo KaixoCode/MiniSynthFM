@@ -25,7 +25,7 @@ namespace Kaixo::Gui {
             .graphics = g,
             .bounds = localDimensions(),
             .value = m_Value
-            });
+        });
 
         // ------------------------------------------------
 
@@ -34,7 +34,7 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void Led::onIdle() {
-        float value = settings.value();
+        float value = Math::clamp1(settings.value());
         if (m_Value != value) {
             m_Value = value;
             repaint();
