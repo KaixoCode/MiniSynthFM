@@ -383,6 +383,8 @@ namespace Kaixo::Gui {
                 .param = Synth.lfo[i].tempo
             }));
 
+            lfoFrequencyTempo[i].select(0);
+
             add<Knob>({ 195, 128, 64, 64 }, {
                 .graphics = T.knob,
                 .tooltipName = false,
