@@ -516,7 +516,7 @@
         }
 
         text: {
-          content: Out
+          content: $text
           font: $main-font
           color: [37, 37, 37]
           align: center

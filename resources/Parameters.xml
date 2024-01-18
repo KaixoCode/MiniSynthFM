@@ -44,7 +44,7 @@
            default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
-           interface="$self.params.fm[$oscillator] = $value * 4"/>
+           interface="$self.params.fm[$oscillator] = $value"/>
 
     <param name="Output"
            default="1"

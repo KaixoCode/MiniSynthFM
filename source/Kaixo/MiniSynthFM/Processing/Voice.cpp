@@ -31,7 +31,7 @@ namespace Kaixo::Processing {
         randomValue = random.next() * 2 - 1;
         for (auto& osc : oscillator) osc.trigger();
         for (auto& env : envelope) env.trigger();
-        for (auto& lfo : envelope) lfo.trigger();
+        for (auto& lfo : lfo) lfo.trigger();
     }
 
     void MiniSynthFMVoice::release() {
@@ -111,13 +111,17 @@ namespace Kaixo::Processing {
             return getOp1FM(dest) + getOp2FM(dest) + getOp3FM(dest);
         };
 
-        oscillator[0].note(note + params.pitchBend * 24 - 12 + 60 * getAllANoOp(ModDestination::Op1FM));
-        oscillator[1].note(note + params.pitchBend * 24 - 12 + 60 * getAllANoOp(ModDestination::Op2FM));
-        oscillator[2].note(note + params.pitchBend * 24 - 12 + 60 * getAllANoOp(ModDestination::Op3FM));
+        auto fm1 = params.fm[0] * getAllM(ModDestination::Op1Amount);
+        auto fm2 = params.fm[1] * getAllM(ModDestination::Op2Amount);
+        auto fm3 = params.fm[2] * getAllM(ModDestination::Op3Amount);
 
-        oscillator[0].fm(params.fm[0] * getAllM(ModDestination::Op1Amount) * (getAllOpFM(ModDestination::Op1FM)));
-        oscillator[1].fm(params.fm[1] * getAllM(ModDestination::Op2Amount) * (getAllOpFM(ModDestination::Op2FM)));
-        oscillator[2].fm(params.fm[2] * getAllM(ModDestination::Op3Amount) * (getAllOpFM(ModDestination::Op3FM)));
+        oscillator[0].note(note + params.pitchBend * 24 - 12 + fm1 * 24 * getAllANoOp(ModDestination::Op1FM));
+        oscillator[1].note(note + params.pitchBend * 24 - 12 + fm2 * 24 * getAllANoOp(ModDestination::Op2FM));
+        oscillator[2].note(note + params.pitchBend * 24 - 12 + fm3 * 24 * getAllANoOp(ModDestination::Op3FM));
+
+        oscillator[0].fm(4 * fm1 * (getAllOpFM(ModDestination::Op1FM)));
+        oscillator[1].fm(4 * fm2 * (getAllOpFM(ModDestination::Op2FM)));
+        oscillator[2].fm(4 * fm3 * (getAllOpFM(ModDestination::Op3FM)));
 
         if (getOp1(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[0]);
         if (getOp2(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[1]);

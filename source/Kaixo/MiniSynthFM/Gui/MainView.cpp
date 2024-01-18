@@ -538,6 +538,48 @@ namespace Kaixo::Gui {
             
         // ------------------------------------------------
         
+        add<Jack>({ 80, 408, 64, 52 }, {
+            .graphics = T.outputJack,
+            .type = Jack::Type::Output,
+            .patchBay = patchBay,
+            .source = ModSource::ModWheel,
+            .name = "Mod",
+        });
+
+        add<Jack>({ 145, 408, 64, 52 }, {
+            .graphics = T.outputJack,
+            .type = Jack::Type::Output,
+            .patchBay = patchBay,
+            .source = ModSource::PitchBend,
+            .name = "PB",
+        });
+
+        add<Jack>({ 210, 408, 64, 52 }, {
+            .graphics = T.outputJack,
+            .type = Jack::Type::Output,
+            .patchBay = patchBay,
+            .source = ModSource::Note,
+            .name = "Note",
+        });
+        
+        add<Jack>({ 275, 408, 64, 52 }, {
+            .graphics = T.outputJack,
+            .type = Jack::Type::Output,
+            .patchBay = patchBay,
+            .source = ModSource::Velocity,
+            .name = "Vel",
+        });
+        
+        add<Jack>({ 340, 408, 64, 52 }, {
+            .graphics = T.outputJack,
+            .type = Jack::Type::Output,
+            .patchBay = patchBay,
+            .source = ModSource::Random,
+            .name = "Rand",
+        });
+
+        // ------------------------------------------------
+        
         add<Piano>({ 180, 493, 1020, 200 }, {
             .start = 36,
             .notes = 12 * 4 + 1, // 4 octaves + C
