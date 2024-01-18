@@ -26,6 +26,7 @@ namespace Kaixo {
         // ------------------------------------------------
         
         linkPitchWheel(Synth.pitchBendParameter);
+        linkModWheel(Synth.modWheelParameter);
 
         // ------------------------------------------------
 

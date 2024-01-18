@@ -20,6 +20,7 @@ namespace Kaixo {
 	// ------------------------------------------------
 	
 	enum class ModSource { 
+		Note, Velocity, Random, PitchBend, ModWheel,
 		Op1, Op2, Op3, 
 		Envelope1, Envelope2, Envelope3,
 		LFO, 

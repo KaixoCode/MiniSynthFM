@@ -6,6 +6,10 @@
          default="0.5"
          interface="$self.params.pitchBend = $value"/>
   
+  <param name="Mod Wheel Parameter"
+         default="0.5"
+         interface="$self.params.modWheel = $value"/>
+  
   <!-- ================================================ -->
 
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">

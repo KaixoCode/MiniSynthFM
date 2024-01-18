@@ -185,6 +185,7 @@ namespace Kaixo::Processing {
         bool outputOscillator[Oscillators]{};
 
         float pitchBend = 0;
+        float modWheel = 0;
 
         // ------------------------------------------------
         
@@ -228,6 +229,11 @@ namespace Kaixo::Processing {
         ADSREnvelope envelope[Envelopes]{ params.envelope[0], params.envelope[1], params.envelope[2] };
         Lfo lfo[Lfos]{ params.lfo[0] };
         CustomFilter filter{ params.filter };
+
+        // ------------------------------------------------
+        
+        Random random{};
+        float randomValue;
 
         // ------------------------------------------------
 
