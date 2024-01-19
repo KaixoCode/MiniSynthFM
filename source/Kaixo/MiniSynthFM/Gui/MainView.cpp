@@ -18,182 +18,12 @@
 #include "Kaixo/MiniSynthFM/Controller.hpp"
 #include "Kaixo/MiniSynthFM/Gui/PatchBay.hpp"
 #include "Kaixo/MiniSynthFM/Gui/Led.hpp"
-#include "Kaixo/MiniSynthFM/Processing/Processor.hpp"
+#include "Kaixo/MiniSynthFM/Gui/Piano.hpp"
+#include "Kaixo/MiniSynthFM/Processing/Interfaces.hpp"
 
 // ------------------------------------------------
 
 namespace Kaixo::Gui {
-
-    // ------------------------------------------------
-    
-    class Piano : public View {
-    public:
-
-        // ------------------------------------------------
-        
-        struct Settings {
-
-            // ------------------------------------------------
-
-            Note start = 1; // Starting note
-            std::size_t notes = 0;
-
-            // ------------------------------------------------
-            
-            Processing::InterfaceStorage<Processing::PianoInterface> interface;
-            Processing::InterfaceStorage<Processing::AsyncInterface<void(Note, bool)>> press;
-
-            // ------------------------------------------------
-
-            struct Key {
-                Point<> size = { 30, 100 };
-                Theme::DrawableElement& graphics;
-            };
-
-            // ------------------------------------------------
-
-            Key white;
-            Key black;
-
-            // ------------------------------------------------
-            
-            Coord spacing = 5;
-
-            // ------------------------------------------------
-
-        } settings;
-
-        // ------------------------------------------------
-        
-        class Key : public View {
-        public:
-
-            // ------------------------------------------------
-            
-            enum class Type { White, Black };
-
-            // ------------------------------------------------
-            
-            struct Settings {
-
-                // ------------------------------------------------
-
-                Piano& piano;
-                Type type;
-
-                // ------------------------------------------------
-                
-                Theme::Drawable graphics;
-
-                // ------------------------------------------------
-                
-                Note note;
-
-                // ------------------------------------------------
-
-            } settings;
-
-            // ------------------------------------------------
-
-            Key(Context c, Settings s)
-                : View(c), settings(std::move(s)) 
-            {
-                animation(settings.graphics);
-                wantsIdle(true);
-            }
-
-            // ------------------------------------------------
-            
-            void paint(juce::Graphics& g) override {
-                settings.graphics.draw({
-                    .graphics = g,
-                    .bounds = localDimensions(),
-                    .state = state(),
-                    //.text = ... TODO: note as text
-                });
-            }
-
-            // ------------------------------------------------
-            
-            void mouseDown(const juce::MouseEvent& event) override {
-                settings.piano.settings.press(settings.note, true);
-            }
-            
-            void mouseUp(const juce::MouseEvent& event) override {
-                settings.piano.settings.press(settings.note, false);
-            }
-            
-            // ------------------------------------------------
-            
-            void onIdle() override {
-                View::onIdle();
-                bool _pressed = settings.piano.settings.interface->pressed(settings.note);
-                if (pressed() != _pressed) {
-                    pressed(_pressed);
-                    repaint();
-                }
-            }
-
-            // ------------------------------------------------
-
-        };
-
-        // ------------------------------------------------
-
-        Piano(Context c, Settings s)
-            : View(c), settings(std::move(s))
-        {
-            Coord x = 0;
-            for (std::size_t i = 0; i < settings.notes; ++i) {
-                Note note = settings.start + i;
-                
-                if (isWhite(note)) {
-                    add<Key>({ x, 0, settings.white.size.x(), settings.white.size.y() }, {
-                        .piano = *this,
-                        .type = Key::Type::White,
-                        .graphics = settings.white.graphics,
-                        .note = note
-                    });
-
-                    x += settings.white.size.x() + settings.spacing;
-                }
-            }
-            x = 0;
-            for (std::size_t i = 0; i < settings.notes; ++i) {
-                Note note = settings.start + i;
-                
-                if (isBlack(note)) {
-                    Coord offset = settings.spacing / 2 + settings.black.size.x() / 2;
-                    add<Key>({ x - offset, 0, settings.black.size.x(), settings.black.size.y() }, {
-                        .piano = *this,
-                        .type = Key::Type::Black,
-                        .graphics = settings.black.graphics,
-                        .note = note
-                    });
-                } else {
-                    x += settings.white.size.x() + settings.spacing;
-                }
-            }
-        }
-
-        // ------------------------------------------------
-    
-    private:
-
-        // ------------------------------------------------
-
-        Note inOctave(Note note) const { return Math::Fast::fmod(note, 12); }
-
-        bool isBlack(Note note) const {
-            Note x = inOctave(note);
-            return int((x < 5 ? -x : x) + (x > 4)) % 2;
-        }
-
-        bool isWhite(int note) const { return !isBlack(note); }
-
-        // ------------------------------------------------
-
-    };
 
     // ------------------------------------------------
 
@@ -583,8 +413,7 @@ namespace Kaixo::Gui {
         add<Piano>({ 180, 493, 1020, 200 }, {
             .start = 36,
             .notes = 12 * 4 + 1, // 4 octaves + C
-            .interface = context.interface<Processing::PianoInterfaceImpl>(),
-            .press = context.interface<Processing::PianoPressInterface>(),
+            .interface = context.interface<Processing::PianoInterface>(),
             .white = {
                 .size = { 30, 200 },
                 .graphics = T.whiteKey

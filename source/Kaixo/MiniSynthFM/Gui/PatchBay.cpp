@@ -6,7 +6,7 @@
 // ------------------------------------------------
 
 #include "Kaixo/MiniSynthFM/Gui/Catenary.hpp"
-#include "Kaixo/MiniSynthFM/Processing/Processor.hpp"
+#include "Kaixo/MiniSynthFM/Processing/Interfaces.hpp"
 
 // ------------------------------------------------
 
@@ -324,7 +324,7 @@ namespace Kaixo::Gui {
 
         if (source == ModSource::None || destination == ModDestination::None) return;
 
-        context.interface<Processing::ModInterface>()->call(source, destination, enable);
+        context.interface<Processing::ModInterface>()(source, destination, enable);
     }
 
     // ------------------------------------------------

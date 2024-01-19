@@ -5,6 +5,7 @@
 #include "Kaixo/Core/Definitions.hpp"
 #include "Kaixo/Core/Gui/View.hpp"
 #include "Kaixo/Core/Theme/Theme.hpp"
+#include "Kaixo/Core/Processing/Interface.hpp"
 
 // ------------------------------------------------
 
@@ -41,6 +42,7 @@ namespace Kaixo::Gui {
         void onIdle() override;
 
         // ------------------------------------------------
+
     private:
         float m_Value = 0;
 

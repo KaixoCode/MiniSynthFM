@@ -2,6 +2,7 @@
 // ------------------------------------------------
 
 #include "Kaixo/MiniSynthFM/Processing/Processor.hpp"
+#include "Kaixo/MiniSynthFM/Processing/Interfaces.hpp"
 
 // ------------------------------------------------
 
@@ -17,8 +18,7 @@ namespace Kaixo::Processing {
         registerInterface<EnvelopeInterface>();
         registerInterface<LfoInterface>();
         registerInterface<ModInterface>();
-        registerInterface<PianoInterfaceImpl>();
-        registerInterface<PianoPressInterface>();
+        registerInterface<PianoInterface>();
     }
 
     // ------------------------------------------------

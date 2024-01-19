@@ -4,11 +4,6 @@
 
 #include "Kaixo/Core/Definitions.hpp"
 #include "Kaixo/Core/Processing/Module.hpp"
-#include "Kaixo/Core/Processing/Interface.hpp"
-
-// ------------------------------------------------
-
-#include "Kaixo/MiniSynthFM/Controller.hpp"
 
 // ------------------------------------------------
 
