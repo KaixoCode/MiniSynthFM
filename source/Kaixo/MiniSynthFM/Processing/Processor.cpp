@@ -86,7 +86,7 @@ namespace Kaixo::Processing {
         forAllModulation([&](ModSource src, ModDestination dst) {
             auto sname = toString(src);
             auto dname = toString(dst);
-            if (data.contains(sname, basic_json::Array) &&
+            if (data.contains(sname, basic_json::Object) &&
                 data[sname].contains(dname, basic_json::Boolean))
             {
                 params.routing[(int)src][(int)dst] = data[sname][dname].as<bool>();
