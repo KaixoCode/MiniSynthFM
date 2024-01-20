@@ -10,6 +10,11 @@ namespace Kaixo {
 
 	// ------------------------------------------------
 	
+	constexpr std::string_view ThemePath = "themepath";
+	constexpr std::string_view PresetPath = "presetpath";
+
+	// ------------------------------------------------
+	
 	constexpr std::size_t Voices = 8;
 	constexpr std::size_t Oscillators = 3;
 	constexpr std::size_t ADSREnvelopes = 2;
@@ -87,6 +92,28 @@ namespace Kaixo {
 
 	// ------------------------------------------------
 	
+	class PresetData : public Serializable {
+	public:
+	
+		// ------------------------------------------------
+
+		std::string name = "";
+		std::string author = "";
+		std::string type = "";
+		std::string description = "";
+
+		// ------------------------------------------------
+
+		void init() override;
+		basic_json serialize() override;
+		void deserialize(basic_json& json) override;
+
+		// ------------------------------------------------
+
+	};
+
+	// ------------------------------------------------
+	
 	class ControllerData : public Serializable {
 	public:
 
@@ -117,43 +144,9 @@ namespace Kaixo {
 
 		// ------------------------------------------------
 		
-		void init() override {
-			connections.clear();
-			connections.push_back({
-				.source = ModSource::Envelope1,
-				.destination = ModDestination::FilterFreq
-			});
-		}
-		
-		basic_json serialize() override {
-			basic_json json;
-
-			json = basic_json::array();
-			for (auto& connection : connections) {
-				basic_json c = basic_json::object();
-				c["source"] = toString(connection.source);
-				c["destination"] = toString(connection.destination);
-				c["color"] = connection.color;
-				json.push_back(c);
-			}
-
-			return json;
-		}
-
-		void deserialize(basic_json& data) {
-			connections.clear();
-			data.foreach([&](basic_json& c) {
-				if (c.contains("source", basic_json::String) &&
-					c.contains("destination", basic_json::String) &&
-					c.contains("color", basic_json::Number)) 
-				{
-					auto& connection = connections.emplace_back();
-					connection.source = sourceFromString(c["source"].as<std::string>());
-					connection.destination = destFromString(c["destination"].as<std::string>());
-					connection.color = c["color"].as<int>();
-				}
-			});
-		}
+		void init() override;
+		basic_json serialize() override;
+		void deserialize(basic_json& data) override;
 
 		// ------------------------------------------------
 

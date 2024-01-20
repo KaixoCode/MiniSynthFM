@@ -52,6 +52,7 @@
     "background": "drawable"
   },
   "text": "text-area",
+  "led-text": "text-area",
   "background": "drawable",
   "scrollbar": "drawable"
 }

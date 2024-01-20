@@ -12,6 +12,7 @@
     
     $selection-color: [ 255, 255, 255, 50 ]
     $text-light: [ 216, 216, 214 ]
+    $text-light-dark: [ 186, 186, 184 ]
     $text-dark: [ 156, 156, 154 ]
 
     // ------------------------------------------------
@@ -19,6 +20,7 @@
     $text-area: {
       font: $main-font
       text-color: $text-light
+      placeholder-color: $text-light-dark
       selection-color: $selection-color
       caret-color: $text-light
     }
@@ -595,6 +597,13 @@
   }
 
   text: $text-area
+
+  led-text: {
+    extends: $text-area
+
+    text-color: [150, 150, 148]
+    placeholder-color: [100, 100, 98]
+  }
 
   // ------------------------------------------------
 
