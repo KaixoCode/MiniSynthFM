@@ -34,7 +34,8 @@
            format="Group[-1, 0, 1]"
            interface="$self.params.oscillator[$oscillator].octave(normalToIndex($value, 3) - 1)"/>
     
-    <param name="Wave"
+    <param name="Waveform"
+           short-name="Wave"
            default="0" 
            steps="4"
            transform="Group[4]"
@@ -188,7 +189,6 @@
            interface="$self.params.filter.enable = $value > 0.5"/>
 
     <param name="Cutoff"
-           var-name="frequency"
            short-name="Cutoff"
            default="16000"
            transform="Log[60.f, 16000.f]"

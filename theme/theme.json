@@ -101,137 +101,147 @@
 
     $main-knob: {
       extends: $knob
-      image: knobs/main-knob.png
-      frames: 181
-      frames-per-row: 10
-      image-size: [ 27, 27 ]
+
+      layers: {
+        background: {
+          image: {
+            source: knobs/main-knob-bg.png
+            position: [ 8, 1 ]
+            frames: 22
+            size: [ 47, 38 ]
+          }
+        }
+        main: {
+          image: {
+            source: knobs/main-knob.png
+            frames: 181
+            frames-per-row: 10
+            size: [ 27, 27 ]
+            position: [ 18, 11 ]
+          }
+        }
+        name: {
+          text: {
+            font: $main-font
+            color: $text-dark
+            content: "$short-name"
+            position: [ 0, 22 ]
+            align: center
+          }
+
+          hovering: {
+            text: "$value"
+          }
+        }
+      }
+    }
+
+    $main-knob-bi: {
+      extends: $main-knob 
+
+      layers: {
+        background: {
+          image: {
+            source: knobs/main-knob-bg-bi.png
+            frames: 21
+          }
+        }
+      }
+    }
+
+    $basic-waveform-knob: { 
+      extends: $main-knob
+
+      layers: {
+        background: {
+          image: { 
+            source: knobs/waveforms.png
+            frames: 4
+            size: [ 64, 64 ]
+            position: [0, 0]
+          }
+        }
+      }
     }
 
     // ------------------------------------------------
-
+    
     $slider: {
       extends: $knob
-      image: knobs/slider.png
-      frames: 148
-      frames-per-row: 148
-      image-size: [ 30, 300 ]
-    }
+      
+      layers: {
+        background: {
+          image: {
+            source: knobs/main-slider-bg.png
+            position: [ 17, 9 ]
+          }
+        }
+        main: {
+          image: {
+            source: knobs/main-slider.png
+            frames: 90
+            frames-per-row: 90
+            size: [ 43, 107 ]
+            position: [ 9, 5 ]
+          }
+        }
+        name: {
+          text: {
+            font: $main-font
+            color: $text-dark
+            content: $short-name
+            position: [ 0, 60 ]
+            align: center 
+          }
 
-    $slider-bi: {
-      extends: $slider
-      image: knobs/slider-bi.png
-    }
-    
-    // ------------------------------------------------
-
-    $param-value: {
-      extends: [ "$main-text", "$knob" ]
-      text: $value
-      text-align: center
-    }
-
-    $param-value-dark: {
-      extends: $param-value
-      text-color: $text-dark
-    }
-    
-    
-    // ------------------------------------------------
-
-    $number: {
-      extends: [ "$main-text", "$knob" ]
-      text: $frame
-      text-align: center
-    }
-
-    $number-dark: {
-      extends: $param-value
-      text-color: $text-dark
-    }
-    
-    // ------------------------------------------------
-
-    $pitch-number: {
-      detune: {
-        image: knobs/number.png
-        frames: 100
-        image-size: [ 26, 22 ]
-      }
-
-      transpose: {
-        image: knobs/number.png
-        frames: 100
-        image-size: [ 26, 22 ]
-      }
-
-      sign: {
-        image: knobs/sign.png
-        frames: 2
-        frames-per-row: 2
-        image-size: [ 10, 22 ]
+          hovering: {
+            text: $value
+          }
+        }
       }
     }
 
-    $pitch-number-dark: {
-      extends: $pitch-number
+    $toggle: {
+      extends: $knob
 
-      detune: {
-        image: knobs/number-dark.png
+      layers: {
+        toggle: {
+          image: {
+            source: knobs/toggle.png
+            size: [ 29, 19 ]
+            position: [ 0, 2 ]
+          }
+
+          selected: {
+            image-offset: [0, 19]
+          }
+        }
+
+        name: {
+          text: {
+            font: $main-font
+            color: $text-dark
+            content: "$short-name" 
+            position: [ 34, 6 ]
+            align: top-left
+          }
+        }
       }
+    }
 
-      transpose: {
-        image: knobs/number-dark.png
+    $threeway-toggle: {
+      extends: $toggle
+
+      layers: {
+        toggle: {
+          image: {
+            source: knobs/threeway-toggle.png
+            frames: 3
+          }
+        }
       }
-
-      sign: {
-        image: knobs/sign-dark.png
-      }
     }
 
-    // ------------------------------------------------
-
-    $points-small: {
-      image: points/white.png
-      image-offset: [40, 80]
-
-      selected: { image-offset: [40, 160] }
-      hovering: { image-offset: [40, 40] }
-      pressed: { image-offset: [40, 0] }
-    }
-
-    $points: {
-      image: points/white.png
-      image-offset: [0, 80]
-
-      selected: { image-offset: [0, 160] }
-      hovering: { image-offset: [0, 40] }
-      pressed: { image-offset: [0, 0] }
-    }
-    
-    // ------------------------------------------------
-
-    $red-points-small: {
-      extends: $points-small
-      image: points/red.png
-    }
-
-    $red-points: {
-      extends: $points
-      image: points/red.png
-    }
-
-    // ------------------------------------------------
-
-    $yellow-points-small: {
-      extends: $points-small
-      image: points/yellow.png
-    }
-
-    $yellow-points: {
-      extends: $points
-      image: points/yellow.png
-    }
-    
     // ------------------------------------------------
 
     $main-font: {
@@ -251,6 +261,56 @@
     
     // ------------------------------------------------
 
+    $led: {
+      image: {
+        source: knobs/led.png
+        frames: 100
+        frames-per-row: 10
+        size: [ 13, 13 ]
+      }
+    }
+
+    // ------------------------------------------------
+
+    $jack: {
+      layers: {
+        jack: {
+          image: {
+            source: knobs/jack.png
+            position: [ 21, 4 ]
+          }
+        }
+
+        name: {
+          text: {
+            content: $text
+            font: $main-font
+            color: $text-dark
+            align: center
+            position: [0, 16]
+          }
+        }
+      }
+    }
+
+    $output-jack: {
+      extends: $jack
+      
+      layers: {
+        name: {
+          text: {
+            color: [37, 37, 37]
+          }
+
+          image: {
+            source: knobs/out-jack-text-background.png
+            position: [12, 32]
+            size: [40, 15]
+            edges: [2, 2, 2, 2]
+          }
+        }
+      }
+    }
   }
 
   // ------------------------------------------------
@@ -281,319 +341,66 @@
     hovering: { background-color: [ 112, 112, 111 ] }
   }
 
-  slider: {
-    extends: $knob
-    
-    layers: {
-      background: {
-        image: {
-          source: knobs/main-slider-bg.png
-          position: [ 17, 9 ]
-        }
-      }
-      main: {
-        image: {
-          source: knobs/main-slider.png
-          frames: 90
-          frames-per-row: 90
-          size: [ 43, 107 ]
-          position: [ 9, 5 ]
-        }
-      }
-      name: {
-        text: {
-          font: $main-font
-          color: $text-dark
-          content: "$short-name"
-          position: [ 0, 60 ]
-          align: center 
-        }
+  slider: $slider
+  knob: $main-knob
+  knob-bi: $main-knob-bi
 
-        hovering: {
-          text: {
-            content: "$value"
-          }
-        }
-      }
+  waveform-knob1: $basic-waveform-knob
+
+  led: $led
+  toggle: $toggle
+  threeway-toggle: $threeway-toggle
+
+  output-jack: $output-jack
+  input-jack: $jack
+
+  cables: {
+    cable1: {
+      end: knobs/cable1.png
+      color: [214, 92, 92]
+    }
+
+    cable2: {
+      end: knobs/cable2.png
+      color: [214, 181, 92]
+    }
+
+    cable3: {
+      end: knobs/cable3.png
+      color: [99, 214, 92]
+    }
+
+    cable4: {
+      end: knobs/cable4.png
+      color: [92, 158, 214]
+    }
+
+    cable5: {
+      end: knobs/cable5.png
+      color: [140, 92, 214]
     }
   }
 
-  knob: {
-    extends: $knob
-
-    layers: {
-      background: {
-        image: {
-          source: knobs/main-knob-bg.png
-          position: [ 8, 1 ]
-          frames: 22
-          size: [ 47, 38 ]
-        }
-      }
-      main: {
-        image: {
-          source: knobs/main-knob.png
-          frames: 181
-          frames-per-row: 10
-          size: [ 27, 27 ]
-          position: [ 18, 11 ]
-        }
-      }
-      name: {
-        text: {
-          font: $main-font
-          color: $text-dark
-          content: "$short-name"
-          position: [ 0, 22 ]
-          align: center
-        }
-
-        hovering: {
-          text: {
-            content: "$value"
-          }
-        }
+  piano: {
+    white-key: {
+      background-color: {
+        value: [211, 211, 211]
+        transition: 50
+        
+        hovering: [180, 180, 180]
+        pressed: [150, 150, 150]
       }
     }
-  }
 
-  knob-bi: {
-    extends: $knob 
+    black-key: {
+      background-color: {
+        value: [22, 22, 22] 
+        transition: 50
 
-    layers: {
-      background: {
-        image: {
-          source: knobs/main-knob-bg-bi.png
-          position: [ 8, 1 ]
-          frames: 21
-          size: [ 47, 38 ]
-        }
+        hovering: [40, 40, 40]
+        pressed: [60, 60, 60]
       }
-      main: {
-        image: {
-          source: knobs/main-knob.png
-          frames: 181
-          frames-per-row: 10
-          size: [ 27, 27 ]
-          position: [ 18, 11 ]
-        }
-      }
-      name: {
-        text: {
-          font: $main-font
-          color: $text-dark
-          content: "$short-name"
-          position: [ 0, 22 ]
-          align: center
-        }
-
-        hovering: {
-          text: {
-            content: "$value"
-          }
-        }
-      }
-    }
-  }
-
-  waveform-knob1: { 
-    extends: $knob
-
-    layers: {
-      background: {
-        image: { 
-          source: knobs/waveforms.png
-          frames: 4
-          size: [ 64, 64 ]
-        }
-      }
-      main: {
-        image: {
-          source: knobs/main-knob.png
-          frames: 181
-          frames-per-row: 10
-          size: [ 27, 27 ]
-          position: [ 18, 11 ]
-        }
-      }
-      name: {
-        text: {
-          font: $main-font
-          color: $text-dark
-          content: "$short-name"
-          position: [ 0, 22 ]
-          align: center
-        }
-
-        hovering: {
-          text: {
-            content: "$value"
-          }
-        }
-      }
-    }
-  }
-
-  led: {
-    extends: $knob
-
-    image: {
-      source: knobs/led.png
-      frames: 100
-      frames-per-row: 10
-      size: [ 13, 13 ]
-    }
-  }
-
-  toggle: {
-    extends: $knob
-
-    layers: {
-      toggle: {
-        image: {
-          source: knobs/toggle.png
-          size: [ 29, 19 ]
-          position: [ 0, 2 ]
-        }
-
-        selected: {
-          image-offset: [0, 19]
-        }
-      }
-
-      name: {
-        text: {
-          font: $main-font
-          color: $text-dark
-          content: "$short-name" 
-          position: [ 34, 6 ]
-          align: top-left
-        }
-      }
-    }
-  }
-
-  threeway-toggle: {
-    extends: $knob
-
-    layers: {
-      toggle: {
-        image: {
-          source: knobs/threeway-toggle.png
-          size: [ 29, 19 ]
-          frames: 3
-          position: [ 0, 2 ]
-        }
-      }
-
-      name: {
-        text: {
-          font: $main-font
-          color: $text-dark
-          content: "$short-name" 
-          position: [ 34, 6 ]
-          align: top-left
-        }
-      }
-    }
-  }
-
-  output-jack: {
-    extends: $knob
-
-    layers: {
-      jack: {
-        image: {
-          source: knobs/jack.png
-          position: [ 21, 4 ]
-        }
-      }
-
-      name: {
-        image: {
-          source: knobs/out-jack-text-background.png
-          position: [12, 32]
-          size: [40, 15]
-          edges: [2, 2, 2, 2]
-        }
-
-        text: {
-          content: $text
-          font: $main-font
-          color: [37, 37, 37]
-          align: center
-          position: [0, 16]
-        }
-      }
-    }
-  }
-
-  input-jack: {
-    extends: $knob
-
-    layers: {
-      jack: {
-        image: {
-          source: knobs/jack.png
-          position: [ 21, 4 ]
-        }
-      }
-
-      name: {
-        text: {
-          content: $text
-          font: $main-font
-          color: $text-dark
-          align: center
-          position: [0, 16]
-        }
-      }
-    }
-  }
-
-  cable1: {
-    end: knobs/cable1.png
-    color: [214, 92, 92]
-  }
-
-  cable2: {
-    end: knobs/cable2.png
-    color: [214, 181, 92]
-  }
-
-  cable3: {
-    end: knobs/cable3.png
-    color: [99, 214, 92]
-  }
-
-  cable4: {
-    end: knobs/cable4.png
-    color: [92, 158, 214]
-  }
-
-  cable5: {
-    end: knobs/cable5.png
-    color: [140, 92, 214]
-  }
-
-  white-key: {
-    background-color: {
-      value: [211, 211, 211]
-      transition: 50
-      
-      hovering: [180, 180, 180]
-      pressed: [150, 150, 150]
-    }
-  }
-
-  black-key: {
-    background-color: {
-      value: [22, 22, 22] 
-      transition: 50
-
-      hovering: [40, 40, 40]
-      pressed: [60, 60, 60]
-    }
+    }    
   }
 
   text: $text-area
@@ -603,6 +410,87 @@
 
     text-color: [150, 150, 148]
     placeholder-color: [100, 100, 98]
+  }
+
+  // ------------------------------------------------
+
+  envelope: {
+    led: $led
+
+    parameters: {
+      loop: $toggle
+      level: $main-knob
+      attack: $slider
+      decay: $slider
+      sustain: $slider
+      release: $slider
+    }
+
+    jacks: {
+      output: $output-jack
+    }
+  }
+
+  gain: {
+    led: $led
+
+    parameters: {
+      gate: $toggle
+      level: $main-knob
+      attack: $main-knob
+      decay: $main-knob
+    }
+
+    jacks: {
+      output: $output-jack
+    }
+  }
+
+  lfo: {
+    led: $led
+    
+    parameters: {
+      frequency: $main-knob
+      depth: $main-knob
+      synced: $toggle
+      tempo: $main-knob
+      waveform: $main-knob
+    }
+
+    jacks: {
+      output: $output-jack
+    }
+  }
+
+  filter: {
+    parameters: {
+      enable: $toggle
+      cutoff: $main-knob
+      resonance: $main-knob
+      drive: $main-knob
+    }
+
+    jacks: {
+      cutoff: $jack
+    }
+  }
+
+  oscillator: {
+    parameters: {
+      volume: $main-knob-bi
+      tune: $main-knob-bi
+      octave: $threeway-toggle
+      waveform: $basic-waveform-knob
+      fm: $main-knob
+      output: $toggle
+    }
+
+    jacks: {
+      output: $output-jack
+      fm: $jack
+      amount: $jack
+      sync: $jack
+    }
   }
 
   // ------------------------------------------------

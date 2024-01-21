@@ -1,42 +1,130 @@
 {
   "envelope": {
+    "led": "drawable",
     "parameters": {
+      "loop": "drawable",
+      "level": "drawable",
       "attack": "drawable",
       "decay": "drawable",
       "sustain": "drawable",
       "release": "drawable"
+    },
+    "jacks": {
+      "output": "drawable"
     }
   },
-  "lfo": {
+  "gain": {
+    "led": "drawable",
     "parameters": {
-      "time": "drawable",
+      "gate": "drawable",
+      "level": "drawable",
+      "attack": "drawable",
+      "decay": "drawable"
+    },
+    "jacks": {
+      "output": "drawable"
+    }
+
+  },
+  "lfo": {
+    "led": "drawable",
+    "parameters": {
+      "frequency": "drawable",
+      "depth": "drawable",
       "synced": "drawable",
       "tempo": "drawable",
-      "depth": "drawable"
+      "waveform": "drawable"
+    },
+    "jacks": {
+      "output": "drawable"
+    }
+  },
+  "filter": {
+    "parameters": {
+      "enable": "drawable",
+      "cutoff": "drawable",
+      "resonance": "drawable",
+      "drive": "drawable"
+    },
+    "jacks": {
+      "cutoff": "drawable"
+    }
+  },
+  "oscillator": {
+    "parameters": {
+      "volume": "drawable",
+      "tune": "drawable",
+      "octave": "drawable",
+      "waveform": "drawable",
+      "fm": "drawable",
+      "output": "drawable"
+    },
+    "jacks": {
+      "output": "drawable",
+      "fm": "drawable",
+      "amount": "drawable",
+      "sync": "drawable"
     }
   },
   "global": {
     "parameters": {
-      "volume": "drawable",
       "glide": "drawable",
-      "transpose": {
-        "sign": "drawable",
-        "detune": "drawable",
-        "transpose": "drawable"
-      },
       "legato": "drawable",
       "voices": "drawable",
       "quality": "drawable"
     }
   },
+  "cables": {
+    "cable1": { "color": "color", "end": "drawable" },
+    "cable2": { "color": "color", "end": "drawable" },
+    "cable3": { "color": "color", "end": "drawable" },
+    "cable4": { "color": "color", "end": "drawable" },
+    "cable5": { "color": "color", "end": "drawable" }
+  },
+  "piano": {
+    "black-key": "drawable",
+    "white-key": "drawable"  
+  },
+  "display": {
+    "main": {
+      "background": "drawable",
+      "button": "drawable",
+      "preset-name": "text-area",
+      "description": "text-area"
+    },
+    "settings": {
+      "background": "drawable",
+      "button": "drawable",
+      "zoom-button": "drawable",
+      "theme-path": "drawable",
+      "default-theme": "drawable",
+      "reload-theme": "drawable",
+      "preset-path": "drawable",
+      "touch-mode": "drawable"
+    },
+    "save-preset": {
+      "background": "drawable",
+      "button": "drawable",
+      "popup": {
+        "background": "drawable",
+        "message": "drawable",
+        "back-button": "drawable",
+        "confirm-button": "drawable"
+      },
+      "name": "text-area",
+      "author": "text-area",
+      "type": "text-area",
+      "description": "text-area",
+      "save-button": "drawable"
+    },
+    "load-preset": {
+      "background": "drawable",
+      "button": "drawable"
+    }
+  },
   "knob": "drawable",
   "knob-bi": "drawable",
   "waveform-knob1": "drawable",
-  "cable1": { "color": "color", "end": "drawable" },
-  "cable2": { "color": "color", "end": "drawable" },
-  "cable3": { "color": "color", "end": "drawable" },
-  "cable4": { "color": "color", "end": "drawable" },
-  "cable5": { "color": "color", "end": "drawable" },
   "slider": "drawable",
   "led": "drawable",
   "input-jack": "drawable",
@@ -44,8 +132,6 @@
   "output-jack": "drawable",
   "toggle": "drawable",
   "threeway-toggle": "drawable",
-  "black-key": "drawable",
-  "white-key": "drawable",
   "tooltip": {
     "text-color": "color",
     "font": "font",

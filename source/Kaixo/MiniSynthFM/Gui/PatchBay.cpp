@@ -182,11 +182,11 @@ namespace Kaixo::Gui {
         setInterceptsMouseClicks(false, false);
         wantsIdle(true);
 
-        m_CableGraphics[0] = { T.cable1.end, T.cable1.color };
-        m_CableGraphics[1] = { T.cable2.end, T.cable2.color };
-        m_CableGraphics[2] = { T.cable3.end, T.cable3.color };
-        m_CableGraphics[3] = { T.cable4.end, T.cable4.color };
-        m_CableGraphics[4] = { T.cable5.end, T.cable5.color };
+        m_CableGraphics[0] = { T.cables.cable1.end, T.cables.cable1.color };
+        m_CableGraphics[1] = { T.cables.cable2.end, T.cables.cable2.color };
+        m_CableGraphics[2] = { T.cables.cable3.end, T.cables.cable3.color };
+        m_CableGraphics[3] = { T.cables.cable4.end, T.cables.cable4.color };
+        m_CableGraphics[4] = { T.cables.cable5.end, T.cables.cable5.color };
     }
 
     // ------------------------------------------------
