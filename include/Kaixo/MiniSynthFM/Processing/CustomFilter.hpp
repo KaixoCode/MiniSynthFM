@@ -41,8 +41,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        Stereo input{ 0, 0 };
-        Stereo output{ 0, 0 };
+        float input = 0;
+        float output = 0;
 
         // ------------------------------------------------
         

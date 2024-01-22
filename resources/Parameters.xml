@@ -211,4 +211,32 @@
   
   <!-- ================================================ -->
 
+  <module name="Delay">
+    <param name="Mix"
+           default="0"
+           transform="Range[0.f, 100.f]"
+           format="Percent"
+           interface="$self.delay.mix($value)"/>
+
+    <param name="Delay"
+           default="1000"
+           transform="Power[1.f, 5000.f, 4.f]"
+           format="Time"
+           interface="$self.delay.delay($value * $value * $value * $value * 4999 + 1)"/>
+
+    <param name="Feedback"
+           default="50"
+           transform="Range[0.f, 100.f]"
+           format="Percent"
+           interface="$self.delay.feedback($value)"/>
+
+    <param name="Pingpong"
+           default="1"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.delay.pingpong($value > 0.5)"/>
+  </module>
+
+  <!-- ================================================ -->
+
 </module>

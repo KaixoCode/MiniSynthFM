@@ -540,6 +540,49 @@
         }
       }
 
+      zoom-button: {
+        extends: $main-text
+        text: ["0.5x", "0.7x", "1.0x"]
+      }
+
+      default-theme: {
+        layers: {
+          background: {
+            background-color: {
+              value: [255, 255, 255, 0]
+              transition: 100
+              hovering: [255, 255, 255, 40]
+            }
+          }
+
+          title: {
+            extends: $main-text
+            text: Default Theme
+            text-align: center-left
+            text-position: [90, 2]
+          }
+        }
+      }
+
+      reload-theme: {
+        layers: {
+          background: {
+            background-color: {
+              value: [255, 255, 255, 0]
+              transition: 100
+              hovering: [255, 255, 255, 40]
+            }
+          }
+
+          title: {
+            extends: $main-text
+            text: Reload Theme
+            text-align: center-left
+            text-position: [90, 2]
+          }
+        }
+      }
+
       theme-path: {
         layers: {
           background: {
@@ -560,7 +603,7 @@
 
           title: {
             extends: $main-text
-            text: "Theme Path:"
+            text: Theme Path
             text-align: center-left
             text-position: [5, 2]
           }
@@ -587,7 +630,7 @@
 
           title: {
             extends: $main-text
-            text: "Preset Path:"
+            text: Preset Path
             text-align: center-left
             text-position: [5, 2]
           }
