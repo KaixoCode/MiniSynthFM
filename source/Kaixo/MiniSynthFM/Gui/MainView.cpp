@@ -60,15 +60,7 @@ namespace Kaixo::Gui {
             else if (zoomFactor == 1.0) zoom.select(2);
             else zoom.select(2);
 
-            auto& text = add<TextView>({ 5, 25, 320, 20 }, {
-                .graphics = T.ledText,
-                .padding = { 8, 8 },
-                .multiline = false,
-                .editable = false,
-                .text = T.ledText.font.fitWithinWidth(T.name(), 360)
-            });
-
-            add<Button>({ 5, 45, 320, 20 }, {
+            Button& themePath = add<Button>({ 5, 25, 320, 20 }, {
                 .callback = [&](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
@@ -80,18 +72,20 @@ namespace Kaixo::Gui {
 
                         if (!T.open(filepath)) return; // Try open theme
 
-                        text.setText(T.ledText.font.fitWithinWidth(T.name(), 360));
+                        themePath.settings.text = T.name();
                         context.repaint();
                         Storage::set<std::string>(ThemePath, filepath);
                     });
-                }
+                },
+                .graphics = T.display.settings.themePath,
+                .text = std::string{ T.name() },
             });
 
             add<Button>({ 5, 45, 320, 20 }, {
                 .callback = [&](bool) {
                     Storage::set<std::string>(ThemePath, Theme::Default);
                     T.openDefault();
-                    text.setText(Theme::Default);
+                    themePath.settings.text = Theme::Default;
                     context.repaint();
                 },
                 .graphics = T.display.settings.defaultTheme
@@ -100,7 +94,7 @@ namespace Kaixo::Gui {
             add<Button>({ 5, 85, 320, 20 }, {
                 .callback = [&](bool) {
                     T.reopen();
-                    text.setText(T.ledText.font.fitWithinWidth(T.name(), 360));
+                    themePath.settings.text = T.name();
                     context.repaint();
                 },
                 .graphics = T.display.settings.reloadTheme
@@ -108,15 +102,7 @@ namespace Kaixo::Gui {
 
             std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-            auto& presetPath = add<TextView>({ 5, 105, 320, 32 }, {
-                .graphics = T.ledText,
-                .padding = { 8, 8 },
-                .multiline = false,
-                .editable = false,
-                .text = T.ledText.font.fitWithinWidth(storedPresetPath, 360)
-            });
-
-            add<Button>({ 5, 105, 320, 20 }, {
+            Button& presetPath = add<Button>({ 5, 105, 320, 20 }, {
                 .callback = [&](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
@@ -127,11 +113,13 @@ namespace Kaixo::Gui {
                         if (!file.exists()) return;
                         auto filepath = file.getFullPathName().toStdString();
 
-                        presetPath.setText(T.ledText.font.fitWithinWidth(filepath, 360));
+                        presetPath.settings.text = filepath;
                         presetPath.repaint();
                         Storage::set<std::string>(PresetPath, filepath);
                     });
-                }
+                },
+                .graphics = T.display.settings.presetPath,
+                .text = storedPresetPath
             });
 
             add<Button>({ 5, 145, 320, 20 }, {
