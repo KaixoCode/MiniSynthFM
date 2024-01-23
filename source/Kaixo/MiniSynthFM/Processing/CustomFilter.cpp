@@ -59,7 +59,6 @@ namespace Kaixo::Processing {
         auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
         input = params.drive * Kaixo::Math::Fast::tanh(input * drive) + input * (1 - params.drive);
 
-        // TODO: mono version of filter
         m_Filter.input = input;
         m_Filter.process();
         output = m_Filter.output.average();

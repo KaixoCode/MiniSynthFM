@@ -17,10 +17,10 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float frequency;
-        float resonance;
-        float drive;
-        bool enable;
+        float frequency = 0;
+        float resonance = 0;
+        float drive = 0;
+        bool enable = true;
 
         // ------------------------------------------------
 

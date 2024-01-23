@@ -14,6 +14,7 @@ namespace Kaixo::Processing {
         registerModule(parameters);
         registerModule(params);
         registerModule(voices);
+        registerModule(delay);
 
         registerInterface<EnvelopeInterface>();
         registerInterface<LfoInterface>();

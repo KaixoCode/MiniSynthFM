@@ -795,6 +795,29 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
+        add<Knob>({ 440, 408, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.delay.mix
+        });
+
+        add<Knob>({ 504, 408, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.delay.delay
+        });
+
+        add<Knob>({ 568, 408, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.delay.feedback
+        });
+        
+        // ------------------------------------------------
+        
         add<Piano>({ 180, 493, 1020, 200 }, {
             .start = 36,
             .notes = 12 * 4 + 1, // 4 octaves + C
