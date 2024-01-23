@@ -795,25 +795,32 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        add<Knob>({ 440, 408, 64, 64 }, {
+        add<Knob>({ 460, 396, 64, 64 }, {
             .graphics = T.knob,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.mix
         });
 
-        add<Knob>({ 504, 408, 64, 64 }, {
+        add<Knob>({ 524, 396, 64, 64 }, {
             .graphics = T.knob,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.delay
         });
 
-        add<Knob>({ 568, 408, 64, 64 }, {
+        add<Knob>({ 588, 396, 64, 64 }, {
             .graphics = T.knob,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.feedback
+        });
+        
+        add<Knob>({ 652, 396, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.delay.pingpong
         });
         
         // ------------------------------------------------

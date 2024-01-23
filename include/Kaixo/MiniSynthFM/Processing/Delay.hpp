@@ -36,8 +36,7 @@ namespace Kaixo::Processing {
 
         void mix(float v) { m_Mix = v; }
         void delay(float millis) { 
-            m_RealDelayL = Math::Fast::clamp(millis, 0, MaxDelaySeconds * 1000); 
-            m_RealDelayR = Math::Fast::clamp(millis * 0.5, 0, MaxDelaySeconds * 1000); 
+            m_TargetDelay = Math::Fast::clamp(millis, 0, MaxDelaySeconds * 1000); 
         }
         void feedback(float fb) { m_Feedback = fb; }
         void pingpong(bool v) { m_PingPong = v; }
@@ -67,17 +66,9 @@ namespace Kaixo::Processing {
         FilterParameters m_FilterParameters;
         CustomFilter m_Filter{ m_FilterParameters };
         std::vector<float> m_Samples{};
-        Random m_Random{};
-        std::size_t m_Counter = 0;
-        float m_RandomDelayL{};
-        float m_RandomDelayR{};
         std::size_t m_Write = 0;
-        float m_DelayL = 0;
-        float m_DelayR = 0;
-        float m_TargetDelayL = 0;
-        float m_TargetDelayR = 0;
-        float m_RealDelayL = 0;
-        float m_RealDelayR = 0;
+        float m_Delay = 0;
+        float m_TargetDelay = 0;
         float m_Smooth = 0.99;
         float m_Feedback = 0.5;
         float m_Mix = true;

@@ -118,6 +118,7 @@
   <module name="Envelope" short-name="Env" count="2">
     <param name="Loop"
            default="0"
+           steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
            interface="$self.params.envelope[$envelope].loop = $value > 0.5"/>
@@ -156,6 +157,7 @@
   <module name="Gain">
     <param name="Gate"
            default="0"
+           steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
            interface="$self.params.envelope[2].trigger = !($value > 0.5)"/>
@@ -184,6 +186,7 @@
   <module name="Filter">
     <param name="Enable"
            default="1"
+           steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
            interface="$self.params.filter.enable = $value > 0.5"/>
@@ -232,6 +235,7 @@
 
     <param name="Pingpong"
            default="1"
+           steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
            interface="$self.delay.pingpong($value > 0.5)"/>

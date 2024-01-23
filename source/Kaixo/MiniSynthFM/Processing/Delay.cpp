@@ -17,19 +17,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
     
     void Delay::process() {
-
-        // Random delay every 1000 millis
-        auto timer = 1000 * sampleRate() / 1000.;
-        if (m_Counter++ > timer) {
-            m_Counter = 0;
-            m_RandomDelayL = 0.1 * m_Random.next();
-            m_RandomDelayR = 0.1 * m_Random.next();
-        }
-
-        m_TargetDelayL = m_RealDelayL + m_RandomDelayL * 2 - 1;
-        m_TargetDelayR = m_RealDelayR + m_RandomDelayR * 2 - 1;
-
-        float out = read(m_DelayL);
+        float out1 = read(m_Delay);
         m_FilterParameters.frequency = 0.8;
         m_FilterParameters.drive = 0.3;
         m_FilterParameters.resonance = 0.4;
@@ -37,7 +25,7 @@ namespace Kaixo::Processing {
         m_HighpassFilter[0].resonance(0.2);
         m_HighpassFilter[0].type(FilterType::HighPass);
 
-        float back = input + m_Feedback * out;
+        float back = input + m_Feedback * out1;
         m_Filter.input = back;
         m_Filter.process();
         m_HighpassFilter.input = m_Filter.output;
@@ -47,25 +35,23 @@ namespace Kaixo::Processing {
         m_Samples[m_Write] = back;
 
         if (m_PingPong) {
-            float outpp = read(m_DelayR);
-            output = input * (1 - m_Mix) + m_Mix * Stereo{ out, outpp };
+            float out2 = read(m_Delay * 0.5);
+            output = input * (1 - m_Mix) + m_Mix * Stereo{ out1, out2 };
         } else {
-            output = input * (1 - m_Mix) + m_Mix * out;
+            output = input * (1 - m_Mix) + m_Mix * out1;
         }
 
         m_Write = (m_Write + 1) % size();
-        m_DelayL = m_DelayL * m_Smooth + m_TargetDelayL * (1 - m_Smooth);
-        m_DelayR = m_DelayR * m_Smooth + m_TargetDelayR * (1 - m_Smooth);
+        m_Delay = m_Delay * m_Smooth + (m_TargetDelay + m_PingPong * m_TargetDelay) * (1 - m_Smooth);
     }
 
     void Delay::prepare(double sampleRate, std::size_t maxBufferSize) {
         resize(sampleRate * MaxDelaySeconds * 2);
-        m_Smooth = Math::smoothCoef(0.9999, 48000. / sampleRate);
+        m_Smooth = Math::smoothCoef(0.99, 48000. / sampleRate);
     }
 
     void Delay::reset() {
-        m_DelayR = m_TargetDelayR;
-        m_DelayL = m_TargetDelayL;
+        m_Delay = m_TargetDelay;
         std::ranges::fill(m_Samples, 0);
     }
 
