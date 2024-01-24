@@ -17,7 +17,33 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
     
     void Delay::process() {
-        float out1 = read(m_Delay);
+
+        auto bars = [&]() {
+            switch (m_Tempo) {
+            case Tempo::T1_1:   return 1.f;
+            case Tempo::T1_2:   return 0.5f;
+            case Tempo::T1_4:   return 0.25f;
+            case Tempo::T1_6:   return 0.16666667f;
+            case Tempo::T1_8:   return 0.125f;
+            case Tempo::T1_16:  return 0.0625f;
+            case Tempo::T1_32:  return 0.03125f;
+            case Tempo::T1_64:  return 0.015625f;
+            }
+        };
+
+        float delay = m_Delay;
+        if (m_Synced) {
+            float nmrBarsForTempo = bars();
+            float beatsPerSecond = bpm() / 60;
+            float beatsPerBar = timeSignature().numerator;
+            float secondsPerBar = beatsPerBar / beatsPerSecond;
+            float seconds = nmrBarsForTempo * secondsPerBar;
+            delay = seconds * 1000;
+        }
+
+        if (m_PingPong) delay *= 2;
+
+        float out1 = read(delay);
         m_FilterParameters.frequency = 0.8;
         m_FilterParameters.drive = 0.3;
         m_FilterParameters.resonance = 0.4;
@@ -35,14 +61,15 @@ namespace Kaixo::Processing {
         m_Samples[m_Write] = back;
 
         if (m_PingPong) {
-            float out2 = read(m_Delay * 0.5);
+            float out2 = read(delay * 0.5);
             output = input * (1 - m_Mix) + m_Mix * Stereo{ out1, out2 };
         } else {
             output = input * (1 - m_Mix) + m_Mix * out1;
         }
 
         m_Write = (m_Write + 1) % size();
-        m_Delay = m_Delay * m_Smooth + (m_TargetDelay + m_PingPong * m_TargetDelay) * (1 - m_Smooth);
+        m_Delay = m_TargetDelay;
+        //m_Delay = m_Delay * m_Smooth + m_TargetDelay * (1 - m_Smooth);
     }
 
     void Delay::prepare(double sampleRate, std::size_t maxBufferSize) {

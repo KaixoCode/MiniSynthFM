@@ -91,11 +91,11 @@
 
     <param name="Synced"
            short-name="Sync"
-           default="0"
+           default="1"
            steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
-           interface="$self.params.lfo[$lfo].synched($value > 0.5)"/>
+           interface="$self.params.lfo[$lfo].synced($value > 0.5)"/>
 
     <param name="Tempo"
            default="5"
@@ -232,6 +232,21 @@
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.delay.feedback($value)"/>
+
+    <param name="Synced"
+           short-name="Sync"
+           default="1"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.delay.synced($value > 0.5)"/>
+
+    <param name="Tempo"
+           default="3"
+           steps="8"
+           transform="Group[8]"
+           format="Group[1/1, 1/2, 1/4, 1/6, 1/8, 1/16, 1/32, 1/64]"
+           interface="$self.delay.tempo($value)"/>
 
     <param name="Pingpong"
            default="1"

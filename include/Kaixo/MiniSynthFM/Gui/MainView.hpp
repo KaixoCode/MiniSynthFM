@@ -26,6 +26,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
         
         TabControl lfoFrequencyTempo[Lfos]{};
+        TabControl delayTimeTempo{};
 
         // ------------------------------------------------
 

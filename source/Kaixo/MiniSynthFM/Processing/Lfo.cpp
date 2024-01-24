@@ -11,7 +11,6 @@ namespace Kaixo::Processing {
 
     float LfoParameters::bars() {
         switch (m_Tempo) {
-        case Tempo::Freeze: return 0.f;
         case Tempo::T32_1:  return 32.f;
         case Tempo::T16_1:  return 16.f;
         case Tempo::T8_1:   return 8.f;
@@ -31,7 +30,7 @@ namespace Kaixo::Processing {
 
     float LfoParameters::samplesPerOscillation() {
         float samplesPerOscillation = 1;
-        if (m_Synched) {
+        if (m_Synced) {
             float nmrBarsForTempo = bars();
             float beatsPerSecond = bpm() / 60;
             float beatsPerBar = timeSignature().numerator;

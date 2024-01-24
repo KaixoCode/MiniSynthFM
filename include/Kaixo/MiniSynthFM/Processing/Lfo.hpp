@@ -23,7 +23,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         enum class Tempo {
-            Freeze, T32_1, T16_1, T8_1, T4_1, T2_1, T1_1, T1_2, T1_4, T1_8, T1_16, T1_32, T1_64, Amount
+            T32_1, T16_1, T8_1, T4_1, T2_1, T1_1, T1_2, T1_4, T1_8, T1_16, T1_32, T1_64, Amount
         };
 
         // ------------------------------------------------
@@ -33,7 +33,7 @@ namespace Kaixo::Processing {
         void tempo(Tempo t) { m_Tempo = t; }
         void waveform(float w) { m_Waveform = normalToIndex(w, LfoWaveform::Amount); }
         void waveform(LfoWaveform w) { m_Waveform = w; }
-        void synched(bool s) { m_Synched = s; }
+        void synced(bool s) { m_Synced = s; }
 
         // ------------------------------------------------
 
@@ -46,10 +46,8 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
     private:
-        float m_Frequency; // Hz
-
-        bool m_Synched;
-
+        float m_Frequency = 10; // Hz
+        bool m_Synced = false;
         Tempo m_Tempo = Tempo::T1_1;
         LfoWaveform m_Waveform = LfoWaveform::Sine;
 

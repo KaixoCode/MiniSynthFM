@@ -598,7 +598,7 @@ namespace Kaixo::Gui {
                 .param = Synth.lfo[i].tempo
             }));
 
-            lfoFrequencyTempo[i].select(0);
+            lfoFrequencyTempo[i].select(1);
 
             add<Knob>({ 195, 128, 64, 64 }, {
                 .graphics = T.lfo.parameters.waveform,
@@ -802,12 +802,21 @@ namespace Kaixo::Gui {
             .param = Synth.delay.mix
         });
 
-        add<Knob>({ 524, 396, 64, 64 }, {
+        delayTimeTempo.add(0, add<Knob>({ 524, 396, 64, 64 }, {
             .graphics = T.knob,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.delay
-        });
+        }));
+        
+        delayTimeTempo.add(1, add<Knob>({ 524, 396, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.delay.tempo
+        }));
+
+        delayTimeTempo.select(1);
 
         add<Knob>({ 588, 396, 64, 64 }, {
             .graphics = T.knob,
@@ -816,11 +825,19 @@ namespace Kaixo::Gui {
             .param = Synth.delay.feedback
         });
         
-        add<Knob>({ 652, 396, 64, 64 }, {
-            .graphics = T.knob,
-            .tooltipName = false,
-            .tooltipValue = false,
-            .param = Synth.delay.pingpong
+        add<Button>({ 652, 396, 64, 64 }, {
+            .graphics = T.toggle,
+            .behaviour = Button::Behaviour::Toggle,
+            .param = Synth.delay.pingpong,
+        });
+        
+        add<Button>({ 726, 396, 64, 64 }, {
+            .callback = [&](bool v) {
+                delayTimeTempo.select(v);
+            },
+            .graphics = T.toggle,
+            .behaviour = Button::Behaviour::Toggle,
+            .param = Synth.delay.synced,
         });
         
         // ------------------------------------------------
