@@ -61,21 +61,15 @@
 
   <!-- ================================================ -->
 
-  <param name="Voices" 
-         default="8" 
-         steps="8" 
-         transform="Integer[1, 8]"
-         format="Integer"/>
-
-  <param name="Legato" 
-         default="1" 
-         steps="2" 
-         transform="Group[2]" 
-         format="Group[Off, On]"/>
+  <param name="Quality" 
+         default="4" 
+         steps="5" 
+         transform="Group[5]"
+         format="Group[Low, Normal, High, Ultra, Extreme]"/>
 
   <!-- ================================================ -->
 
-  <module name="Lfo" count="1" namespace="{name}" short-namespace="{short-name}">
+  <module name="Lfo" count="1">
     <param name="Frequency"
            short-name="Freq"
            default="1"

@@ -9,6 +9,10 @@
 
 // ------------------------------------------------
 
+#include "Kaixo/MiniSynthFM/Controller.hpp"
+
+// ------------------------------------------------
+
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
@@ -21,6 +25,7 @@ namespace Kaixo::Processing {
         float resonance = 0;
         float drive = 0;
         bool enable = true;
+        Quality quality = Quality::Normal;
 
         // ------------------------------------------------
 

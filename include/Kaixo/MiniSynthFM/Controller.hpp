@@ -24,6 +24,12 @@ namespace Kaixo {
 
 	// ------------------------------------------------
 	
+	enum class Quality {
+		Low, Normal, High, Ultra, Extreme, Amount
+	};
+
+	// ------------------------------------------------
+	
 	enum class ModSource { 
 		Note, Velocity, Random, PitchBend, ModWheel,
 		Op1, Op2, Op3, 

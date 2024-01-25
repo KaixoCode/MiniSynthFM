@@ -5,6 +5,11 @@
 #include "Kaixo/Core/Definitions.hpp"
 #include "Kaixo/Core/Processing/Module.hpp"
 #include "Kaixo/Core/Processing/Random.hpp"
+#include "Kaixo/Core/Processing/Filter.hpp"
+
+// ------------------------------------------------
+
+#include "Kaixo/MiniSynthFM/Controller.hpp"
 
 // ------------------------------------------------
 
@@ -24,13 +29,18 @@ namespace Kaixo::Processing {
         void octave(int o) { m_Octave = o; }
 
         void waveform(Waveform wf) { m_Waveform = wf; }
-        void waveform(float val) { m_Waveform = normalToIndex(val, Waveform::Amount); }
+        void waveform(float val) { waveform(normalToIndex(val, Waveform::Amount)); }
+
+        void quality(Quality val) { m_Quality = val; }
+        void quality(float val) { quality(normalToIndex(val, Quality::Amount)); }
 
         // ------------------------------------------------
+
     private:
         Note m_Tune = 0;
         int m_Octave = 0;
         Waveform m_Waveform = Waveform::Sine;
+        Quality m_Quality = Quality::Normal;
 
         // ------------------------------------------------
         
@@ -81,8 +91,13 @@ namespace Kaixo::Processing {
     private:
         float m_Phase = 0;
         float m_PhaseModulation = 0;
+        float m_PreviousPhaseModulation = 0;
         float m_Frequency = 440;
         bool m_DidCycle = false;
+
+        // ------------------------------------------------
+        
+        AAFilter m_AAF{};
 
         // ------------------------------------------------
 
@@ -102,6 +117,14 @@ namespace Kaixo::Processing {
 
         float at(float p);
         float fmAt(float p);
+
+        // ------------------------------------------------
+        
+        template<Quality> float atImpl(float phase);
+        template<Quality> float fmAtImpl(float phase);
+
+        template<std::size_t Oversample, Quality quality>
+        void processImpl();
 
         // ------------------------------------------------
 

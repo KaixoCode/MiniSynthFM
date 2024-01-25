@@ -50,6 +50,13 @@ namespace Kaixo::Processing {
     }
 
     // ------------------------------------------------
+    
+    void MiniSynthFMProcessor::quality(Quality val) {
+        for (auto& osc : params.oscillator) osc.quality(val);
+        params.filter.quality = val;
+    }
+
+    // ------------------------------------------------
 
     void MiniSynthFMProcessor::init() {
         std::memset(params.routing, 0, sizeof(params.routing));

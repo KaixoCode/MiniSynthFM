@@ -35,6 +35,10 @@ namespace Kaixo::Processing {
         void noteOff(Note note, double velocity, int channel) override;
 
         // ------------------------------------------------
+        
+        void quality(Quality val);
+
+        // ------------------------------------------------
 
         ParameterDatabase<MiniSynthFMProcessor> parameters{ this };
         VoiceParameters params;
