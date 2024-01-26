@@ -13,6 +13,12 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    float TimerInterface::operator()() {
+        return self<MiniSynthFMProcessor>().timerPercent;
+    }
+
+    // ------------------------------------------------
+
     float EnvelopeInterface::operator()() {
         return self<MiniSynthFMProcessor>().voices.lastTriggered().envelope[settings.index].output;
     }

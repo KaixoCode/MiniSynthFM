@@ -353,6 +353,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
+        Processing::InterfaceStorage<float()> timerValue;
+        TextView* timer = nullptr;
         TextView* description = nullptr;
 
         // ------------------------------------------------
@@ -360,11 +362,28 @@ namespace Kaixo::Gui {
         MainTab(Context c)
             : View(c) 
         {
+            wantsIdle(true);
+
+            timerValue = context.interface<Processing::TimerInterface>();
+
             description = &add<TextView>({ 5, 35, 320, 125 }, {
                 .graphics = T.ledText,
                 .multiline = true,
                 .editable = false,
             });
+
+            timer = &add<TextView>({ 5, 5, 320, 20 }, {
+                .graphics = T.ledText,
+                .multiline = false,
+                .editable = false,
+            });
+        }
+
+        // ------------------------------------------------
+    
+        void onIdle() override {
+            timer->setText(std::format("{:.4f} %", timerValue()));
+            timer->repaint();
         }
 
         // ------------------------------------------------
@@ -838,6 +857,13 @@ namespace Kaixo::Gui {
             .graphics = T.toggle,
             .behaviour = Button::Behaviour::Toggle,
             .param = Synth.delay.synced,
+        });
+        
+        add<Knob>({ 790, 396, 64, 64 }, {
+            .graphics = T.knob,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.quality
         });
         
         // ------------------------------------------------

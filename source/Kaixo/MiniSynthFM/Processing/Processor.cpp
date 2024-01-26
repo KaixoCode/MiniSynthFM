@@ -2,6 +2,13 @@
 // ------------------------------------------------
 
 #include "Kaixo/MiniSynthFM/Processing/Processor.hpp"
+
+// ------------------------------------------------
+
+#include "Kaixo/Utils/Timer.hpp"
+
+// ------------------------------------------------
+
 #include "Kaixo/MiniSynthFM/Processing/Interfaces.hpp"
 
 // ------------------------------------------------
@@ -20,23 +27,33 @@ namespace Kaixo::Processing {
         registerInterface<LfoInterface>();
         registerInterface<ModInterface>();
         registerInterface<PianoInterface>();
+        registerInterface<TimerInterface>();
     }
 
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::process() {
+        Timer timer{};
+
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
             float output = 0;
             for (auto& voice : voices) {
                 voice.process();
                 output += voice.result;
+                break;
             }
 
             delay.input = output;
             delay.process();
             outputBuffer()[i] = delay.output;
         }
+
+        double nanos = timer.time();
+        double nanosUsedPerSample = nanos / outputBuffer().size();
+        double availableNanosPerSample = sampleRate() / 1e9;
+        double percentUsed = nanosUsedPerSample / availableNanosPerSample;
+        timerPercent = 0.99 * timerPercent + 0.01 * percentUsed;
     }
 
     // ------------------------------------------------
@@ -50,7 +67,11 @@ namespace Kaixo::Processing {
     }
 
     // ------------------------------------------------
-    
+
+    void MiniSynthFMProcessor::quality(float val) {
+        quality(normalToIndex(val, Quality::Amount));
+    }
+
     void MiniSynthFMProcessor::quality(Quality val) {
         params.quality = val;
     }

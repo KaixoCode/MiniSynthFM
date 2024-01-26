@@ -14,6 +14,19 @@
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
+    
+    class TimerInterface : public TypedInterface<float()> {
+    public:
+
+        // ------------------------------------------------
+
+        float operator()() override;
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
 
     class EnvelopeInterface : public TypedInterface<float()> {
     public:

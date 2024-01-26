@@ -65,7 +65,8 @@
          default="4" 
          steps="5" 
          transform="Group[5]"
-         format="Group[Low, Normal, High, Ultra, Extreme]"/>
+         format="Group[Low, Normal, High, Ultra, Extreme]"
+         interface="$self.quality($value)"/>
 
   <!-- ================================================ -->
 

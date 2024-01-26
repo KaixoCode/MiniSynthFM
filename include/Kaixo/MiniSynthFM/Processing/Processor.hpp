@@ -36,6 +36,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
+        void quality(float val);
         void quality(Quality val);
 
         // ------------------------------------------------
@@ -50,6 +51,10 @@ namespace Kaixo::Processing {
         void init() override;
         basic_json serialize() override;
         void deserialize(basic_json& data) override;
+
+        // ------------------------------------------------
+        
+        float timerPercent = 0;
 
         // ------------------------------------------------
 
