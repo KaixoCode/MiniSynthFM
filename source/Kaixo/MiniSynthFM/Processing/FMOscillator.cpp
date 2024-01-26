@@ -59,45 +59,6 @@ namespace Kaixo::Processing {
         }
     }
 
-    template<std::size_t Oversample, Quality Q>
-    void FMOscillator::processImpl() {
-        float delta = m_Frequency / sampleRate();
-
-        if constexpr (Oversample != 1) {
-            float realSampleRate = sampleRate() * Oversample;
-
-            m_AAF.sampleRateIn = realSampleRate;
-            m_AAF.sampleRateOut = sampleRate();
-
-            float actualDelta = m_Frequency / realSampleRate;
-            float deltaPM = (m_PhaseModulation - m_PreviousPhaseModulation) / Oversample;
-            for (std::size_t i = 0; i < Oversample; ++i) {
-                float phaseModulation = m_PreviousPhaseModulation + i * deltaPM;
-                float currentPhase = m_Phase + i * actualDelta;
-                float phase = currentPhase + phaseModulation;
-
-                float out = this->atImpl<Q>(Math::Fast::fmod1(phase + 10));
-                float fmOut = this->fmAtImpl<Q>(Math::Fast::fmod1(phase + 10));
-
-                auto [outLP, fmOutLP] = m_AAF.process({ out, fmOut });
-                output = outLP;
-                fmOutput = fmOutLP;
-            }
-        } else {
-            float phase = m_Phase + m_PhaseModulation;
-
-            output = this->atImpl<Q>(Math::Fast::fmod1(phase + 10));
-            fmOutput = this->fmAtImpl<Q>(Math::Fast::fmod1(phase + 10));
-        }
-
-        m_Phase = Math::Fast::fmod1(m_Phase + delta);
-        
-        m_PreviousPhaseModulation = m_PhaseModulation;
-        m_PhaseModulation = 0;
-
-        m_DidCycle = m_Phase < delta;
-    }
-
     void FMOscillator::process() {
         auto timer = 10 * sampleRate() / 1000.;
         if (m_Counter++ > timer) {

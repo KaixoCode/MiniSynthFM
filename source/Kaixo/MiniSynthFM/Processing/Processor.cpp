@@ -52,8 +52,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
     
     void MiniSynthFMProcessor::quality(Quality val) {
-        for (auto& osc : params.oscillator) osc.quality(val);
-        params.filter.quality = val;
+        params.quality = val;
     }
 
     // ------------------------------------------------

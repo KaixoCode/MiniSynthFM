@@ -45,8 +45,16 @@ namespace Kaixo::Processing {
         float modWheel = 0;
 
         // ------------------------------------------------
+
+        Quality quality = Quality::Normal;
+
+        // ------------------------------------------------
         
         bool routing[(int)ModSource::Amount][(int)ModDestination::Amount]{};
+
+        // ------------------------------------------------
+        
+        std::size_t oversample() const;
 
         // ------------------------------------------------
 
@@ -90,7 +98,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
         
         Random random{};
-        float randomValue;
+        float randomValue = 0;
 
         // ------------------------------------------------
 

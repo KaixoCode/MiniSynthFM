@@ -18,6 +18,19 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    std::size_t VoiceParameters::oversample() const {
+        switch (quality) {
+        case Quality::Low: return 1;
+        case Quality::Normal: return 2;
+        case Quality::High: return 4;
+        case Quality::Ultra: return 8;
+        case Quality::Extreme: return 16;
+        default: return 1;
+        }
+    }
+
+    // ------------------------------------------------
+
     MiniSynthFMVoice::MiniSynthFMVoice(VoiceParameters& p) : params(p) {
         for (auto& lfo : lfo) registerModule(lfo);
         for (auto& osc : oscillator) registerModule(osc);
@@ -142,19 +155,25 @@ namespace Kaixo::Processing {
         for (auto& lfo : lfo) lfo.process();
         for (auto& env : envelope) env.process();
 
-        doModulations();
+        auto os = params.oversample();
+        oversample(os);
+        float out = 0;
+        for (std::size_t i = 0; i < os; ++i) {
+            doModulations();
 
-        for (auto& osc : oscillator) osc.process();
+            for (auto& osc : oscillator) osc.process();
 
-        result = 
-            params.outputOscillator[0] * oscillator[0].output * params.volume[0] +
-            params.outputOscillator[1] * oscillator[1].output * params.volume[1] +
-            params.outputOscillator[2] * oscillator[2].output * params.volume[2];
+            filter.input =
+                params.outputOscillator[0] * oscillator[0].output * params.volume[0] +
+                params.outputOscillator[1] * oscillator[1].output * params.volume[1] +
+                params.outputOscillator[2] * oscillator[2].output * params.volume[2];
 
-        filter.input = result;
+            filter.process();
+            out += filter.output * envelope[2].output * params.envelopeLevel[2];
+        }
+        oversample(1); // reset oversample
 
-        filter.process();
-        result = filter.output * envelope[2].output * params.envelopeLevel[2];
+        result = out / os;
     }
 
     // ------------------------------------------------

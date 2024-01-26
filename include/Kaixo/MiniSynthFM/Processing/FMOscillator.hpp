@@ -96,10 +96,6 @@ namespace Kaixo::Processing {
         bool m_DidCycle = false;
 
         // ------------------------------------------------
-        
-        AAFilter m_AAF{};
-
-        // ------------------------------------------------
 
         Note m_Note = 0;
 
@@ -122,9 +118,6 @@ namespace Kaixo::Processing {
         
         template<Quality> float atImpl(float phase);
         template<Quality> float fmAtImpl(float phase);
-
-        template<std::size_t Oversample, Quality quality>
-        void processImpl();
 
         // ------------------------------------------------
 
