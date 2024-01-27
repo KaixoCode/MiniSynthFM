@@ -37,6 +37,9 @@ namespace Kaixo::Processing {
 
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
+            for (auto& osc : params.oscillator)
+                osc.updateFrequency();
+            
             float output = 0;
             for (auto& voice : voices) {
                 voice.process();
@@ -49,10 +52,10 @@ namespace Kaixo::Processing {
             outputBuffer()[i] = delay.output;
         }
 
-        double nanos = timer.time();
+        double nanos = timer.time<std::chrono::nanoseconds>();
         double nanosUsedPerSample = nanos / outputBuffer().size();
-        double availableNanosPerSample = sampleRate() / 1e9;
-        double percentUsed = nanosUsedPerSample / availableNanosPerSample;
+        double availableNanosPerSample = 1e9 / sampleRate();
+        double percentUsed = 100 * nanosUsedPerSample / availableNanosPerSample;
         timerPercent = 0.99 * timerPercent + 0.01 * percentUsed;
     }
 
@@ -80,6 +83,7 @@ namespace Kaixo::Processing {
 
     void MiniSynthFMProcessor::init() {
         std::memset(params.routing, 0, sizeof(params.routing));
+        //params.routing.reset();
     }
 
     constexpr void forAllModulation(auto lambda) {
@@ -109,7 +113,7 @@ namespace Kaixo::Processing {
         basic_json json;
 
         forAllModulation([&](ModSource src, ModDestination dst) {
-            json[toString(src)][toString(dst)] = params.routing[(int)src][(int)dst];
+            json[toString(src)][toString(dst)] = (bool)params.routing[(int)dst][(int)src];
         });
 
         return json;
@@ -122,7 +126,7 @@ namespace Kaixo::Processing {
             if (data.contains(sname, basic_json::Object) &&
                 data[sname].contains(dname, basic_json::Boolean))
             {
-                params.routing[(int)src][(int)dst] = data[sname][dname].as<bool>();
+                params.routing[(int)dst][(int)src] = data[sname][dname].as<bool>();
             }
         });
     }

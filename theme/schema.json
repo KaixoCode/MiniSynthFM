@@ -107,7 +107,7 @@
       "button": "drawable",
       "popup": {
         "background": "drawable",
-        "message": "drawable",
+        "message": "text-area",
         "back-button": "drawable",
         "confirm-button": "drawable"
       },
@@ -119,7 +119,9 @@
     },
     "load-preset": {
       "background": "drawable",
-      "button": "drawable"
+      "button": "drawable",
+      "bank": "drawable",
+      "preset": "drawable"
     }
   },
   "knob": "drawable",

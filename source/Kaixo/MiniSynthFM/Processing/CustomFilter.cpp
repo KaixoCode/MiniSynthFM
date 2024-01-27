@@ -57,12 +57,12 @@ namespace Kaixo::Processing {
         m_Filter[2].gain(resonance * 15 - params.drive * 12);
 
         auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
-        input = params.drive * Kaixo::Math::Fast::tanh(input * drive) + input * (1 - params.drive);
+        input = params.drive * Math::Fast::tanh_like(input * drive) + input * (1 - params.drive);
 
         m_Filter.input = input;
         m_Filter.process();
         output = m_Filter.output.average();
-        output = params.drive * Kaixo::Math::Fast::tanh(1.115 * output) + output * (1 - 0.9 * params.drive);
+        output = params.drive * Math::Fast::tanh_like(1.115 * output) + output * (1 - 0.9 * params.drive);
     }
 
     // ------------------------------------------------

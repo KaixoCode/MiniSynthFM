@@ -50,7 +50,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
-        bool routing[(int)ModSource::Amount][(int)ModDestination::Amount]{};
+        bool routing[(int)ModDestination::Amount][(int)ModSource::Amount]{};
 
         // ------------------------------------------------
         

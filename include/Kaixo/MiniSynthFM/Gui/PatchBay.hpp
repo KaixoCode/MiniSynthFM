@@ -128,7 +128,7 @@ namespace Kaixo::Gui {
         private:
             struct Segment {
                 float y = 0;
-                float vy = 0;
+                float vy = 1;
             };
 
             std::array<Segment, Segments> m_Segments;

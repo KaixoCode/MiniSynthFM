@@ -25,8 +25,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void tune(Note t) { m_Tune = t; }
-        void octave(int o) { m_Octave = o; }
+        void tune(Note t) { m_Tune = t; m_FrequencyDirty = true; }
+        void octave(int o) { m_Octave = o; m_FrequencyDirty = true; }
 
         void waveform(Waveform wf) { m_Waveform = wf; }
         void waveform(float val) { waveform(normalToIndex(val, Waveform::Amount)); }
@@ -35,12 +35,26 @@ namespace Kaixo::Processing {
         void quality(float val) { quality(normalToIndex(val, Quality::Amount)); }
 
         // ------------------------------------------------
+        
+        float frequencyMultiplier() { return m_FrequencyMultiplier; }
+
+        // ------------------------------------------------
+
+        void updateFrequency() {
+            if (!m_FrequencyDirty) return;
+            m_FrequencyDirty = false;
+            m_FrequencyMultiplier = Math::Fast::exp2(1. / 12. * m_Tune + m_Octave);
+        }
+
+        // ------------------------------------------------
 
     private:
         Note m_Tune = 0;
+        float m_FrequencyMultiplier = 1;
         int m_Octave = 0;
         Waveform m_Waveform = Waveform::Sine;
         Quality m_Quality = Quality::Normal;
+        bool m_FrequencyDirty = true;
 
         // ------------------------------------------------
         
@@ -74,8 +88,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void note(float note) { m_Note = note; }
-        void fm(float phase) { m_PhaseModulation += phase; }
+        void note(float note);
+        void fm(float phase);
 
         // ------------------------------------------------
 
@@ -93,17 +107,13 @@ namespace Kaixo::Processing {
         float m_PhaseModulation = 0;
         float m_PreviousPhaseModulation = 0;
         float m_Frequency = 440;
+        float m_FrequencyOffset = 440;
+        float m_NoteFrequency = 0;
         bool m_DidCycle = false;
 
         // ------------------------------------------------
-
-        Note m_Note = 0;
-
-        // ------------------------------------------------
         
-        Random m_Random;
-        float m_RandomTune = 0;
-        std::size_t m_Counter = 0;
+        Note m_Note = 1;
 
         // ------------------------------------------------
 
@@ -113,11 +123,6 @@ namespace Kaixo::Processing {
 
         float at(float p);
         float fmAt(float p);
-
-        // ------------------------------------------------
-        
-        template<Quality> float atImpl(float phase);
-        template<Quality> float fmAtImpl(float phase);
 
         // ------------------------------------------------
 

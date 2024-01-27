@@ -27,6 +27,217 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
     
+    class LoadPresetTab : public View {
+    public:
+
+        // ------------------------------------------------
+        
+        class Bank : public View {
+        public:
+
+            // ------------------------------------------------
+            
+            struct Settings {
+
+                LoadPresetTab& self;
+                std::string name;
+                std::filesystem::path folder{};
+                bool isFactory = false;
+
+            } settings;
+
+            // ------------------------------------------------
+            
+            Theme::Drawable graphics;
+
+            // ------------------------------------------------
+
+            Bank(Context c, Settings s)
+                : View(c), settings(std::move(s)) 
+            {
+                graphics = T.display.loadPreset.bank;
+                animation(graphics);
+            }
+
+            // ------------------------------------------------
+            
+            void mouseDown(const juce::MouseEvent& e) override {
+                settings.self.select(*this);
+            }
+
+            // ------------------------------------------------
+
+            void paint(juce::Graphics& g) override {
+                graphics.draw({
+                    .graphics = g,
+                    .bounds = localDimensions(),
+                    .text = settings.name,
+                    .state = state()
+                });
+            }
+
+            // ------------------------------------------------
+
+        };
+
+        // ------------------------------------------------
+        
+        class Preset : public View {
+        public:
+
+            // ------------------------------------------------
+
+            struct Settings {
+
+                LoadPresetTab& self;
+                std::filesystem::path path{};
+                std::string factoryName{};
+                bool isFactory = false;
+                bool isInit = false;
+
+            } settings;
+
+            // ------------------------------------------------
+            
+            Theme::Drawable graphics;
+            PresetData presetData;
+
+            // ------------------------------------------------
+
+            Preset(Context c, Settings s)
+                : View(c), settings(std::move(s))
+            {
+                graphics = T.display.loadPreset.preset;
+
+                if (settings.isFactory) {
+                    presetData.name = settings.factoryName;
+                } else {
+                    if (auto json = basic_json::parse(file_to_string(settings.path))) {
+                        auto pdata = typeid(PresetData).name();
+                        if (json->contains(pdata)) {
+                            presetData.deserialize(json.value()[pdata]);
+                        }
+                    }
+                }
+
+                animation(graphics);
+            }
+
+            // ------------------------------------------------
+
+            void mouseDown(const juce::MouseEvent& e) override {
+                if (settings.isInit) {
+                    context.initPreset();
+                } else if (settings.isFactory) {
+                    // TODO:
+                } else {
+                    context.loadPreset(settings.path);
+                }
+            }
+
+            // ------------------------------------------------
+            
+            void paint(juce::Graphics& g) override {
+                graphics.draw({
+                    .graphics = g,
+                    .bounds = localDimensions(),
+                    .text = presetData.name,
+                    .state = state()
+                });
+            }
+
+            // ------------------------------------------------
+
+        };
+
+        // ------------------------------------------------
+        
+        ScrollView* m_Banks;
+        ScrollView* m_Presets;
+
+        // ------------------------------------------------
+
+        LoadPresetTab(Context c) 
+            : View(c) 
+        {
+            m_Banks = &add<ScrollView>({ 0, 0, 110, Height }, {
+                .scrollbar = T.scrollbar
+            });
+            
+            m_Presets = &add<ScrollView>({ 110, 0, 220, Height }, {
+                .scrollbar = T.scrollbar
+            });
+
+            reloadBanks();
+        }
+
+        // ------------------------------------------------
+        
+        void reloadBanks() {
+            m_Banks->clear();
+
+            select(m_Banks->add<Bank>({ Width, 20 }, {
+                .self = *this,
+                .name = "Factory",
+                .isFactory = true
+            }));
+
+            if (auto optPath = Storage::get<std::string>(PresetPath)) {
+                std::filesystem::path path = optPath.value();
+
+                m_Banks->add<Bank>({ Width, 20 }, {
+                    .self = *this,
+                    .name = "User",
+                    .folder = path
+                });
+
+                for (auto& entry : std::filesystem::directory_iterator(path)) {
+                    if (entry.is_directory()) {
+                        m_Banks->add<Bank>({ Width, 20 }, {
+                            .self = *this,
+                            .name = entry.path().stem().string(),
+                            .folder = entry
+                        });
+                    }
+                }
+            }
+        }
+
+        // ------------------------------------------------
+        
+        void select(Bank& bank) {
+            m_Presets->clear();
+
+            for (auto& b : m_Banks->views()) {
+                b->selected(false);
+            }
+            bank.selected(true);
+
+            if (bank.settings.isFactory) {
+                m_Presets->add<Preset>({ Width, 20 }, {
+                    .self = *this,
+                    .factoryName = "Init",
+                    .isFactory = true,
+                    .isInit = true,
+                });
+            } else {
+                for (auto& entry : std::filesystem::directory_iterator(bank.settings.folder)) {
+                    if (entry.is_regular_file()) {
+                        m_Presets->add<Preset>({ Width, 20 }, {
+                            .self = *this,
+                            .path = entry
+                        });
+                    }
+                }
+            }
+        }
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+    
     class SettingsTab : public View {
     public:
 
@@ -155,7 +366,9 @@ namespace Kaixo::Gui {
                 
                 // ------------------------------------------------
 
-                m_BackButton = &add<Button>({ 94, 130, 146, 32 }, {
+                add<ImageView>({ .image = T.display.savePreset.popup.background });
+
+                m_BackButton = &add<Button>({ 80, 98, 95, 32 }, {
                     .callback = [this](bool) {
                         if (m_Callback) m_Callback(false);
                         if (--m_Requests == 0) setVisible(false);
@@ -163,7 +376,7 @@ namespace Kaixo::Gui {
                     .graphics = T.display.savePreset.popup.backButton,
                 });
 
-                add<Button>({ 244, 130, 146, 32 }, {
+                add<Button>({ 175, 98, 100, 32 }, {
                     .callback = [this](bool) {
                         if (m_Callback) m_Callback(true);
                         if (--m_Requests == 0) setVisible(false);
@@ -171,8 +384,8 @@ namespace Kaixo::Gui {
                     .graphics = T.display.savePreset.popup.confirmButton
                 });
 
-                m_Message = &add<TextView>({ 94, 75, 296, 56 }, {
-                    .graphics = T.ledText,
+                m_Message = &add<TextView>({ 85, 40, 185, 63 }, {
+                    .graphics = T.display.savePreset.popup.message,
                     .padding = { 8, 8 },
                     .multiline = true,
                     .editable = false,
@@ -406,7 +619,8 @@ namespace Kaixo::Gui {
         {
             tabs.add(0, add<MainTab>());
             tabs.add(1, add<PresetTab>());
-            tabs.add(2, add<SettingsTab>());
+            tabs.add(2, add<LoadPresetTab>());
+            tabs.add(3, add<SettingsTab>());
 
             tabs.addButton(0, add<Button>({ 330, 0, 25, 25 }, {
                 .graphics = T.display.main.button
@@ -417,6 +631,10 @@ namespace Kaixo::Gui {
             }));
 
             tabs.addButton(2, add<Button>({ 330, 50, 25, 25 }, {
+                .graphics = T.display.loadPreset.button
+            }));
+
+            tabs.addButton(3, add<Button>({ 330, 75, 25, 25 }, {
                 .graphics = T.display.settings.button
             }));
 

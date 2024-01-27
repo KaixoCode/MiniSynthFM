@@ -311,6 +311,18 @@
         }
       }
     }
+
+    $basic-button: {
+      extends: $main-text
+
+      background-color: {
+        value: [255, 255, 255, 0]
+        transition: 100
+        hovering: [255, 255, 255, 40]
+      }
+
+      text-align: center-left
+    }
   }
 
   // ------------------------------------------------
@@ -512,32 +524,81 @@
   display: {
     main: {
       button: {
+        extends: $basic-button
+        text: M
+        text-align: center
+      }
+    }
+
+    load-preset: {
+      button: {
+        extends: $basic-button
+        text: L
+        text-align: center
+      }
+
+      preset: {
         background-color: {
-          value: [255, 255, 255, 0]
+          value: [255, 255, 255, 10]
           transition: 100
           hovering: [255, 255, 255, 40]
         }
 
-        text: {
-          content: M
+        extends: $main-text
+        text: $text
+        text-position: [5, 2]
+        text-align: center-left
+      }
+
+      bank: {
+        background-color: {
+          value: [255, 255, 255, 10]
+          transition: 100
+          hovering: [255, 255, 255, 40]
+        }
+
+        extends: $main-text
+        text: $text
+        text-position: [5, 2]
+        text-align: center-left
+      }
+    }
+
+    save-preset: {
+      button: {
+        extends: $basic-button
+        text: P
+        text-align: center
+      }
+
+      popup: {
+        background: {
+          background-color: [0, 0, 0, 100]
+        }
+
+        back-button: {
+          extends: $basic-button
+          text: Back
+          text-align: center
+        }
+
+        confirm-button: {
+          extends: $basic-button
+          text: OK
+          text-align: center
+        }
+
+        message: {
+          extends: $text-area
         }
       }
     }
 
     settings: {
       button: {
-        extends: $main-text
-        
-        background-color: {
-          value: [255, 255, 255, 0]
-          transition: 100
-          hovering: [255, 255, 255, 40]
-        }
-
-        text: {  
-          content: S
-          align: center
-        }
+        extends: $basic-button
+        text: S
+        text-align: center
       }
 
       zoom-button: {
@@ -546,80 +607,39 @@
       }
 
       default-theme: {
-        layers: {
-          background: {
-            background-color: {
-              value: [255, 255, 255, 0]
-              transition: 100
-              hovering: [255, 255, 255, 40]
-            }
-          }
-
-          title: {
-            extends: $main-text
-            text: Default Theme
-            text-align: center-left
-            text-position: [90, 2]
-          }
-        }
+        extends: $basic-button
+        text: Default Theme
+        text-position: [90, 2]
       }
 
       reload-theme: {
-        layers: {
-          background: {
-            background-color: {
-              value: [255, 255, 255, 0]
-              transition: 100
-              hovering: [255, 255, 255, 40]
-            }
-          }
-
-          title: {
-            extends: $main-text
-            text: Reload Theme
-            text-align: center-left
-            text-position: [90, 2]
-          }
-        }
+        extends: $basic-button
+        text: Reload Theme
+        text-position: [90, 2]
       }
 
       theme-path: {
-        layers: {
-          background: {
-            background-color: {
-              value: [255, 255, 255, 0]
-              transition: 100
-              hovering: [255, 255, 255, 40]
-            }
-          }
+        extends: $basic-button
+        text: Theme Path
+        text-position: [5, 2]
 
+        layers: {
           path: {
             extends: $main-text
             text: $text
             text-overflow: dots
             text-align: center-left
             text-position: [90, 2]
-          }
-
-          title: {
-            extends: $main-text
-            text: Theme Path
-            text-align: center-left
-            text-position: [5, 2]
           }
         }
       }
 
       preset-path: {
-        layers: {
-          background: {
-            background-color: {
-              value: [255, 255, 255, 0]
-              transition: 100
-              hovering: [255, 255, 255, 40]
-            }
-          }
+        extends: $basic-button
+        text: Preset Path
+        text-position: [5, 2]
 
+        layers: {
           path: {
             extends: $main-text
             text: $text
@@ -627,17 +647,8 @@
             text-align: center-left
             text-position: [90, 2]
           }
-
-          title: {
-            extends: $main-text
-            text: Preset Path
-            text-align: center-left
-            text-position: [5, 2]
-          }
         }
       }
     }
-
-
   }
 }
