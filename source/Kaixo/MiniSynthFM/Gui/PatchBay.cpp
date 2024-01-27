@@ -83,6 +83,23 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+    void PatchBay::Connection::initPosition(PatchBay& self) {
+        Point<float> a = self.m_Jacks[begin]->holePosition();
+        Point<float> b = self.m_Jacks[end]->holePosition();
+
+        if (a.x() > b.x()) std::swap(a, b);
+        if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
+
+        float dy = (b.y() - a.y()) / (Segments + 1);
+        for (std::size_t i = 0; i < Segments; ++i) {
+            auto& segment = m_Segments[i];
+            float y = a.y() + dy * (i + 1);
+            segment.y = y;
+        }
+    }
+
+    // ------------------------------------------------
+
     void PatchBay::Connection::paint(juce::Graphics& g, Point<> mouse, PatchBay& self) {
         if (begin == npos && end == npos) return; // Nothing to draw
 
@@ -285,6 +302,7 @@ namespace Kaixo::Gui {
             }
 
             c.m_Color = connection.color;
+            c.initPosition(*this);
         }
     }
 

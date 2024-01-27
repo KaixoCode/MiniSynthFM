@@ -115,6 +115,10 @@ namespace Kaixo::Gui {
             void reset();
 
             // ------------------------------------------------
+            
+            void initPosition(PatchBay& self);
+
+            // ------------------------------------------------
 
             void paint(juce::Graphics& g, Point<> mouse, PatchBay& self);
 
