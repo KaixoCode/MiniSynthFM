@@ -14,7 +14,7 @@
 
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">
     <param name="Volume"
-           description="Adjust the volume of the operator."
+           description="Adjust the volume of the operator. This affects both the output jack, and the output toggle."
            default="0"
            transform="Decibel[0.f, 1.9952623149688795f]"
            format="Decibels"
@@ -22,12 +22,14 @@
     </param>
 
     <param name="Tune"
+           description="Fine control over the tune of the operator. Use the Octave switch to tune the operator up or down even further."
            default="0"
            transform="Range[-12.f, 12.f]"
            format="Pitch"
            interface="$self.params.oscillator[$oscillator].tune($value * 24 - 12)"/>
 
     <param name="Octave"
+           description="Tune the operator up or down an octave."
            default="1" 
            steps="3"
            transform="Group[3]"
@@ -35,6 +37,7 @@
            interface="$self.params.oscillator[$oscillator].octave(normalToIndex($value, 3) - 1)"/>
     
     <param name="Waveform"
+           description="Switch between the 4 basic waveforms: Sine, Triangle, Saw, and Square."
            short-name="Wave"
            default="0" 
            steps="4"
@@ -43,12 +46,14 @@
            interface="$self.params.oscillator[$oscillator].waveform($value)"/>
     
     <param name="FM" var-name="fm"
+           description="Adjust how much FM from the FM jack is applied. This parameter can also additionally be controlled with the Amount jack."
            default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.fm[$oscillator] = $value"/>
 
     <param name="Output"
+           description="This toggle enables or disables this operators main output. This does not affect the out jack, only whether the sound gets forwarded to the filter."
            default="1"
            steps="2"
            transform="Group[2]"
@@ -62,7 +67,7 @@
   <!-- ================================================ -->
 
   <param name="Quality" 
-         default="4" 
+         default="1" 
          steps="5" 
          transform="Group[5]"
          format="Group[Low, Normal, High, Ultra, Extreme]"
@@ -73,12 +78,14 @@
   <module name="Lfo" count="1">
     <param name="Frequency"
            short-name="Freq"
+           description="Fine control over the frequency of the LFO. Toggle the Sync switch to synchronize the LFO to the BMP."
            default="1"
            transform="Power[0.05f, 100.f, 4.f]"
            format="Frequency"
            interface="$self.params.lfo[$lfo].frequency($value * $value * $value * $value * 99.95 + 0.05)"/>
 
     <param name="Depth"
+           description="Control the depth of the LFO."
            default="100"
            transform="Range[0.f, 100.f]"
            format="Percent"
@@ -86,6 +93,7 @@
 
     <param name="Synced"
            short-name="Sync"
+           description="This toggle switches between Frequency and Tempo mode of the LFO. In Tempo mode the LFO is synced to the BPM, in Frequency mode it's not synced."
            default="1"
            steps="2"
            transform="Group[2]"
@@ -93,6 +101,7 @@
            interface="$self.params.lfo[$lfo].synced($value > 0.5)"/>
 
     <param name="Tempo"
+           description="Set the rate of the LFO to a multiple of a bar."
            default="5"
            steps="12"
            transform="Group[12]"
@@ -101,6 +110,7 @@
 
     <param name="Waveform"
            short-name="Wave"
+           description="Set the waveform of the LFO, either basic waveforms: Sine, Triangle, Saw, or Square. Or noise: Quantized is discrete values, and Noise is smoothed random values."
            default="0"
            steps="6"
            transform="Group[6]"
@@ -112,6 +122,7 @@
 
   <module name="Envelope" short-name="Env" count="2">
     <param name="Loop"
+           description="Loop the envelope. Instead of going into the sustain, it will loop back to the attack phase of the envelope when it finishes decaying."
            default="0"
            steps="2"
            transform="Group[2]"
@@ -119,30 +130,35 @@
            interface="$self.params.envelope[$envelope].loop = $value > 0.5"/>
 
     <param name="Level"
+           description="Adjust the level of the envelope."
            default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.envelopeLevel[$envelope] = $value"/>
 
     <param name="Attack"
+           description="The attack of the envelope follows an exponential curve."
            default="10"
            transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
            interface="$self.params.envelope[$envelope].attack($value * $value * 4990 + 10)"/>
 
     <param name="Decay"
+           description="The decay of the envelope follows an exponential curve."
            default="200"
            transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
            interface="$self.params.envelope[$envelope].decay($value * $value * 4990 + 10)"/>
 
     <param name="Sustain"
+           description="Set the sustain value of the envelope."
            default="100"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.envelope[$envelope].sustain($value)"/>
 
     <param name="Release"
+           description="The release of the envelope follows an exponential curve."
            default="60"
            transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
@@ -151,6 +167,7 @@
 
   <module name="Gain">
     <param name="Gate"
+           description="When gate is enabled the envelope will sustain after the attack phase. Otherwise it will immediately enter the decay phase."
            default="0"
            steps="2"
            transform="Group[2]"
@@ -158,18 +175,21 @@
            interface="$self.params.envelope[2].trigger = !($value > 0.5)"/>
 
     <param name="Level"
+           description="Adjust the level of the envelope."
            default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.envelopeLevel[2] = $value"/>
 
     <param name="Attack"
+           description="The attack of the envelope follows an exponential curve."
            default="10"
            transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
            interface="$self.params.envelope[2].attack($value * $value * 4990 + 10)"/>
 
     <param name="Decay"
+           description="The decay of the envelope follows an exponential curve."
            default="200"
            transform="Power[10.f, 5000.f, 2.f]"
            format="Time"
@@ -180,6 +200,7 @@
 
   <module name="Filter">
     <param name="Enable"
+           description="Enable the filter module. When disabled the filter is entirely bypassed and the signal is immediately sent out to the delay."
            default="1"
            steps="2"
            transform="Group[2]"
@@ -188,6 +209,7 @@
 
     <param name="Cutoff"
            short-name="Cutoff"
+           description="Control the cutoff of the lowpass filter."
            default="16000"
            transform="Log[60.f, 16000.f]"
            format="Frequency"
@@ -195,12 +217,14 @@
     
     <param name="Resonance"
            short-name="Reso"
+           description="Control the resonance of the lowpass filter."
            default="0"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.filter.resonance = $value"/>
 
     <param name="Drive"
+           description="The drive control drives the signal both before and after the lowpass filter. This also introduces additional noise to make the filter sound more unstable and dirty."
            default="0"
            transform="Range[0.f, 100.f]"
            format="Percent"
@@ -211,18 +235,21 @@
 
   <module name="Delay">
     <param name="Mix"
+           description="Mix between the dry and delayed signal."
            default="0"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.delay.mix($value)"/>
 
-    <param name="Delay"
+    <param name="Time"
+           description="Fine control over the delay time. Toggle the Sync switch to synchronize the delay to the BMP."
            default="1000"
            transform="Power[1.f, 5000.f, 4.f]"
            format="Time"
            interface="$self.delay.delay($value * $value * $value * $value * 4999 + 1)"/>
 
     <param name="Feedback"
+           description="Adjust how much of the signal is fed back after the delay time. At 100% all of the signal is fed back and results an infinite delay tail."
            default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
@@ -230,6 +257,7 @@
 
     <param name="Synced"
            short-name="Sync"
+           description="This toggle switches between Time and Tempo mode of the delay. In Tempo mode the delay is synced to the BPM, in Time mode it's not synced."
            default="1"
            steps="2"
            transform="Group[2]"
@@ -237,6 +265,7 @@
            interface="$self.delay.synced($value > 0.5)"/>
 
     <param name="Tempo"
+           description="Set the delay time of the delay to a multiple of a bar."
            default="3"
            steps="8"
            transform="Group[8]"
@@ -244,6 +273,7 @@
            interface="$self.delay.tempo($value)"/>
 
     <param name="Pingpong"
+           description="Enable a ping-pong effect. This offsets the delay for one of the stereo channels."
            default="1"
            steps="2"
            transform="Group[2]"

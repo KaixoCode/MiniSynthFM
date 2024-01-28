@@ -14,10 +14,10 @@ namespace Kaixo {
     // ------------------------------------------------
     
     void PresetData::init() {
-        name = "";
+        name = "Init";
         author = "";
         type = "";
-        description = "";
+        description = "MiniFM is a 3-Operator FM synth with a driven lowpass filter and a simple delay effect, all of which can be modulated with envelopes and an lfo.";
     }
 
     basic_json PresetData::serialize() {

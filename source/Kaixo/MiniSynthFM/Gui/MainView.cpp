@@ -352,6 +352,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
+        Button* themePath;
         Button* presetPath;
 
         // ------------------------------------------------
@@ -372,9 +373,9 @@ namespace Kaixo::Gui {
 
             //add(new TimerValue{ context }, Dimensions{ 10, 210, 10 + 200, 210 + 100 });
 
-            zoom.addButton(0, add<Button>({ 5 + 0 * 48, 5, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
-            zoom.addButton(1, add<Button>({ 5 + 1 * 48, 5, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
-            zoom.addButton(2, add<Button>({ 5 + 2 * 48, 5, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
+            zoom.addButton(0, add<Button>({ 6 + 0 * 48, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
+            zoom.addButton(1, add<Button>({ 6 + 1 * 48, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
+            zoom.addButton(2, add<Button>({ 6 + 2 * 48, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
             
             zoom.tab(0).addCallback([&](bool v) { if (v) context.scale(0.5); });
             zoom.tab(1).addCallback([&](bool v) { if (v) context.scale(0.7); });
@@ -386,41 +387,41 @@ namespace Kaixo::Gui {
             else if (zoomFactor == 1.0) zoom.select(2);
             else zoom.select(2);
 
-            Button& themePath = add<Button>({ 5, 25, 320, 20 }, {
-                .callback = [&](bool) {
+            themePath = &add<Button>({ 6, 6, 312, 20 }, {
+                .callback = [this](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
                         | juce::FileBrowserComponent::canSelectFiles,
-                    [&](const juce::FileChooser& choose) 
+                    [this](const juce::FileChooser& choose)
                     {
                         auto file = choose.getResult();
                         auto filepath = file.getFullPathName().toStdString();
 
                         if (!T.open(filepath)) return; // Try open theme
 
-                        themePath.settings.text = T.name();
+                        themePath->settings.text = T.name();
                         context.repaint();
-                        Storage::set<std::string>(ThemePath, filepath);
+                        Storage::set<std::string>(Setting::LoadedTheme, filepath);
                     });
                 },
                 .graphics = T.display.settings.themePath,
                 .text = std::string{ T.name() },
             });
 
-            add<Button>({ 5, 45, 320, 20 }, {
-                .callback = [&](bool) {
-                    Storage::set<std::string>(ThemePath, Theme::Default);
+            add<Button>({ 6, 28, 312, 20 }, {
+                .callback = [this](bool) {
+                    Storage::set<std::string>(Setting::LoadedTheme, Theme::Default);
                     T.openDefault();
-                    themePath.settings.text = Theme::Default;
+                    themePath->settings.text = Theme::Default;
                     context.repaint();
                 },
                 .graphics = T.display.settings.defaultTheme
             });
 
-            add<Button>({ 5, 85, 320, 20 }, {
-                .callback = [&](bool) {
+            add<Button>({ 6, 50, 312, 20 }, {
+                .callback = [this](bool) {
                     T.reopen();
-                    themePath.settings.text = T.name();
+                    themePath->settings.text = T.name();
                     context.repaint();
                 },
                 .graphics = T.display.settings.reloadTheme
@@ -428,7 +429,7 @@ namespace Kaixo::Gui {
 
             std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-            presetPath = &add<Button>({ 5, 105, 320, 20 }, {
+            presetPath = &add<Button>({ 6, 72, 312, 20 }, {
                 .callback = [this](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
@@ -448,13 +449,13 @@ namespace Kaixo::Gui {
                 .text = storedPresetPath
             });
 
-            add<Button>({ 5, 145, 320, 20 }, {
+            add<Button>({ 6, 94, 312, 20 }, {
                 .callback = [&](bool state) {
                     Storage::set<bool>(Setting::TouchMode, state);
                 },
                 .graphics = T.display.settings.touchMode,
                 .behaviour = Button::Behaviour::Toggle,
-            }).selected(Storage::flag(Setting::TouchMode));
+            }).value(Storage::flag(Setting::TouchMode));
         }
 
         // ------------------------------------------------
@@ -520,7 +521,7 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             name = &add<TextView>({ 6, 6, 312, 20 }, {
-                .graphics = T.ledText,
+                .graphics = T.display.savePreset.name,
                 .padding = { 4, 3 },
                 .multiline = false,
                 .editable = true,
@@ -530,7 +531,7 @@ namespace Kaixo::Gui {
             });
 
             author = &add<TextView>({ 6, 28, 312, 20 }, {
-                .graphics = T.ledText,
+                .graphics = T.display.savePreset.author,
                 .padding = { 4, 3 },
                 .multiline = false,
                 .editable = true,
@@ -540,7 +541,7 @@ namespace Kaixo::Gui {
             });
 
             type = &add<TextView>({ 6, 50, 312, 20 }, {
-                .graphics = T.ledText,
+                .graphics = T.display.savePreset.type,
                 .padding = { 4, 3 },
                 .multiline = false,
                 .editable = true,
@@ -550,7 +551,7 @@ namespace Kaixo::Gui {
             });
 
             description = &add<TextView>({ 6, 72, 312, 65 }, {
-                .graphics = T.ledText,
+                .graphics = T.display.savePreset.description,
                 .padding = { 4, 3 },
                 .multiline = true,
                 .editable = true,
@@ -602,7 +603,8 @@ namespace Kaixo::Gui {
     
         void resultHandler(SaveResult result) {
             switch (result) {
-            case SaveResult::Success: return; // Success
+            case SaveResult::Success:
+                return settings.popup.open([](bool) {}, "Preset saved!", false);
             case SaveResult::AlreadyExists:
                 return settings.popup.open([this](bool v) {
                     if (!v) return;
@@ -621,7 +623,7 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
     
-    class MainTab : public View, public DescriptionListener {
+    class MainTab : public View, public DescriptionListener, public PresetListener {
     public:
 
         // ------------------------------------------------
@@ -632,10 +634,25 @@ namespace Kaixo::Gui {
         }
 
         // ------------------------------------------------
+
+        void presetSaved() override { reloadPresetName(); }
+        void presetLoaded() override { reloadPresetName(); }
+
+        // ------------------------------------------------
         
-        Processing::InterfaceStorage<float()> timerValue;
-        TextView* timer = nullptr;
+        void reloadPresetName() {
+            auto& data = context.data<PresetData>();
+            std::string name = data.name;
+            if (!data.type.empty()) name += " (" + data.type + ")";
+            if (!data.author.empty()) name += " - " + data.author;
+            presetName->settings.text = name;
+            presetName->repaint();
+        }
+
+        // ------------------------------------------------
+        
         TextView* description = nullptr;
+        TextView* presetName = nullptr;
 
         // ------------------------------------------------
 
@@ -659,29 +676,25 @@ namespace Kaixo::Gui {
             add<ImageView>({ .image = T.display.main.background });
 
             // ------------------------------------------------
-
-            wantsIdle(true);
-
-            timerValue = context.interface<Processing::TimerInterface>();
-
-            description = &add<TextView>({ 5, 35, 320, 125 }, {
-                .graphics = T.ledText,
-                .multiline = true,
-                .editable = false,
-            });
-
-            timer = &add<TextView>({ 5, 5, 320, 20 }, {
-                .graphics = T.ledText,
+            
+            presetName = &add<TextView>({ 6, 6, 312, 20 }, {
+                .graphics = T.display.main.presetName,
+                .padding = { 4, 3 },
                 .multiline = false,
                 .editable = false,
+                .lineHeight = 14,
             });
-        }
 
-        // ------------------------------------------------
-    
-        void onIdle() override {
-            timer->setText(std::format("{:.4f} %", timerValue()));
-            timer->repaint();
+            description = &add<TextView>({ 6, 28, 312, 54 }, {
+                .graphics = T.display.main.description,
+                .padding = { 4, 3 },
+                .multiline = true,
+                .editable = false,
+                .lineHeight = 16,
+            });
+
+            // ------------------------------------------------
+
         }
 
         // ------------------------------------------------
@@ -751,10 +764,6 @@ namespace Kaixo::Gui {
         context.tooltip().background(T.tooltip.background);
         context.tooltip().font(T.tooltip.font);
         context.tooltip().textColor(T.tooltip.textColor);
-
-        // ------------------------------------------------
-        
-        context.defaultDescription("MiniFM is a simple FM synthesizer.");
 
         // ------------------------------------------------
 
@@ -1135,7 +1144,7 @@ namespace Kaixo::Gui {
             .graphics = T.knob,
             .tooltipName = false,
             .tooltipValue = false,
-            .param = Synth.delay.delay
+            .param = Synth.delay.time
         }));
         
         delayTimeTempo.add(1, add<Knob>({ 524, 396, 64, 64 }, {

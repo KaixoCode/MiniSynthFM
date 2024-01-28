@@ -180,6 +180,8 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     bool PatchBay::Connection::changing() {
+        // If not connected, not changing
+        if (end == npos && begin == npos) return false; 
         // If it's currently being moved, it's changing
         if (end == npos && begin != npos) return true;
         // Otherwise, if any segment is moving, it's changing

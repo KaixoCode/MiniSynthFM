@@ -256,16 +256,6 @@
       description: fonts/map.json
     }
 
-    $small-font: {
-      map: fonts/small-map.png
-      description: fonts/small-map.json
-    }
-
-    $main-font-2: {
-      font: fonts/font.ttf
-      font-size: 18
-    }
-    
     // ------------------------------------------------
 
     $led: {
@@ -330,6 +320,14 @@
       }
 
       text-align: center-left
+    }
+
+    $basic-button-select: {
+      extends: $basic-button
+
+      selected: {
+        image: button-hover.png
+      }
     }
 
     // ------------------------------------------------
@@ -579,13 +577,13 @@
 
       back-button: {
         extends: $basic-button
-        text: Back
+        text: Cancel
         text-align: center
       }
 
       confirm-button: {
         extends: $basic-button
-        text: OK
+        text: Confirm
         text-align: center
       }
 
@@ -602,6 +600,9 @@
           image-offset: [80, 40]          
         }
       }
+
+      preset-name: $display-text-area
+      description: $display-text-area
     }
 
     load-preset: {
@@ -658,6 +659,11 @@
         text: Save Preset
         text-align: center
       }
+
+      name: $display-text-area
+      author: $display-text-area
+      type: $display-text-area
+      description: $display-text-area
     }
 
     settings: {
@@ -672,8 +678,9 @@
       }
 
       zoom-button: {
-        extends: $main-text
+        extends: $basic-button-select
         text: ["0.5x", "0.7x", "1.0x"]
+        text-position: [5, 2]
       }
 
       default-theme: {
@@ -686,6 +693,8 @@
         extends: $basic-button
         text: Reload Theme
         text-position: [90, 2]
+
+        image: button-underline.png
       }
 
       theme-path: {
@@ -695,7 +704,7 @@
 
         layers: {
           path: {
-            extends: $main-text
+            extends: $display-text
             text: $text
             text-overflow: dots
             text-align: center-left
@@ -709,13 +718,37 @@
         text: Preset Path
         text-position: [5, 2]
 
+        image: button-underline.png
+
         layers: {
           path: {
-            extends: $main-text
+            extends: $display-text
             text: $text
             text-overflow: dots
             text-align: center-left
             text-position: [90, 2]
+          }
+        }
+      }
+      
+      touch-mode: {
+        extends: $basic-button
+        text: Touch Mode
+        text-position: [5, 2]
+
+        image: button-underline.png
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: Disabled
+            text-overflow: dots
+            text-align: center-left
+            text-position: [90, 2]
+
+            selected: {
+              text: Enabled
+            }
           }
         }
       }
