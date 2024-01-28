@@ -23,7 +23,7 @@ namespace Kaixo::Processing {
             case Tempo::T1_1:   return 1.f;
             case Tempo::T1_2:   return 0.5f;
             case Tempo::T1_4:   return 0.25f;
-            case Tempo::T1_6:   return 0.16666667f;
+            case Tempo::T1_6:   return 0.1875f;
             case Tempo::T1_8:   return 0.125f;
             case Tempo::T1_16:  return 0.0625f;
             case Tempo::T1_32:  return 0.03125f;
