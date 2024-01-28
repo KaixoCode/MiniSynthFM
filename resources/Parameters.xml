@@ -199,13 +199,14 @@
   <!-- ================================================ -->
 
   <module name="Filter">
-    <param name="Enable"
-           description="Enable the filter module. When disabled the filter is entirely bypassed and the signal is immediately sent out to the delay."
-           default="1"
+    <param name="Key Track"
+           short-name="Key"
+           description="Enabling key tracking means the cutoff of the filter will change depending on what note is being played."
+           default="0"
            steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
-           interface="$self.params.filter.enable = $value > 0.5"/>
+           interface="$self.params.filter.keytrack = $value > 0.5"/>
 
     <param name="Cutoff"
            short-name="Cutoff"
@@ -273,6 +274,7 @@
            interface="$self.delay.tempo($value)"/>
 
     <param name="Pingpong"
+           short-name="Pong"
            description="Enable a ping-pong effect. This offsets the delay for one of the stereo channels."
            default="1"
            steps="2"

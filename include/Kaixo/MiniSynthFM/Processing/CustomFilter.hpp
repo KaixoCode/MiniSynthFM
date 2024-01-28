@@ -24,7 +24,7 @@ namespace Kaixo::Processing {
         float frequency = 0;
         float resonance = 0;
         float drive = 0;
-        bool enable = true;
+        bool keytrack = false;
         Quality quality = Quality::Normal;
 
         // ------------------------------------------------
@@ -48,6 +48,10 @@ namespace Kaixo::Processing {
 
         float input = 0;
         float output = 0;
+
+        // ------------------------------------------------
+        
+        Note note = 1;
 
         // ------------------------------------------------
         

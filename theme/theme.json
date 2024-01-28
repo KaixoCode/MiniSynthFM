@@ -236,6 +236,34 @@
       }
     }
 
+    $vertical-toggle: {
+      extends: $knob
+
+      layers: {
+        toggle: {
+          image: {
+            source: knobs/toggle.png
+            size: [ 29, 19 ]
+            position: [ 17, 3 ]
+          }
+
+          selected: {
+            image-offset: [0, 19]
+          }
+        }
+
+        name: {
+          text: {
+            font: $main-font
+            color: $text-dark
+            content: "$short-name" 
+            position: [ 0, 13 ]
+            align: center
+          }
+        }
+      }
+    }
+
     $threeway-toggle: {
       extends: $toggle
 
@@ -499,11 +527,24 @@
 
   // ------------------------------------------------
 
+  delay: {
+    parameters: {
+      time: $main-knob
+      tempo: $main-knob
+      feedback: $main-knob
+      mix: $main-knob
+      synced: $vertical-toggle
+      pingpong: $toggle
+    }
+  }
+
+  // ------------------------------------------------
+
   gain: {
     led: $led
 
     parameters: {
-      gate: $toggle
+      gate: $vertical-toggle
       level: $main-knob
       attack: $main-knob
       decay: $main-knob
@@ -522,12 +563,13 @@
     parameters: {
       frequency: $main-knob
       depth: $main-knob
-      synced: $toggle
+      synced: $vertical-toggle
       tempo: $main-knob
       waveform: $main-knob
     }
 
     jacks: {
+      depth: $jack
       output: $output-jack
     }
   }
@@ -536,7 +578,7 @@
 
   filter: {
     parameters: {
-      enable: $toggle
+      keytrack: $toggle
       cutoff: $main-knob
       resonance: $main-knob
       drive: $main-knob

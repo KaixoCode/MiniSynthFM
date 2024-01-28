@@ -101,6 +101,10 @@ namespace Kaixo::Processing {
         float randomValue = 0;
 
         // ------------------------------------------------
+        
+        float previousLfoLevel = 0;
+
+        // ------------------------------------------------
 
     };
 

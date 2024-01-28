@@ -64,8 +64,6 @@ namespace Kaixo::Processing {
         auto env2level = envelope[1].output * params.envelopeLevel[1];
         auto env3level = envelope[2].output * params.envelopeLevel[2];
         
-        auto lfolevel = lfo[0].output * params.lfoLevel[0];
-
         auto op1level = oscillator[0].output * params.volume[0];
         auto op2level = oscillator[1].output * params.volume[1];
         auto op3level = oscillator[2].output * params.volume[2];
@@ -73,22 +71,8 @@ namespace Kaixo::Processing {
         auto op1fm = oscillator[0].fmOutput * params.volume[0];
         auto op2fm = oscillator[1].fmOutput * params.volume[1];
         auto op3fm = oscillator[2].fmOutput * params.volume[2];
-        
-        auto getNote  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Note] * notelevel; };
-        auto getPB    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::PitchBend] * pitchbendlevel; };
-        auto getMW    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::ModWheel] * modwheellevel; };
-        auto getRand  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Random] * randomlevel; };
-        auto getVel   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Velocity] * velocitylevel; };
-        auto getEnv1  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope1] * env1level; };
-        auto getEnv2  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope2] * env2level; };
-        auto getEnv3  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope3] * env3level; };
-        auto getLfo   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::LFO] * lfolevel; };
-        auto getOp1   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op1] * op1level; };
-        auto getOp2   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op2] * op2level; };
-        auto getOp3   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3level; };
-        auto getOp1FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op1] * op1fm; };
-        auto getOp2FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op2] * op2fm; };
-        auto getOp3FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3fm; };
+
+        auto lfolevel = previousLfoLevel; 
 
         auto getAllM = [&](ModDestination dest) {
             float amount = 1;
@@ -106,7 +90,27 @@ namespace Kaixo::Processing {
             if (params.routing[(int)dest][(int)ModSource::Op3]) amount *= op3level;
             return amount;
         };
-        
+
+        // Assign new value
+        lfolevel = lfo[0].output * params.lfoLevel[0] * getAllM(ModDestination::LfoDepth);
+        previousLfoLevel = lfolevel; // Store for recursive
+
+        auto getNote  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Note] * notelevel; };
+        auto getPB    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::PitchBend] * pitchbendlevel; };
+        auto getMW    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::ModWheel] * modwheellevel; };
+        auto getRand  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Random] * randomlevel; };
+        auto getVel   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Velocity] * velocitylevel; };
+        auto getEnv1  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope1] * env1level; };
+        auto getEnv2  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope2] * env2level; };
+        auto getEnv3  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope3] * env3level; };
+        auto getLfo   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::LFO] * lfolevel; };
+        auto getOp1   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op1] * op1level; };
+        auto getOp2   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op2] * op2level; };
+        auto getOp3   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3level; };
+        auto getOp1FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op1] * op1fm; };
+        auto getOp2FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op2] * op2fm; };
+        auto getOp3FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3fm; };
+
         auto getAllA = [&](ModDestination dest) {
             return getNote(dest) + getVel(dest)  + getPB(dest) + 
                    getMW(dest)   + getRand(dest) + getOp1(dest) + 
@@ -127,6 +131,8 @@ namespace Kaixo::Processing {
         auto fm1 = params.fm[0] * getAllM(ModDestination::Op1Amount);
         auto fm2 = params.fm[1] * getAllM(ModDestination::Op2Amount);
         auto fm3 = params.fm[2] * getAllM(ModDestination::Op3Amount);
+
+        filter.note = note + params.pitchBend * 24 - 12;
 
         oscillator[0].note(note + params.pitchBend * 24 - 12 + fm1 * 24 * getAllANoOp(ModDestination::Op1FM));
         oscillator[1].note(note + params.pitchBend * 24 - 12 + fm2 * 24 * getAllANoOp(ModDestination::Op2FM));

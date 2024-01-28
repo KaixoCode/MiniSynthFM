@@ -293,14 +293,25 @@ namespace Kaixo::Gui {
         for (auto& connection : data) {
             auto& c = m_Connections.emplace_back();
 
+            bool foundBegin = false;
+            bool foundEnd = false;
             for (auto& jack : m_Jacks) {
                 if (jack->settings.source == connection.source) {
                     c.begin = jack->m_Id;
+                    foundBegin = true;
                 }
 
                 if (jack->settings.destination == connection.destination) {
                     c.end = jack->m_Id;
+                    foundEnd = true;
                 }
+
+                if (foundBegin && foundEnd) break;
+            }
+
+            if (!foundBegin || !foundEnd) {
+                m_Connections.pop_back();
+                continue;
             }
 
             c.m_Color = connection.color;

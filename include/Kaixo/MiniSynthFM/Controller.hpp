@@ -39,7 +39,7 @@ namespace Kaixo {
 	};
 
 	enum class ModDestination {
-		FilterFreq,
+		FilterFreq, LfoDepth,
 		Op1FM, Op2FM, Op3FM,
 		Op1Amount, Op2Amount, Op3Amount,
 		Op1Sync, Op2Sync, Op3Sync,
@@ -60,6 +60,7 @@ namespace Kaixo {
 	
 	constexpr std::string_view toString(ModDestination source) {
 		switch (source) {
+		case ModDestination::LfoDepth: return "lfo-depth";
 		case ModDestination::FilterFreq: return "filter-freq";
 		case ModDestination::Op1FM: return "op1-fm";
 		case ModDestination::Op2FM: return "op2-fm";

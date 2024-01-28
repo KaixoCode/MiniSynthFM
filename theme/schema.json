@@ -24,7 +24,6 @@
     "jacks": {
       "output": "drawable"
     }
-
   },
   "lfo": {
     "led": "drawable",
@@ -36,18 +35,29 @@
       "waveform": "drawable"
     },
     "jacks": {
+      "depth": "drawable",
       "output": "drawable"
     }
   },
   "filter": {
     "parameters": {
-      "enable": "drawable",
+      "keytrack": "drawable",
       "cutoff": "drawable",
       "resonance": "drawable",
       "drive": "drawable"
     },
     "jacks": {
       "cutoff": "drawable"
+    }
+  },
+  "delay": {
+    "parameters": {
+      "time": "drawable",
+      "feedback": "drawable",
+      "mix": "drawable",
+      "tempo": "drawable",
+      "synced": "drawable",
+      "pingpong": "drawable"
     }
   },
   "oscillator": {

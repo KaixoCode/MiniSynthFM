@@ -9,7 +9,10 @@
     "g": { "location": [42, 30, 6, 14] },
     "h": { "location": [49, 30, 6, 14] },
     "i": { "location": [56, 30, 2, 14] },
-    "j": { "location": [59, 30, 6, 14], "exceptions": [{ "pre-spacing": -3, "after": ["i"] }] },
+    "j": { "location": [60, 30, 5, 14], "exceptions": [
+        { "pre-spacing": -3, "after": ["a", "b", "c", "d", "e", "f", "h", "i", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "v", "w", "x", "z",
+                                       "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] }
+    ] },
     "k": { "location": [66, 30, 6, 14] },
     "l": { "location": [73, 30, 2, 14] },
     "m": { "location": [76, 30, 8, 14] },
@@ -32,11 +35,18 @@
     "C": { "location": [16, 0, 7, 14] },
     "D": { "location": [24, 0, 7, 14] },
     "E": { "location": [32, 0, 7, 14] },
-    "F": { "location": [40, 0, 7, 14] },
+    "F": { "location": [40, 0, 7, 14], "exceptions": [
+        { "post-spacing": -1, "before": ["a", "c", "d", "e", "f", "g", "m", "n", "o", "p", "q", "r", "s", "u", "v", "w", "x", "y", "z"] }
+    ] },
     "G": { "location": [48, 0, 7, 14] },
     "H": { "location": [56, 0, 7, 14] },
-    "I": { "location": [64, 0, 6, 14] },
-    "J": { "location": [71, 0, 6, 14] },
+    "I": { "location": [64, 0, 6, 14], "exceptions":[
+        { "pre-spacing": -2, "after": ["f", "r"] }
+    ] },
+    "J": { "location": [71, 0, 6, 14], "exceptions": [
+        { "post-spacing": 0, "before": ["a", "c", "d", "e", "f", "g", "m", "n", "o", "p", "q", "r", "s", "u", "v", "w", "x", "y", "z"] },
+        { "pre-spacing": -3, "after": ["f", "r"] }
+    ] },
     "K": { "location": [78, 0, 6, 14] },
     "L": { "location": [85, 0, 6, 14] },
     "M": { "location": [92, 0, 8, 14] },
@@ -46,14 +56,19 @@
     "Q": { "location": [16, 15, 8, 14] },
     "R": { "location": [25, 15, 8, 14] },
     "S": { "location": [34, 15, 7, 14] },
-    "T": { "location": [42, 15, 8, 14] },
+    "T": { "location": [42, 15, 8, 14], "exceptions": [
+        { "post-spacing": -2, "before": ["a", "c", "d", "e", "f", "g", "m", "n", "o", "p", "q", "r", "s", "u", "v", "w", "x", "y", "z"] },
+        { "pre-spacing": -3, "after": ["a", "b", "c", "e", "f", "g", "h", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]}
+    ] },
     "U": { "location": [51, 15, 7, 14] },
     "V": { "location": [59, 15, 7, 14] },
     "W": { "location": [67, 15, 8, 14] },
     "X": { "location": [76, 15, 7, 14] },
     "Y": { "location": [84, 15, 8, 14] },
-    "Z": { "location": [93, 15, 7, 14] },
-
+    "Z": { "location": [93, 15, 7, 14], "exceptions":[
+        { "pre-spacing": -1, "after": ["f"] },
+        { "pre-spacing": -3, "after": ["r"] }
+    ] },
     ".": { "location": [0, 75, 2, 14] },
     ",": { "location": [3, 75, 2, 16] },
     "!": { "location": [6, 75, 2, 14] },
