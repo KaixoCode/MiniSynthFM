@@ -85,6 +85,7 @@ namespace Kaixo {
 	}
 	
 	constexpr ModDestination destFromString(std::string_view dest) {
+		if (dest == "lfo-depth") return ModDestination::LfoDepth;
 		if (dest == "filter-freq") return ModDestination::FilterFreq;
 		if (dest == "op1-fm") return ModDestination::Op1FM;
 		if (dest == "op2-fm") return ModDestination::Op2FM;

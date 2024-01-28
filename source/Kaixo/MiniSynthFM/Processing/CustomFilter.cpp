@@ -28,10 +28,12 @@ namespace Kaixo::Processing {
 
         m_FrequencyModulation = m_FrequencyModulation * m_Ratio + frequencyModulation * (1 - m_Ratio);
 
-        float freqValue = Math::Fast::magnitude_to_log(Math::Fast::clamp(params.frequency + m_FrequencyModulation, 0, 1), 16., 16000.);
+        float freqValue = Math::Fast::magnitude_to_log(params.frequency + m_FrequencyModulation, 16., 16000.);
 
         if (params.keytrack) {
             freqValue = Math::Fast::clamp(freqValue * Math::Fast::exp2((note - 60) / 12.), 16, 16000);
+        } else {
+            freqValue = Math::Fast::clamp(freqValue, 16, 16000);
         }
 
         float nfreq = (freqValue / 16000);

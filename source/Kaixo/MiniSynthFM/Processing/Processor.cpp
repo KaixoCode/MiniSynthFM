@@ -96,6 +96,7 @@ namespace Kaixo::Processing {
             lambda(ModSource::LFO, dst);
         };
 
+        doAllS(ModDestination::LfoDepth);
         doAllS(ModDestination::FilterFreq);
         doAllS(ModDestination::Op1Amount);
         doAllS(ModDestination::Op2Amount);
@@ -119,6 +120,8 @@ namespace Kaixo::Processing {
     }
 
     void MiniSynthFMProcessor::deserialize(basic_json& data) {
+        std::memset(params.routing, 0, sizeof(params.routing));
+
         forAllModulation([&](ModSource src, ModDestination dst) {
             auto sname = toString(src);
             auto dname = toString(dst);
