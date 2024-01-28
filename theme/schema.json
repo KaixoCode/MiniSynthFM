@@ -86,6 +86,12 @@
     "white-key": "drawable"  
   },
   "display": {
+    "popup": {
+      "background": "drawable",
+      "message": "text-area",
+      "back-button": "drawable",
+      "confirm-button": "drawable"
+    },
     "main": {
       "background": "drawable",
       "button": "drawable",
@@ -105,12 +111,6 @@
     "save-preset": {
       "background": "drawable",
       "button": "drawable",
-      "popup": {
-        "background": "drawable",
-        "message": "text-area",
-        "back-button": "drawable",
-        "confirm-button": "drawable"
-      },
       "name": "text-area",
       "author": "text-area",
       "type": "text-area",

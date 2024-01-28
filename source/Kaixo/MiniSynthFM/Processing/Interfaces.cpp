@@ -32,7 +32,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void ModInterface::operator()(ModSource source, ModDestination destination, bool val) {
-        self<MiniSynthFMProcessor>().params.routing[(int)source][(int)destination] = val;
+        self<MiniSynthFMProcessor>().params.routing[(int)destination][(int)source] = val;
     }
 
     // ------------------------------------------------

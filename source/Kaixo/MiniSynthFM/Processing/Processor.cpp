@@ -44,7 +44,6 @@ namespace Kaixo::Processing {
             for (auto& voice : voices) {
                 voice.process();
                 output += voice.result;
-                break;
             }
 
             delay.input = output;

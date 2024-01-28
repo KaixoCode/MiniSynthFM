@@ -26,6 +26,76 @@
 namespace Kaixo::Gui {
 
     // ------------------------------------------------
+
+    class PopupView : public View {
+    public:
+
+        // ------------------------------------------------
+
+        PopupView(Context c)
+            : View(c)
+        {
+
+            // ------------------------------------------------
+
+            add<ImageView>({ .image = T.display.popup.background });
+
+            // ------------------------------------------------
+
+            m_BackButton = &add<Button>({ 80, 100, 96, 20 }, {
+                .callback = [this](bool) {
+                    if (m_Callback) m_Callback(false);
+                    if (--m_Requests == 0) setVisible(false);
+                },
+                .graphics = T.display.popup.backButton,
+            });
+
+            add<Button>({ 178, 100, 96, 20 }, {
+                .callback = [this](bool) {
+                    if (m_Callback) m_Callback(true);
+                    if (--m_Requests == 0) setVisible(false);
+                },
+                .graphics = T.display.popup.confirmButton
+            });
+
+            m_Message = &add<TextView>({ 80, 60, 194, 38 }, {
+                .graphics = T.display.popup.message,
+                .padding = { 4, 3 },
+                .multiline = true,
+                .editable = false,
+                .lineHeight = 16,
+            });
+
+            // ------------------------------------------------
+
+            setVisible(false);
+
+            // ------------------------------------------------
+
+        }
+
+        // ------------------------------------------------
+
+        void open(auto c, std::string_view text, bool withBack = true) {
+            m_Callback = c;
+            m_Message->setText(text);
+            m_Requests++;
+            m_BackButton->setVisible(withBack);
+            setVisible(true);
+        }
+
+        // ------------------------------------------------
+    private:
+        std::function<void(bool)> m_Callback;
+        TextView* m_Message;
+        std::size_t m_Requests = 0;
+        Button* m_BackButton;
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
     
     class LoadPresetTab : public View {
     public:
@@ -151,15 +221,33 @@ namespace Kaixo::Gui {
         };
 
         // ------------------------------------------------
+
+        struct Settings {
+
+            // ------------------------------------------------
+
+            PopupView& popup;
+
+            // ------------------------------------------------
+
+        } settings;
+
+        // ------------------------------------------------
         
         ScrollView* m_Banks;
         ScrollView* m_Presets;
 
         // ------------------------------------------------
 
-        LoadPresetTab(Context c) 
-            : View(c) 
+        LoadPresetTab(Context c, Settings s) 
+            : View(c), settings(s) 
         {
+            // ------------------------------------------------
+
+            add<ImageView>({ .image = T.display.loadPreset.background });
+
+            // ------------------------------------------------
+
             m_Banks = &add<ScrollView>({ 0, 0, 110, Height }, {
                 .scrollbar = T.scrollbar
             });
@@ -184,6 +272,8 @@ namespace Kaixo::Gui {
 
             if (auto optPath = Storage::get<std::string>(PresetPath)) {
                 std::filesystem::path path = optPath.value();
+
+                if (!std::filesystem::exists(path)) return;
 
                 m_Banks->add<Bank>({ Width, 20 }, {
                     .self = *this,
@@ -221,6 +311,9 @@ namespace Kaixo::Gui {
                     .isInit = true,
                 });
             } else {
+
+                if (!std::filesystem::exists(bank.settings.folder)) return;
+
                 for (auto& entry : std::filesystem::directory_iterator(bank.settings.folder)) {
                     if (entry.is_regular_file()) {
                         m_Presets->add<Preset>({ Width, 20 }, {
@@ -243,7 +336,23 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
+        struct Settings {
+
+            // ------------------------------------------------
+
+            PopupView& popup;
+
+            // ------------------------------------------------
+
+        } settings;
+
+        // ------------------------------------------------
+
         TabControl zoom;
+
+        // ------------------------------------------------
+
+        Button* presetPath;
 
         // ------------------------------------------------
 
@@ -252,9 +361,15 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        SettingsTab(Context c)
-            : View(c)
+        SettingsTab(Context c, Settings s)
+            : View(c), settings(s)
         {
+            // ------------------------------------------------
+
+            add<ImageView>({ .image = T.display.settings.background });
+
+            // ------------------------------------------------
+
             //add(new TimerValue{ context }, Dimensions{ 10, 210, 10 + 200, 210 + 100 });
 
             zoom.addButton(0, add<Button>({ 5 + 0 * 48, 5, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
@@ -313,19 +428,19 @@ namespace Kaixo::Gui {
 
             std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-            Button& presetPath = add<Button>({ 5, 105, 320, 20 }, {
-                .callback = [&](bool) {
+            presetPath = &add<Button>({ 5, 105, 320, 20 }, {
+                .callback = [this](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
                         | juce::FileBrowserComponent::canSelectDirectories,
-                    [&](const juce::FileChooser& choose) 
+                    [this](const juce::FileChooser& choose)
                     {
                         auto file = choose.getResult();
                         if (!file.exists()) return;
                         auto filepath = file.getFullPathName().toStdString();
 
-                        presetPath.settings.text = filepath;
-                        presetPath.repaint();
+                        presetPath->settings.text = filepath;
+                        presetPath->repaint();
                         Storage::set<std::string>(PresetPath, filepath);
                     });
                 },
@@ -354,72 +469,16 @@ namespace Kaixo::Gui {
     public:
 
         // ------------------------------------------------
-
-        class PopupView : public View {
-        public:
-
-            // ------------------------------------------------
-
-            PopupView(Context c)
-                : View(c)
-            {
-                
-                // ------------------------------------------------
-
-                add<ImageView>({ .image = T.display.savePreset.popup.background });
-
-                m_BackButton = &add<Button>({ 80, 98, 95, 32 }, {
-                    .callback = [this](bool) {
-                        if (m_Callback) m_Callback(false);
-                        if (--m_Requests == 0) setVisible(false);
-                    },
-                    .graphics = T.display.savePreset.popup.backButton,
-                });
-
-                add<Button>({ 175, 98, 100, 32 }, {
-                    .callback = [this](bool) {
-                        if (m_Callback) m_Callback(true);
-                        if (--m_Requests == 0) setVisible(false);
-                    },
-                    .graphics = T.display.savePreset.popup.confirmButton
-                });
-
-                m_Message = &add<TextView>({ 85, 40, 185, 63 }, {
-                    .graphics = T.display.savePreset.popup.message,
-                    .padding = { 8, 8 },
-                    .multiline = true,
-                    .editable = false,
-                    .lineHeight = 22,
-                });
-
-                // ------------------------------------------------
-
-                setVisible(false);
-
-                // ------------------------------------------------
-
-            }
+        
+        struct Settings {
 
             // ------------------------------------------------
 
-            void open(auto c, std::string_view text, bool withBack = true) {
-                m_Callback = c;
-                m_Message->setText(text);
-                m_Requests++;
-                m_BackButton->setVisible(withBack);
-                setVisible(true);
-            }
-
-            // ------------------------------------------------
-        private:
-            std::function<void(bool)> m_Callback;
-            TextView* m_Message;
-            std::size_t m_Requests = 0;
-            Button* m_BackButton;
+            PopupView& popup;
 
             // ------------------------------------------------
 
-        };
+        } settings;
 
         // ------------------------------------------------
 
@@ -448,57 +507,65 @@ namespace Kaixo::Gui {
         TextView* type = nullptr;
         TextView* description = nullptr;
 
-        PopupView* popup = nullptr;
-
         // ------------------------------------------------
 
-        PresetTab(Context c)
-            : View(c)
+        PresetTab(Context c, Settings s)
+            : View(c), settings(s)
         {
 
             // ------------------------------------------------
+            
+            add<ImageView>({ .image = T.display.savePreset.background });
 
-            name = &add<TextView>({ 5, 5, 320, 20 }, {
+            // ------------------------------------------------
+
+            name = &add<TextView>({ 6, 6, 312, 20 }, {
                 .graphics = T.ledText,
+                .padding = { 4, 3 },
                 .multiline = false,
                 .editable = true,
+                .lineHeight = 14,
                 .maxSize = 32,
                 .placeholder = "Name"
             });
 
-            author = &add<TextView>({ 5, 25, 320, 20 }, {
+            author = &add<TextView>({ 6, 28, 312, 20 }, {
                 .graphics = T.ledText,
+                .padding = { 4, 3 },
                 .multiline = false,
                 .editable = true,
+                .lineHeight = 14,
                 .maxSize = 32,
                 .placeholder = "Author"
             });
 
-            type = &add<TextView>({ 5, 45, 320, 20 }, {
+            type = &add<TextView>({ 6, 50, 312, 20 }, {
                 .graphics = T.ledText,
+                .padding = { 4, 3 },
                 .multiline = false,
                 .editable = true,
+                .lineHeight = 14,
                 .maxSize = 32,
                 .placeholder = "Type"
             });
 
-            description = &add<TextView>({ 5, 65, 320, 75 }, {
+            description = &add<TextView>({ 6, 72, 312, 65 }, {
                 .graphics = T.ledText,
+                .padding = { 4, 3 },
                 .multiline = true,
                 .editable = true,
+                .lineHeight = 16,
                 .maxSize = 255,
                 .placeholder = "Description"
             });
 
-            add<Button>({ 5, 140, 100, 20 }, {
+            add<Button>({ 6, 139, 312, 20 }, {
                 .callback = [&](bool) {
-                    if (name->empty()) popup->open([](bool) {}, "You cannot leave the preset name blank.", false);
+                    if (name->empty()) settings.popup.open([](bool) {}, "You cannot leave the preset name blank.", false);
                     else savePreset(false);
                 },
                 .graphics = T.display.savePreset.saveButton,
             });
-
-            popup = &add<PopupView>();
 
             // ------------------------------------------------
 
@@ -525,7 +592,7 @@ namespace Kaixo::Gui {
 
                 resultHandler(context.savePreset(file, force));
             } else {
-                popup->open([this](bool v) {
+                settings.popup.open([this](bool v) {
                     //context.tabControl(MidTabs).select(4);
                 }, "No preset path is specified, please select one.", false);
             }
@@ -537,14 +604,14 @@ namespace Kaixo::Gui {
             switch (result) {
             case SaveResult::Success: return; // Success
             case SaveResult::AlreadyExists:
-                return popup->open([this](bool v) {
+                return settings.popup.open([this](bool v) {
                     if (!v) return;
                     savePreset(true);
                     }, "File already exists, do you wish to overwrite?");
             case SaveResult::CannotWrite:
-                return popup->open([](bool) {}, "Cannot write to file, check folder permissions.", false);
+                return settings.popup.open([](bool) {}, "Cannot write to file, check folder permissions.", false);
             case SaveResult::InvalidPath:
-                return popup->open([](bool) {}, "Cannot save preset.", false);
+                return settings.popup.open([](bool) {}, "Cannot save preset.", false);
             }
         }
 
@@ -572,9 +639,27 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        MainTab(Context c)
-            : View(c) 
+        struct Settings {
+
+            // ------------------------------------------------
+
+            PopupView& popup;
+
+            // ------------------------------------------------
+
+        } settings;
+
+        // ------------------------------------------------
+
+        MainTab(Context c, Settings s)
+            : View(c), settings(s)
         {
+            // ------------------------------------------------
+
+            add<ImageView>({ .image = T.display.main.background });
+
+            // ------------------------------------------------
+
             wantsIdle(true);
 
             timerValue = context.interface<Processing::TimerInterface>();
@@ -617,28 +702,35 @@ namespace Kaixo::Gui {
         LedScreen(Context c)
             : View(c)
         {
-            tabs.add(0, add<MainTab>());
-            tabs.add(1, add<PresetTab>());
-            tabs.add(2, add<LoadPresetTab>());
-            tabs.add(3, add<SettingsTab>());
 
-            tabs.addButton(0, add<Button>({ 330, 0, 25, 25 }, {
+            auto& popup = add<PopupView>();
+
+            tabs.add(0, add<MainTab>({ .popup = popup }));
+            tabs.add(1, add<PresetTab>({ .popup = popup }));
+            tabs.add(2, add<LoadPresetTab>({ .popup = popup }));
+            tabs.add(3, add<SettingsTab>({ .popup = popup }));
+
+            tabs.addButton(0, add<Button>({ 314, 1, 40, 40 }, {
                 .graphics = T.display.main.button
             }));
 
-            tabs.addButton(1, add<Button>({ 330, 25, 25, 25 }, {
+            tabs.addButton(1, add<Button>({ 314, 42, 40, 40 }, {
                 .graphics = T.display.savePreset.button
             }));
 
-            tabs.addButton(2, add<Button>({ 330, 50, 25, 25 }, {
+            tabs.addButton(2, add<Button>({ 314, 83, 40, 40 }, {
                 .graphics = T.display.loadPreset.button
             }));
 
-            tabs.addButton(3, add<Button>({ 330, 75, 25, 25 }, {
+            tabs.addButton(3, add<Button>({ 314, 124, 40, 40 }, {
                 .graphics = T.display.settings.button
             }));
 
             tabs.select(0);
+
+            // Move popup to end of views, so it draws on top
+            removeChildComponent(&popup);
+            addChildComponent(&popup);
         }
 
         // ------------------------------------------------
