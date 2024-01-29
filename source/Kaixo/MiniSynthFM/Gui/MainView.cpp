@@ -771,7 +771,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<LedScreen>({ 506, 30, 355, 165 });
+        add<LedScreen>({ 486, 30, 355, 165 });
 
         // ------------------------------------------------
         
@@ -820,35 +820,35 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            add<Knob>({ 37 + i * 280, 244, 64, 64 }, {
+            add<Knob>({ 37 + i * 270, 234, 64, 64 }, {
                 .graphics = T.oscillator.parameters.volume,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].volume
             });
             
-            add<Knob>({ 37 + i * 280, 308, 64, 64 }, {
+            add<Knob>({ 37 + i * 270, 298, 64, 64 }, {
                 .graphics = T.oscillator.parameters.waveform,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].waveform
             });
 
-            add<Knob>({ 103 + i * 280, 308, 64, 64 }, {
+            add<Knob>({ 103 + i * 270, 298, 64, 64 }, {
                 .graphics = T.oscillator.parameters.fm,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].fm
             });
             
-            add<Knob>({ 103 + i * 280, 244, 64, 64 }, {
+            add<Knob>({ 103 + i * 270, 234, 64, 64 }, {
                 .graphics = T.oscillator.parameters.tune,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.oscillator[i].tune
             });
             
-            add<Jack>({ 169 + i * 280, 256, 64, 52 }, {
+            add<Jack>({ 169 + i * 270, 246, 64, 52 }, {
                 .graphics = T.oscillator.jacks.fm,
                 .type = Jack::Type::Input,
                 .patchBay = patchBay,
@@ -858,7 +858,7 @@ namespace Kaixo::Gui {
                 .name = "FM"
             });
             
-            add<Jack>({ 169 + i * 280, 320, 64, 52 }, {
+            add<Jack>({ 169 + i * 270, 310, 64, 52 }, {
                 .graphics = T.oscillator.jacks.amount,
                 .type = Jack::Type::Input,
                 .patchBay = patchBay,
@@ -868,7 +868,7 @@ namespace Kaixo::Gui {
                 .name = "Amount"
             });
 
-            add<Jack>({ 235 + i * 280, 256, 64, 52 }, {
+            add<Jack>({ 235 + i * 270, 246, 64, 52 }, {
                 .graphics = T.oscillator.jacks.sync,
                 .type = Jack::Type::Input,
                 .patchBay = patchBay,
@@ -878,7 +878,7 @@ namespace Kaixo::Gui {
                 .name = "Sync"
             });
             
-            add<Jack>({ 235 + i * 280, 320, 64, 52 }, {
+            add<Jack>({ 235 + i * 270, 310, 64, 52 }, {
                 .graphics = T.oscillator.jacks.output,
                 .type = Jack::Type::Output,
                 .patchBay = patchBay,
@@ -889,7 +889,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
             
-            add<Button>({ 215 + i * 280, 213, 80, 23 }, {
+            add<Button>({ 215 + i * 270, 203, 80, 23 }, {
                 .graphics = T.oscillator.parameters.output,
                 .behaviour = Button::Behaviour::Toggle,
                 .param = Synth.oscillator[i].output
@@ -897,7 +897,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
             
-            add<Knob>({ 92 + i * 280, 213, 80, 23 }, {
+            add<Knob>({ 92 + i * 270, 203, 80, 23 }, {
                 .graphics = T.oscillator.parameters.octave,
                 .type = Knob::Type::Both,
                 .tooltipName = false,
@@ -915,21 +915,21 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            add<Knob>({ 730, 396, 64, 64 }, {
+            add<Knob>({ 710, 379, 64, 64 }, {
                 .graphics = T.lfo.parameters.depth,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.lfo[i].depth
             });
             
-            lfoFrequencyTempo[i].add(0, add<Knob>({ 535, 396, 64, 64 }, {
+            lfoFrequencyTempo[i].add(0, add<Knob>({ 515, 379, 64, 64 }, {
                 .graphics = T.lfo.parameters.frequency,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.lfo[i].frequency
             }));
 
-            lfoFrequencyTempo[i].add(1, add<Knob>({ 535, 396, 64, 64 }, {
+            lfoFrequencyTempo[i].add(1, add<Knob>({ 515, 379, 64, 64 }, {
                 .graphics = T.lfo.parameters.tempo,
                 .tooltipName = false,
                 .tooltipValue = false,
@@ -938,7 +938,7 @@ namespace Kaixo::Gui {
 
             lfoFrequencyTempo[i].select(1);
 
-            add<Knob>({ 600, 396, 64, 64 }, {
+            add<Knob>({ 580, 379, 64, 64 }, {
                 .graphics = T.lfo.parameters.waveform,
                 .tooltipName = false,
                 .tooltipValue = false,
@@ -947,7 +947,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            add<Button>({ 470, 414, 64, 46 }, {
+            add<Button>({ 450, 397, 64, 46 }, {
                 .callback = [&, i](bool val) {
                     lfoFrequencyTempo[i].select(val);
                 },
@@ -958,14 +958,14 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            add<Jack>({ 795, 408, 64, 52 }, {
+            add<Jack>({ 775, 391, 64, 52 }, {
                 .graphics = T.lfo.jacks.output,
                 .type = Jack::Type::Output,
                 .patchBay = patchBay,
                 .source = ModSource::LFO
             });
             
-            add<Jack>({ 665, 408, 64, 52 }, {
+            add<Jack>({ 645, 391, 64, 52 }, {
                 .graphics = T.lfo.jacks.depth,
                 .type = Jack::Type::Input,
                 .patchBay = patchBay,
@@ -975,7 +975,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
             
-            add<Led>({ 842, 398, 13, 13 }, {
+            add<Led>({ 822, 378, 13, 13 }, {
                 .graphics = T.lfo.led,
                 .value = context.interface<Processing::LfoInterface>({ .index = i })
             });
@@ -987,35 +987,35 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
         
         for (std::size_t i = 0; i < ADSREnvelopes; ++i) {
-            add<Knob>({ 880, 71 + i * 180, 64, 64 }, {
+            add<Knob>({ 850, 71 + i * 170, 64, 64 }, {
                 .graphics = T.envelope.parameters.level,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.envelope[i].level
             });
                         
-            add<Knob>({ 957, 52 + i * 180, 60, 140 }, {
+            add<Knob>({ 927, 52 + i * 170, 60, 140 }, {
                 .graphics = T.envelope.parameters.attack,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.envelope[i].attack
             });
 
-            add<Knob>({ 1017, 52 + i * 180, 60, 140 }, {
+            add<Knob>({ 987, 52 + i * 170, 60, 140 }, {
                 .graphics = T.envelope.parameters.decay,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.envelope[i].decay
             });
 
-            add<Knob>({ 1077, 52 + i * 180, 60, 140 }, {
+            add<Knob>({ 1047, 52 + i * 170, 60, 140 }, {
                 .graphics = T.envelope.parameters.sustain,
                 .tooltipName = false,
                 .tooltipValue = false,
                 .param = Synth.envelope[i].sustain
             });
 
-            add<Knob>({ 1137, 52 + i * 180, 60, 140 }, {
+            add<Knob>({ 1107, 52 + i * 170, 60, 140 }, {
                 .graphics = T.envelope.parameters.release,
                 .tooltipName = false,
                 .tooltipValue = false,
@@ -1024,7 +1024,7 @@ namespace Kaixo::Gui {
             
             // ------------------------------------------------
             
-            add<Jack>({ 880, 140 + i * 180, 64, 52 }, {
+            add<Jack>({ 850, 140 + i * 170, 64, 52 }, {
                 .graphics = T.envelope.jacks.output,
                 .type = Jack::Type::Output,
                 .patchBay = patchBay,
@@ -1033,7 +1033,7 @@ namespace Kaixo::Gui {
             
             // ------------------------------------------------
             
-            add<Button>({ 942, 33 + i * 180, 80, 23 }, {
+            add<Button>({ 912, 33 + i * 170, 80, 23 }, {
                 .graphics = T.envelope.parameters.loop,
                 .behaviour = Button::Behaviour::Toggle,
                 .param = Synth.envelope[i].loop
@@ -1041,7 +1041,7 @@ namespace Kaixo::Gui {
             
             // ------------------------------------------------
 
-            add<Led>({ 1182, 38 + i * 180, 13, 13 }, {
+            add<Led>({ 1152, 38 + i * 170, 13, 13 }, {
                 .graphics = T.envelope.led,
                 .value = context.interface<Processing::EnvelopeInterface>({ .index = i })
             });
@@ -1052,21 +1052,21 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<Knob>({ 941, 399, 64, 64 }, {
+        add<Knob>({ 911, 379, 64, 64 }, {
             .graphics = T.gain.parameters.level,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.gain.level
         });
                         
-        add<Knob>({ 1006, 399, 64, 64 }, {
+        add<Knob>({ 976, 379, 64, 64 }, {
             .graphics = T.gain.parameters.attack,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.gain.attack
         });
 
-        add<Knob>({ 1071, 399, 64, 64 }, {
+        add<Knob>({ 1041, 379, 64, 64 }, {
             .graphics = T.gain.parameters.decay,
             .tooltipName = false,
             .tooltipValue = false,
@@ -1075,7 +1075,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
             
-        add<Jack>({ 1136, 411, 64, 52 }, {
+        add<Jack>({ 1106, 391, 64, 52 }, {
             .graphics = T.gain.jacks.output,
             .type = Jack::Type::Output,
             .patchBay = patchBay,
@@ -1084,7 +1084,7 @@ namespace Kaixo::Gui {
             
         // ------------------------------------------------
             
-        add<Button>({ 876, 417, 64, 46 }, {
+        add<Button>({ 846, 397, 64, 46 }, {
             .graphics = T.gain.parameters.gate,
             .behaviour = Button::Behaviour::Toggle,
             .param = Synth.gain.gate
@@ -1092,7 +1092,7 @@ namespace Kaixo::Gui {
             
         // ------------------------------------------------
 
-        add<Led>({ 1182, 398, 13, 13 }, {
+        add<Led>({ 1152, 378, 13, 13 }, {
             .graphics = T.gain.led,
             .value = context.interface<Processing::EnvelopeInterface>({ .index = 2 })
         });
@@ -1141,21 +1141,21 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        add<Knob>({ 422, 128, 64, 64 }, {
+        add<Knob>({ 412, 128, 64, 64 }, {
             .graphics = T.delay.parameters.mix,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.mix
         });
 
-        delayTimeTempo.add(0, add<Knob>({ 353, 64, 64, 64 }, {
+        delayTimeTempo.add(0, add<Knob>({ 343, 64, 64, 64 }, {
             .graphics = T.delay.parameters.time,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.time
         }));
         
-        delayTimeTempo.add(1, add<Knob>({ 353, 64, 64, 64 }, {
+        delayTimeTempo.add(1, add<Knob>({ 343, 64, 64, 64 }, {
             .graphics = T.delay.parameters.tempo,
             .tooltipName = false,
             .tooltipValue = false,
@@ -1164,20 +1164,20 @@ namespace Kaixo::Gui {
 
         delayTimeTempo.select(1);
 
-        add<Knob>({ 422, 64, 64, 64 }, {
+        add<Knob>({ 412, 64, 64, 64 }, {
             .graphics = T.delay.parameters.feedback,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delay.feedback
         });
         
-        add<Button>({ 413, 33, 75, 23 }, {
+        add<Button>({ 403, 33, 75, 23 }, {
             .graphics = T.delay.parameters.pingpong,
             .behaviour = Button::Behaviour::Toggle,
             .param = Synth.delay.pingpong,
         });
         
-        add<Button>({ 353, 146, 64, 46 }, {
+        add<Button>({ 343, 146, 64, 46 }, {
             .callback = [&](bool v) {
                 delayTimeTempo.select(v);
             },
@@ -1186,7 +1186,7 @@ namespace Kaixo::Gui {
             .param = Synth.delay.synced,
         });
         
-        add<Knob>({ 400, 399, 64, 64 }, {
+        add<Knob>({ 390, 399, 64, 64 }, {
             .graphics = T.knob,
             .tooltipName = false,
             .tooltipValue = false,
@@ -1195,7 +1195,7 @@ namespace Kaixo::Gui {
         
         // ------------------------------------------------
         
-        add<Piano>({ 180, 496, 1020, 200 }, {
+        add<Piano>({ 150, 476, 1020, 200 }, {
             .start = 36,
             .notes = 12 * 4 + 1, // 4 octaves + C
             .interface = context.interface<Processing::PianoInterface>(),

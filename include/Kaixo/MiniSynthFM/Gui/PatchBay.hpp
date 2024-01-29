@@ -120,7 +120,8 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            void paint(juce::Graphics& g, Point<> mouse, PatchBay& self);
+            void drawCable(juce::Graphics& g, Point<> mouse, PatchBay& self);
+            void drawJacks(juce::Graphics& g, Point<> mouse, PatchBay& self);
 
             // ------------------------------------------------
             

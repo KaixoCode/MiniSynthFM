@@ -100,7 +100,32 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    void PatchBay::Connection::paint(juce::Graphics& g, Point<> mouse, PatchBay& self) {
+    void PatchBay::Connection::drawJacks(juce::Graphics& g, Point<> mouse, PatchBay& self) {
+        if (begin == npos && end == npos) return; // Nothing to draw
+
+        Point<float> a = self.m_Jacks[begin]->holePosition();
+        Point<float> b = mouse;
+
+        if (end != npos) {
+            b = self.m_Jacks[end]->holePosition();
+        }
+
+        if (a.x() > b.x()) std::swap(a, b);
+        if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
+
+
+        self.m_CableGraphics[m_Color].end.draw({
+            .graphics = g,
+            .bounds = { a.x() - 13, a.y() - 13, 26, 26 },
+        });
+
+        self.m_CableGraphics[m_Color].end.draw({
+            .graphics = g,
+            .bounds = { b.x() - 13, b.y() - 13, 26, 26 },
+        });
+    }
+
+    void PatchBay::Connection::drawCable(juce::Graphics& g, Point<> mouse, PatchBay& self) {
         if (begin == npos && end == npos) return; // Nothing to draw
 
         Point<float> a = self.m_Jacks[begin]->holePosition();
@@ -145,16 +170,11 @@ namespace Kaixo::Gui {
 
         path.lineTo(b);
 
-        self.m_CableGraphics[m_Color].end.draw({
-            .graphics = g,
-            .bounds = { a.x() - 13, a.y() - 13, 26, 26 },
-        });
+        path.applyTransform(juce::AffineTransform::translation(0, 3));
+        g.setColour(juce::Colour{ 0.f, 0.f, 0.f, 0.2f });
+        g.strokePath(path, PathStrokeType{ 8.f, PathStrokeType::curved, PathStrokeType::rounded });
 
-        self.m_CableGraphics[m_Color].end.draw({
-            .graphics = g,
-            .bounds = { b.x() - 13, b.y() - 13, 26, 26 },
-        });
-
+        path.applyTransform(juce::AffineTransform::translation(0, -3));
         g.setColour(self.m_CableGraphics[m_Color].color);
         g.strokePath(path, PathStrokeType{ 8.f, PathStrokeType::curved, PathStrokeType::rounded });
     }
@@ -218,9 +238,15 @@ namespace Kaixo::Gui {
 
     void PatchBay::paint(juce::Graphics& g) {
         for (auto& connection : m_Connections) {
-            connection.paint(g, m_LastMousePosition, *this);
+            connection.drawJacks(g, m_LastMousePosition, *this);
         }
-        m_CurrentConnection.paint(g, m_LastMousePosition, *this);
+
+        for (auto& connection : m_Connections) {
+            connection.drawCable(g, m_LastMousePosition, *this);
+        }
+
+        m_CurrentConnection.drawJacks(g, m_LastMousePosition, *this);
+        m_CurrentConnection.drawCable(g, m_LastMousePosition, *this);
     }
 
     // ------------------------------------------------
