@@ -69,11 +69,12 @@ namespace Kaixo::Processing {
 
     float FMOscillator::at(float p) {
         // requires 0 <= p <= 1
+        float xd = Math::Fast::max(1.5 * m_Frequency / sampleRate(), 0.002);
         switch (params.m_Waveform) {
         case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
         case Waveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * p);
-        case Waveform::Saw: return Math::Fast::saw(p, Math::Fast::max(1.5 * m_Frequency / sampleRate(), 0.002));
-        case Waveform::Square: return p > 0.5 ? 1 : -1;
+        case Waveform::Saw: return Math::Fast::saw(p + xd, xd);
+        case Waveform::Square: return Math::Fast::saw(p + xd, xd) + Math::Fast::saw(0.5 - p + xd, xd);
         }
     }
 
