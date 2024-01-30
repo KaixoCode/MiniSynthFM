@@ -68,6 +68,15 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     float FMOscillator::at(float p) {
+
+        constexpr auto saw = [](float x, float nf) {
+            auto q1 = Math::Fast::fmod1(x - 2 * nf + 3) * 2 - 1;
+            auto q2 = Math::Fast::fmod1(x + 3) * 2 - 1;
+            auto q3 = Math::Fast::fmod1(x - nf + 3) * 2 - 1;
+
+            return (((q1 * q1 - 1.f) * q1) + ((q2 * q2 - 1.f) * q2) - (2 * (q3 * q3 - 1.f) * q3)) / (24 * nf * nf);
+        };
+
         // requires 0 <= p <= 1
         float xd = Math::Fast::max(1.5 * m_Frequency / sampleRate(), 0.002);
         switch (params.m_Waveform) {
