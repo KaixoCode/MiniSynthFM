@@ -69,21 +69,36 @@ namespace Kaixo::Processing {
 
     float FMOscillator::at(float p) {
 
+        constexpr auto g = [](auto x) {
+            return (x - 1) * x * (2 * x - 1);
+        };
+        
         constexpr auto saw = [](float x, float nf) {
-            auto q1 = Math::Fast::fmod1(x - 2 * nf + 3) * 2 - 1;
-            auto q2 = Math::Fast::fmod1(x + 3) * 2 - 1;
-            auto q3 = Math::Fast::fmod1(x - nf + 3) * 2 - 1;
+            float v1 = Math::Fast::fmod1(x - nf + 1);
+            float v2 = Math::Fast::fmod1(x + nf);
+            float v3 = x;
 
-            return (((q1 * q1 - 1.f) * q1) + ((q2 * q2 - 1.f) * q2) - (2 * (q3 * q3 - 1.f) * q3)) / (24 * nf * nf);
+            return (g(v1) + g(v2) - 2 * g(v3)) / (6.f * nf * nf);
+        };
+        
+        constexpr auto square = [](float x, float nf) {
+            float v1 = Math::Fast::fmod1(x - nf + 1);
+            float v2 = Math::Fast::fmod1(x + nf);
+            float v3 = x;
+            float v4 = Math::Fast::fmod1(2.5 - x - nf);
+            float v5 = Math::Fast::fmod1(1.5 - x + nf);
+            float v6 = Math::Fast::fmod1(1.5 - x);
+
+            return (g(v1) + g(v2) - 2 * g(v3) + g(v4) + g(v5) - 2 * g(v6)) / (6.f * nf * nf);
         };
 
         // requires 0 <= p <= 1
-        float xd = Math::Fast::max(1.5 * m_Frequency / sampleRate(), 0.002);
+        float xd = Math::Fast::max(m_Frequency / 30000.f, 0.002f);
         switch (params.m_Waveform) {
         case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
         case Waveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * p);
-        case Waveform::Saw: return Math::Fast::saw(p + xd, xd);
-        case Waveform::Square: return Math::Fast::saw(p + xd, xd) + Math::Fast::saw(0.5 - p + xd, xd);
+        case Waveform::Saw: return saw(p, xd);
+        case Waveform::Square: return square(p, xd);
         }
     }
 
