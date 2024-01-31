@@ -545,6 +545,24 @@
         }
       }
 
+      next-preset: {
+        extends: $basic-button
+        layers: {
+          img: {
+            image: next-preset.png
+          }
+        }
+      }
+      
+      previous-preset: {
+        extends: $basic-button
+        layers: {
+          img: {
+            image: previous-preset.png
+          }
+        }
+      }
+      
       preset-name: $display-text-area
       description: $display-text-area
     }
@@ -566,13 +584,15 @@
       preset: {
         extends: $basic-button
         text: $text
+        text-overflow: dots
         text-position: [5, 1]
         text-align: center-left
       }
 
       bank: {
-        extends: $basic-button
+        extends: $basic-button-select
         text: $text
+        text-overflow: dots
         text-position: [5, 1]
         text-align: center-left
       }

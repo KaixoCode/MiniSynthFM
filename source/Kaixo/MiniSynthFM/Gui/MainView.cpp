@@ -126,9 +126,7 @@ namespace Kaixo::Gui {
             struct Settings {
 
                 LoadPresetTab& self;
-                std::string name;
-                std::filesystem::path folder{};
-                bool isFactory = false;
+                std::size_t bankIndex;
 
             } settings;
 
@@ -154,10 +152,13 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void paint(juce::Graphics& g) override {
+                auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+                if (settings.bankIndex >= database.banks.size()) return; // Does not exist anymore!
+
                 graphics.draw({
                     .graphics = g,
                     .bounds = localDimensions(),
-                    .text = settings.name,
+                    .text = database.banks[settings.bankIndex].name,
                     .state = state()
                 });
             }
@@ -175,18 +176,20 @@ namespace Kaixo::Gui {
 
             struct Settings {
 
+                // ------------------------------------------------
+
                 LoadPresetTab& self;
-                std::filesystem::path path{};
-                std::string factoryName{};
-                bool isFactory = false;
-                bool isInit = false;
+                std::size_t bankIndex;
+                std::size_t presetIndex;
+
+                // ------------------------------------------------
 
             } settings;
 
             // ------------------------------------------------
             
             Theme::Drawable graphics;
-            PresetData presetData;
+            std::string displayName;
 
             // ------------------------------------------------
 
@@ -194,56 +197,59 @@ namespace Kaixo::Gui {
                 : View(c), settings(std::move(s))
             {
                 graphics = T.display.loadPreset.preset;
-
-                if (settings.isFactory) {
-                    presetData.name = settings.factoryName;
-                } else {
-                    if (auto json = basic_json::parse(file_to_string(settings.path))) {
-                        auto pdata = typeid(PresetData).name();
-                        if (json->contains(pdata)) {
-                            presetData.deserialize(json.value()[pdata]);
-                        }
-                    }
-                }
-
+                reloadDisplayName();
                 animation(graphics);
             }
 
             // ------------------------------------------------
 
             void mouseDown(const juce::MouseEvent& e) override {
-                if (settings.isInit) {
-                    context.initPreset();
-                } else if (settings.isFactory) {
-                    // TODO:
-                } else {
-                    context.loadPreset(settings.path);
-                }
+                load();
             }
 
             // ------------------------------------------------
             
             void paint(juce::Graphics& g) override {
+                reloadDisplayName();
                 graphics.draw({
                     .graphics = g,
                     .bounds = localDimensions(),
-                    .text = name(),
+                    .text = displayName,
                     .state = state()
                 });
             }
 
             // ------------------------------------------------
             
-            std::string name() {
-                std::string name = presetData.name;
-                if (!presetData.type.empty()) name += " (" + presetData.type + ")";
-                return name;
+            PresetData presetData() {
+                auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+                if (settings.bankIndex >= database.banks.size()) return {}; // Does not exist anymore!
+                auto& presets = database.banks[settings.bankIndex].presets();
+                if (settings.presetIndex >= presets.size()) return {}; // Does not exist anymore!
+                return presets[settings.presetIndex].presetData;
+            }
+            
+            void load() {
+                auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+                if (settings.bankIndex >= database.banks.size()) return; // Does not exist anymore!
+                auto& presets = database.banks[settings.bankIndex].presets();
+                if (settings.presetIndex >= presets.size()) return; // Does not exist anymore!
+                presets[settings.presetIndex].load();
+            }
+
+            // ------------------------------------------------
+            
+            void reloadDisplayName() {
+                auto pdata = presetData();
+                displayName = pdata.name;
+                if (!pdata.type.empty()) displayName += " (" + pdata.type + ")";
             }
 
             // ------------------------------------------------
             
             bool matchesSearch(std::string_view search) {
-                return matches_search(presetData.type + " " + presetData.name + " " + presetData.author, search);
+                auto pdata = presetData();
+                return matches_search(pdata.type + " " + pdata.name + " " + pdata.author, search);
             }
 
             // ------------------------------------------------
@@ -326,33 +332,18 @@ namespace Kaixo::Gui {
         void reloadBanks() {
             m_Banks->clear();
 
-            select(m_Banks->add<Bank>({ Width, 20 }, {
-                .self = *this,
-                .name = "Factory",
-                .isFactory = true
-            }));
+            auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+            database.reloadInformation();
 
-            if (auto optPath = Storage::get<std::string>(PresetPath)) {
-                std::filesystem::path path = optPath.value();
-
-                if (!std::filesystem::exists(path)) return;
-
-                m_Banks->add<Bank>({ Width, 20 }, {
+            std::size_t index = 0;
+            for (auto& bank : database.banks) {
+                m_Banks->add<Bank>({ Width, 20 }, Bank::Settings{
                     .self = *this,
-                    .name = "User",
-                    .folder = path
+                    .bankIndex = index++
                 });
-
-                for (auto& entry : std::filesystem::directory_iterator(path)) {
-                    if (entry.is_directory()) {
-                        m_Banks->add<Bank>({ Width, 20 }, {
-                            .self = *this,
-                            .name = entry.path().stem().string(),
-                            .folder = entry
-                        });
-                    }
-                }
             }
+
+            select((Bank&)*m_Banks->views().front());
         }
 
         // ------------------------------------------------
@@ -362,28 +353,23 @@ namespace Kaixo::Gui {
 
             for (auto& b : m_Banks->views()) {
                 b->selected(false);
+                b->repaint();
             }
             bank.selected(true);
 
-            if (bank.settings.isFactory) {
+            auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+
+            if (bank.settings.bankIndex >= database.banks.size()) return; // Does not exist anymore!
+
+            auto& presets = database.banks[bank.settings.bankIndex].presets();
+
+            std::size_t index = 0;
+            for (auto& preset : presets) {
                 m_Presets->add<Preset>({ Width, 20 }, {
                     .self = *this,
-                    .factoryName = "Init",
-                    .isFactory = true,
-                    .isInit = true,
+                    .bankIndex = bank.settings.bankIndex,
+                    .presetIndex = index++
                 });
-            } else {
-
-                if (!std::filesystem::exists(bank.settings.folder)) return;
-
-                for (auto& entry : std::filesystem::directory_iterator(bank.settings.folder)) {
-                    if (entry.is_regular_file()) {
-                        m_Presets->add<Preset>({ Width, 20 }, {
-                            .self = *this,
-                            .path = entry
-                        });
-                    }
-                }
             }
 
             m_Presets->updateDimensions();
@@ -735,7 +721,7 @@ namespace Kaixo::Gui {
         
         void onIdle() override {
             float value = context.interface<Processing::TimerInterface>()();
-            timer->settings.text = std::format("{:.2f} %", 100 * value);
+            timer->settings.text = std::format("{:.2f} %", value);
             timer->repaint();
         }
 
@@ -762,12 +748,26 @@ namespace Kaixo::Gui {
                 .lineHeight = 14,
             });
             
-            presetName = &add<TextView>({ 6, 6, 300, 20 }, {
+            presetName = &add<TextView>({ 6, 6, 256, 20 }, {
                 .graphics = T.display.main.presetName,
                 .padding = { 4, 3 },
                 .multiline = false,
                 .editable = false,
                 .lineHeight = 14,
+            });
+            
+            add<Button>({ 264, 6, 20, 20 }, {
+                .callback = [&](bool) {
+                    context.controller<MiniSynthFMController>().presetDatabase.loadPreviousPreset();
+                },
+                .graphics = T.display.main.previousPreset,
+            });
+            
+            add<Button>({ 286, 6, 20, 20 }, {
+                .callback = [&](bool) {
+                    context.controller<MiniSynthFMController>().presetDatabase.loadNextPreset();
+                },
+                .graphics = T.display.main.nextPreset,
             });
 
             description = &add<TextView>({ 6, 28, 300, 54 }, {
@@ -793,7 +793,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        TabControl tabs{};
+        LoadPresetTab* load;
 
         // ------------------------------------------------
 
@@ -803,9 +803,11 @@ namespace Kaixo::Gui {
 
             auto& popup = add<PopupView>();
 
+            auto& tabs = context.tabControl(0);
+
             tabs.add(0, add<MainTab>({ .popup = popup }));
-            tabs.add(1, add<PresetTab>({ .popup = popup }));
-            tabs.add(2, add<LoadPresetTab>({ .popup = popup }));
+            tabs.add(1, *(load = &add<LoadPresetTab>({ .popup = popup })));
+            tabs.add(2, add<PresetTab>({ .popup = popup }));
             tabs.add(3, add<SettingsTab>({ .popup = popup }));
 
             tabs.addButton(0, add<Button>({ 313, 6, 35, 35 }, {
@@ -813,16 +815,20 @@ namespace Kaixo::Gui {
             }));
 
             tabs.addButton(1, add<Button>({ 313, 43, 35, 35 }, {
-                .graphics = T.display.savePreset.button
+                .graphics = T.display.loadPreset.button
             }));
 
             tabs.addButton(2, add<Button>({ 313, 80, 35, 35 }, {
-                .graphics = T.display.loadPreset.button
+                .graphics = T.display.savePreset.button
             }));
 
             tabs.addButton(3, add<Button>({ 313, 117, 35, 35 }, {
                 .graphics = T.display.settings.button
             }));
+
+            tabs.tab(1).addCallback([&](bool v) {
+                if (v) load->reloadBanks();
+            });
 
             tabs.select(0);
 

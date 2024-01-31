@@ -6,6 +6,11 @@
 
 // ------------------------------------------------
 
+#include "Kaixo/MiniSynthFM/PresetData.hpp"
+#include "Kaixo/MiniSynthFM/PresetDatabase.hpp"
+
+// ------------------------------------------------
+
 namespace Kaixo {
 
 	// ------------------------------------------------
@@ -100,28 +105,6 @@ namespace Kaixo {
 
 	// ------------------------------------------------
 	
-	class PresetData : public Serializable {
-	public:
-	
-		// ------------------------------------------------
-
-		std::string name = "";
-		std::string author = "";
-		std::string type = "";
-		std::string description = "";
-
-		// ------------------------------------------------
-
-		void init() override;
-		basic_json serialize() override;
-		void deserialize(basic_json& json) override;
-
-		// ------------------------------------------------
-
-	};
-
-	// ------------------------------------------------
-	
 	class ControllerData : public Serializable {
 	public:
 
@@ -168,6 +151,10 @@ namespace Kaixo {
 		// ------------------------------------------------
 
 		MiniSynthFMController();
+
+		// ------------------------------------------------
+		
+		PresetDatabase presetDatabase{ *this };
 
 		// ------------------------------------------------
 

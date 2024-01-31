@@ -106,6 +106,8 @@
       "background": "drawable",
       "button": "drawable",
       "preset-name": "text-area",
+      "next-preset": "drawable",
+      "previous-preset": "drawable",
       "description": "text-area"
     },
     "settings": {

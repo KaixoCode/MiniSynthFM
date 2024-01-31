@@ -168,7 +168,7 @@
   <module name="Gain">
     <param name="Gate"
            description="When gate is enabled the envelope will sustain after the attack phase. Otherwise it will immediately enter the decay phase."
-           default="0"
+           default="1"
            steps="2"
            transform="Group[2]"
            format="Group[Off, On]"
