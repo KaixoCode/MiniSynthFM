@@ -9,6 +9,21 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    // ------------------------------------------------
+
+    std::size_t FilterParameters::oversample() const {
+        switch (quality) {
+        case Quality::Low: return 1;
+        case Quality::Normal: return 2;
+        case Quality::High: return 4;
+        case Quality::Ultra: return 8;
+        case Quality::Extreme: return 16;
+        default: return 1;
+        }
+    }
+
+    // ------------------------------------------------
+
     CustomFilter::CustomFilter(FilterParameters& p)
         : params(p)
     {
@@ -59,9 +74,21 @@ namespace Kaixo::Processing {
         m_Filter[2].gain(resonance * 15 - params.drive * 12);
 
         auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
-        input = params.drive * Math::Fast::tanh_like(input * drive) + input * (1 - params.drive);
 
-        m_Filter.input = input;
+        float res = 0;
+        if (params.oversample() == 1) {
+            res = params.drive * Math::Fast::tanh_like(input[0] * drive) + input[0] * (1 - params.drive);
+        } else {
+            m_AAF.sampleRateIn = sampleRate() * params.oversample();
+            m_AAF.sampleRateOut = sampleRate();
+
+            for (std::size_t i = 0; i < params.oversample(); ++i) {
+                input[i] = params.drive * Math::Fast::tanh_like(input[i] * drive) + input[i] * (1 - params.drive);
+                res = m_AAF.process(input[i]);
+            }
+        }
+
+        m_Filter.input = res;
         m_Filter.process();
         output = m_Filter.output.average();
         output = params.drive * Math::Fast::tanh_like(1.115 * output) + output * (1 - 0.9 * params.drive);
@@ -72,6 +99,13 @@ namespace Kaixo::Processing {
     void CustomFilter::prepare(double sampleRate, std::size_t maxBufferSize) {
         m_Ratio = Math::smoothCoef(0.99, 96000 / sampleRate);
     }
+
+    void CustomFilter::reset() {
+        ModuleContainer::reset();
+        m_AAF.reset();
+    }
+
+
 
     // ------------------------------------------------
 

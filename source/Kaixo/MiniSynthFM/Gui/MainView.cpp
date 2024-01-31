@@ -101,6 +101,22 @@ namespace Kaixo::Gui {
     public:
 
         // ------------------------------------------------
+
+        static bool matches_search(const auto& haystack, const auto& needle) {
+            constexpr auto tolower = [](char c) -> char { return std::tolower(c); };
+            constexpr auto equals = [](char a, char b) { return a == b; };
+            if (needle.empty()) return true;
+            bool matches = true;
+            auto parts = split(needle, " ");
+            for (auto& part : parts) {
+                if (part.empty()) continue;
+                auto res = std::ranges::search(haystack, part, equals, tolower, tolower);
+                matches &= !res.empty();
+            }
+            return matches;
+        };
+
+        // ------------------------------------------------
         
         class Bank : public View {
         public:
@@ -211,9 +227,23 @@ namespace Kaixo::Gui {
                 graphics.draw({
                     .graphics = g,
                     .bounds = localDimensions(),
-                    .text = presetData.name,
+                    .text = name(),
                     .state = state()
                 });
+            }
+
+            // ------------------------------------------------
+            
+            std::string name() {
+                std::string name = presetData.name;
+                if (!presetData.type.empty()) name += " (" + presetData.type + ")";
+                return name;
+            }
+
+            // ------------------------------------------------
+            
+            bool matchesSearch(std::string_view search) {
+                return matches_search(presetData.type + " " + presetData.name + " " + presetData.author, search);
             }
 
             // ------------------------------------------------
@@ -236,6 +266,7 @@ namespace Kaixo::Gui {
         
         ScrollView* m_Banks;
         ScrollView* m_Presets;
+        TextView* m_Search;
 
         // ------------------------------------------------
 
@@ -248,12 +279,43 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            m_Banks = &add<ScrollView>({ 0, 0, 110, Height }, {
-                .scrollbar = T.scrollbar
+            m_Banks = &add<ScrollView>({ 6, 6, 100, Height - 12 }, {
+                .scrollbar = T.scrollbar,
+                .margin = { 0, 0, 0, 0 },
+                .gap = 2,
+                .barThickness = 5,
+                .barPadding = { 2, 0, 0, 0 },
+                .keepBarSpace = false,
+                .alignChildren = Theme::Align::Left
             });
             
-            m_Presets = &add<ScrollView>({ 110, 0, 220, Height }, {
-                .scrollbar = T.scrollbar
+            m_Search = &add<TextView>({ 113, 6, 193, 20 }, {
+                .graphics = T.display.loadPreset.search,
+                .padding = { 4, 3 },
+                .multiline = false,
+                .editable = true,
+                .lineHeight = 14,
+                .maxSize = 24,
+                .placeholder = "Search..."
+            });
+            
+            m_Search->addCallback([this](std::string_view content) {
+                for (auto& view : m_Presets->views()) {
+                    if (auto entry = dynamic_cast<Preset*>(view.get())) {
+                        entry->setVisible(entry->matchesSearch(m_Search->content()));
+                    }
+                }
+                m_Presets->updateDimensions();
+            });
+
+            m_Presets = &add<ScrollView>({ 113, 28, 193, Height - 34 }, {
+                .scrollbar = T.scrollbar,
+                .margin = { 0, 0, 0, 0 },
+                .gap = 2,
+                .barThickness = 5,
+                .barPadding = { 2, 0, 0, 0 },
+                .keepBarSpace = false,
+                .alignChildren = Theme::Align::Left
             });
 
             reloadBanks();
@@ -323,6 +385,8 @@ namespace Kaixo::Gui {
                     }
                 }
             }
+
+            m_Presets->updateDimensions();
         }
 
         // ------------------------------------------------
@@ -373,9 +437,9 @@ namespace Kaixo::Gui {
 
             //add(new TimerValue{ context }, Dimensions{ 10, 210, 10 + 200, 210 + 100 });
 
-            zoom.addButton(0, add<Button>({ 6 + 0 * 48, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
-            zoom.addButton(1, add<Button>({ 6 + 1 * 48, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
-            zoom.addButton(2, add<Button>({ 6 + 2 * 48, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
+            zoom.addButton(0, add<Button>({ 6 + 0 * 50, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
+            zoom.addButton(1, add<Button>({ 6 + 1 * 50, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
+            zoom.addButton(2, add<Button>({ 6 + 2 * 50, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
             
             zoom.tab(0).addCallback([&](bool v) { if (v) context.scale(0.5); });
             zoom.tab(1).addCallback([&](bool v) { if (v) context.scale(0.7); });
@@ -387,7 +451,7 @@ namespace Kaixo::Gui {
             else if (zoomFactor == 1.0) zoom.select(2);
             else zoom.select(2);
 
-            themePath = &add<Button>({ 6, 6, 312, 20 }, {
+            themePath = &add<Button>({ 6, 6, 300, 20 }, {
                 .callback = [this](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
@@ -408,7 +472,7 @@ namespace Kaixo::Gui {
                 .text = std::string{ T.name() },
             });
 
-            add<Button>({ 6, 28, 312, 20 }, {
+            add<Button>({ 6, 28, 300, 20 }, {
                 .callback = [this](bool) {
                     Storage::set<std::string>(Setting::LoadedTheme, Theme::Default);
                     T.openDefault();
@@ -418,7 +482,7 @@ namespace Kaixo::Gui {
                 .graphics = T.display.settings.defaultTheme
             });
 
-            add<Button>({ 6, 50, 312, 20 }, {
+            add<Button>({ 6, 50, 300, 20 }, {
                 .callback = [this](bool) {
                     T.reopen();
                     themePath->settings.text = T.name();
@@ -429,7 +493,7 @@ namespace Kaixo::Gui {
 
             std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-            presetPath = &add<Button>({ 6, 72, 312, 20 }, {
+            presetPath = &add<Button>({ 6, 72, 300, 20 }, {
                 .callback = [this](bool) {
                     themeChooser.launchAsync(
                           juce::FileBrowserComponent::openMode
@@ -449,7 +513,7 @@ namespace Kaixo::Gui {
                 .text = storedPresetPath
             });
 
-            add<Button>({ 6, 94, 312, 20 }, {
+            add<Button>({ 6, 94, 300, 20 }, {
                 .callback = [&](bool state) {
                     Storage::set<bool>(Setting::TouchMode, state);
                 },
@@ -520,7 +584,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            name = &add<TextView>({ 6, 6, 312, 20 }, {
+            name = &add<TextView>({ 6, 6, 300, 20 }, {
                 .graphics = T.display.savePreset.name,
                 .padding = { 4, 3 },
                 .multiline = false,
@@ -530,7 +594,7 @@ namespace Kaixo::Gui {
                 .placeholder = "Name"
             });
 
-            author = &add<TextView>({ 6, 28, 312, 20 }, {
+            author = &add<TextView>({ 6, 28, 300, 20 }, {
                 .graphics = T.display.savePreset.author,
                 .padding = { 4, 3 },
                 .multiline = false,
@@ -540,7 +604,7 @@ namespace Kaixo::Gui {
                 .placeholder = "Author"
             });
 
-            type = &add<TextView>({ 6, 50, 312, 20 }, {
+            type = &add<TextView>({ 6, 50, 300, 20 }, {
                 .graphics = T.display.savePreset.type,
                 .padding = { 4, 3 },
                 .multiline = false,
@@ -550,7 +614,7 @@ namespace Kaixo::Gui {
                 .placeholder = "Type"
             });
 
-            description = &add<TextView>({ 6, 72, 312, 65 }, {
+            description = &add<TextView>({ 6, 72, 300, 65 }, {
                 .graphics = T.display.savePreset.description,
                 .padding = { 4, 3 },
                 .multiline = true,
@@ -560,7 +624,7 @@ namespace Kaixo::Gui {
                 .placeholder = "Description"
             });
 
-            add<Button>({ 6, 139, 312, 20 }, {
+            add<Button>({ 6, 139, 300, 20 }, {
                 .callback = [&](bool) {
                     if (name->empty()) settings.popup.open([](bool) {}, "You cannot leave the preset name blank.", false);
                     else savePreset(false);
@@ -653,6 +717,7 @@ namespace Kaixo::Gui {
         
         TextView* description = nullptr;
         TextView* presetName = nullptr;
+        TextView* timer = nullptr;
 
         // ------------------------------------------------
 
@@ -667,17 +732,37 @@ namespace Kaixo::Gui {
         } settings;
 
         // ------------------------------------------------
+        
+        void onIdle() override {
+            float value = context.interface<Processing::TimerInterface>()();
+            timer->settings.text = std::format("{:.2f} %", 100 * value);
+            timer->repaint();
+        }
+
+        // ------------------------------------------------
 
         MainTab(Context c, Settings s)
             : View(c), settings(s)
         {
+            // ------------------------------------------------
+            
+            wantsIdle(true);
+
             // ------------------------------------------------
 
             add<ImageView>({ .image = T.display.main.background });
 
             // ------------------------------------------------
             
-            presetName = &add<TextView>({ 6, 6, 312, 20 }, {
+            timer = &add<TextView>({ 6, 100, 100, 20 }, {
+                .graphics = T.display.main.presetName,
+                .padding = { 4, 3 },
+                .multiline = false,
+                .editable = false,
+                .lineHeight = 14,
+            });
+            
+            presetName = &add<TextView>({ 6, 6, 300, 20 }, {
                 .graphics = T.display.main.presetName,
                 .padding = { 4, 3 },
                 .multiline = false,
@@ -685,7 +770,7 @@ namespace Kaixo::Gui {
                 .lineHeight = 14,
             });
 
-            description = &add<TextView>({ 6, 28, 312, 54 }, {
+            description = &add<TextView>({ 6, 28, 300, 54 }, {
                 .graphics = T.display.main.description,
                 .padding = { 4, 3 },
                 .multiline = true,
@@ -723,19 +808,19 @@ namespace Kaixo::Gui {
             tabs.add(2, add<LoadPresetTab>({ .popup = popup }));
             tabs.add(3, add<SettingsTab>({ .popup = popup }));
 
-            tabs.addButton(0, add<Button>({ 314, 1, 40, 40 }, {
+            tabs.addButton(0, add<Button>({ 313, 6, 35, 35 }, {
                 .graphics = T.display.main.button
             }));
 
-            tabs.addButton(1, add<Button>({ 314, 42, 40, 40 }, {
+            tabs.addButton(1, add<Button>({ 313, 43, 35, 35 }, {
                 .graphics = T.display.savePreset.button
             }));
 
-            tabs.addButton(2, add<Button>({ 314, 83, 40, 40 }, {
+            tabs.addButton(2, add<Button>({ 313, 80, 35, 35 }, {
                 .graphics = T.display.loadPreset.button
             }));
 
-            tabs.addButton(3, add<Button>({ 314, 124, 40, 40 }, {
+            tabs.addButton(3, add<Button>({ 313, 117, 35, 35 }, {
                 .graphics = T.display.settings.button
             }));
 

@@ -11,94 +11,40 @@
     // ------------------------------------------------
     
     $selection-color: [ 255, 255, 255, 50 ]
-    $text-light: [ 216, 216, 214 ]
-    $text-light-dark: [ 186, 186, 184 ]
-    $text-dark: [ 156, 156, 154 ]
+    $text-color: [ 156, 156, 154 ]
     $display-color: [150, 150, 148]
 
     // ------------------------------------------------
 
-    $text-area: {
+    $display-text-area: {
       font: $main-font
-      text-color: $text-light
-      placeholder-color: $text-light-dark
+      text-color: $display-color
+      caret-color: $display-color
       selection-color: $selection-color
-      caret-color: $text-light
-    }
+      placeholder-color: {
+        value: $display-color
+        focused: [0, 0, 0, 0]
+      }
 
-    // ------------------------------------------------
-    
-    $main-text: {
-      font: $main-font
-      text-position: [ 0, 2 ]
-      text-color: $text-light
+      background: {
+        image-edges: [2, 2, 2, 2]
+
+        image: button-underline.png
+
+        focused: {
+          image: button-hover.png
+        }
+      }
     }
+    
+    // ------------------------------------------------
     
     $display-text: {
       font: $main-font
-      text-position: [ 0, 2 ]
+      text-position: [ 0, 1 ]
       text-color: $display-color
     }
     
-    $dark-text: {
-      extends: $main-text
-      text-color: $text-dark
-    }
-
-    // ------------------------------------------------
-
-    $text-button: {
-      extends: $dark-text
-
-      hovering: {
-        text-color: $text-light
-      }
-    }
-
-    $text-toggle: {
-      extends: $dark-text
-
-      selected: {
-        text-color: $text-light
-      }
-    }
-
-    // ------------------------------------------------
-
-    $light-button: {
-      extends: $main-text
-      
-      background-color: {
-        transition: 50
-        color: [ 89, 89, 89 ]
-        selected: [ 117, 117, 115 ]
-        hovering: [ 117, 117, 115 ]
-      }
-
-      text-color: {
-        transition: 50
-        color: $text-dark
-        selected: $text-light
-      }
-    }
-
-    $dark-button: {
-      extends: $main-text
-      
-      background-color: {
-        transition: 50
-        color: [ 40, 40, 40 ]
-        selected: [ 48, 48, 48 ]
-        hovering: [ 48, 48, 48 ]
-      }
-
-      text-color: {
-        transition: 50
-        color: $text-dark
-        selected: $text-light
-      }
-    }
-
     // ------------------------------------------------
 
     // Little base class for easy modification of knobs
@@ -112,7 +58,7 @@
       layers: {
         background: {
           image: {
-            source: knobs/main-knob-bg.png
+            source: knob-bg.png
             position: [ 8, 1 ]
             frames: 22
             size: [ 47, 38 ]
@@ -120,7 +66,7 @@
         }
         main: {
           image: {
-            source: knobs/main-knob.png
+            source: knob.png
             frames: 181
             frames-per-row: 10
             size: [ 27, 27 ]
@@ -130,7 +76,7 @@
         name: {
           text: {
             font: $main-font
-            color: $text-dark
+            color: $text-color
             content: "$short-name"
             position: [ 0, 22 ]
             align: center
@@ -149,7 +95,7 @@
       layers: {
         background: {
           image: {
-            source: knobs/main-knob-bg-bi.png
+            source: knob-bg-bi.png
             frames: 21
           }
         }
@@ -162,7 +108,7 @@
       layers: {
         background: {
           image: { 
-            source: knobs/waveforms.png
+            source: basic-waveforms.png
             frames: 4
             size: [ 64, 64 ]
             position: [0, 0]
@@ -179,13 +125,13 @@
       layers: {
         background: {
           image: {
-            source: knobs/main-slider-bg.png
+            source: slider-bg.png
             position: [ 17, 9 ]
           }
         }
         main: {
           image: {
-            source: knobs/main-slider.png
+            source: slider.png
             frames: 90
             frames-per-row: 90
             size: [ 43, 107 ]
@@ -195,7 +141,7 @@
         name: {
           text: {
             font: $main-font
-            color: $text-dark
+            color: $text-color
             content: $short-name
             position: [ 0, 60 ]
             align: center 
@@ -214,7 +160,7 @@
       layers: {
         toggle: {
           image: {
-            source: knobs/toggle.png
+            source: toggle.png
             size: [ 29, 19 ]
             position: [ 0, 2 ]
           }
@@ -227,7 +173,7 @@
         name: {
           text: {
             font: $main-font
-            color: $text-dark
+            color: $text-color
             content: "$short-name" 
             position: [ 34, 6 ]
             align: top-left
@@ -237,26 +183,17 @@
     }
 
     $vertical-toggle: {
-      extends: $knob
+      extends: $toggle
 
       layers: {
         toggle: {
           image: {
-            source: knobs/toggle.png
-            size: [ 29, 19 ]
             position: [ 17, 3 ]
-          }
-
-          selected: {
-            image-offset: [0, 19]
           }
         }
 
         name: {
           text: {
-            font: $main-font
-            color: $text-dark
-            content: "$short-name" 
             position: [ 0, 13 ]
             align: center
           }
@@ -270,7 +207,7 @@
       layers: {
         toggle: {
           image: {
-            source: knobs/threeway-toggle.png
+            source: threeway-toggle.png
             frames: 3
           }
         }
@@ -280,15 +217,15 @@
     // ------------------------------------------------
 
     $main-font: {
-      map: fonts/map.png
-      description: fonts/map.json
+      map: map.png
+      description: map.json
     }
 
     // ------------------------------------------------
 
     $led: {
       image: {
-        source: knobs/led.png
+        source: led.png
         frames: 100
         frames-per-row: 10
         size: [ 13, 13 ]
@@ -301,7 +238,7 @@
       layers: {
         jack: {
           image: {
-            source: knobs/jack.png
+            source: jack.png
             position: [ 21, 4 ]
           }
         }
@@ -310,7 +247,7 @@
           text: {
             content: $text
             font: $main-font
-            color: $text-dark
+            color: $text-color
             align: center
             position: [0, 16]
           }
@@ -328,7 +265,7 @@
           }
 
           image: {
-            source: knobs/out-jack-text-background.png
+            source: out-jack-text-background.png
             position: [12, 32]
             size: [40, 15]
           }
@@ -360,29 +297,6 @@
 
     // ------------------------------------------------
 
-    $display-text-area: {
-      extends: $text-area
-
-      text-color: $display-color
-      caret-color: $display-color
-      placeholder-color: {
-        value: $display-color
-        focused: [0, 0, 0, 0]
-      }
-
-      background: {
-        image-edges: [2, 2, 2, 2]
-
-        image: button-underline.png
-
-        focused: {
-          image: button-hover.png
-        }
-      }
-    }
-    
-    // ------------------------------------------------
-
   }
 
   // ------------------------------------------------
@@ -396,21 +310,8 @@
 
   // ------------------------------------------------
 
-  tooltip: {
-    background: {
-      image: tooltip.png
-      edges: [ 4, 4, 4, 4 ]
-    }
-    font: $main-font
-    text-color: $text-light
-  }
-
-  // ------------------------------------------------
-
   scrollbar: {
-    background-color: [ 102, 102, 100 ]
-
-    hovering: { background-color: [ 112, 112, 111 ] }
+    background-color: $display-color
   }
 
   // ------------------------------------------------
@@ -432,27 +333,27 @@
 
   cables: {
     cable1: {
-      end: knobs/cable1.png
+      end: cable1.png
       color: [214, 92, 92]
     }
 
     cable2: {
-      end: knobs/cable2.png
+      end: cable2.png
       color: [214, 181, 92]
     }
 
     cable3: {
-      end: knobs/cable3.png
+      end: cable3.png
       color: [99, 214, 92]
     }
 
     cable4: {
-      end: knobs/cable4.png
+      end: cable4.png
       color: [92, 158, 214]
     }
 
     cable5: {
-      end: knobs/cable5.png
+      end: cable5.png
       color: [140, 92, 214]
     }
   }
@@ -633,13 +534,14 @@
     }
 
     main: {
-      background: main-tab-background.png
+      background: display-background.png
       button: {
-        image: tabs.png
-        image-offset: [80, 0]
-
-        selected: {
-          image-offset: [80, 40]          
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: tabs.png
+            image-offset: [80, 0]
+          }
         }
       }
 
@@ -650,49 +552,41 @@
     load-preset: {
       background: load-preset-background.png
       button: {
-        image: tabs.png
-        image-offset: [40, 0]
-
-        selected: {
-          image-offset: [40, 40]          
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: tabs.png
+            image-offset: [40, 0]
+          }
         }
       }
 
-      preset: {
-        background-color: { 
-          value: [255, 255, 255, 10]
-          transition: 100
-          hovering: [255, 255, 255, 40]
-        }
+      search: $display-text-area
 
-        extends: $main-text
+      preset: {
+        extends: $basic-button
         text: $text
-        text-position: [10, 2]
+        text-position: [5, 1]
         text-align: center-left
       }
 
       bank: {
-        background-color: {
-          value: [255, 255, 255, 10]
-          transition: 100
-          hovering: [255, 255, 255, 40]
-        }
-
-        extends: $main-text
+        extends: $basic-button
         text: $text
-        text-position: [5, 2]
+        text-position: [5, 1]
         text-align: center-left
       }
     }
 
     save-preset: {
-      background: save-preset-background.png
+      background: display-background.png
       button: {
-        image: tabs.png
-        image-offset: [0, 0]
-
-        selected: {
-          image-offset: [0, 40]          
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: tabs.png
+            image-offset: [0, 0]
+          }
         }
       }
 
@@ -709,32 +603,33 @@
     }
 
     settings: {
-      background: settings-background.png
+      background: display-background.png
       button: {
-        image: tabs.png
-        image-offset: [120, 0]
-
-        selected: {
-          image-offset: [120, 40]          
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: tabs.png
+            image-offset: [120, 0]
+          }
         }
       }
 
       zoom-button: {
         extends: $basic-button-select
         text: ["0.5x", "0.7x", "1.0x"]
-        text-position: [5, 2]
+        text-position: [5, 1]
       }
 
       default-theme: {
         extends: $basic-button
         text: Default Theme
-        text-position: [90, 2]
+        text-position: [90, 1]
       }
 
       reload-theme: {
         extends: $basic-button
         text: Reload Theme
-        text-position: [90, 2]
+        text-position: [90, 1]
 
         image: button-underline.png
       }
@@ -742,7 +637,7 @@
       theme-path: {
         extends: $basic-button
         text: Theme Path
-        text-position: [5, 2]
+        text-position: [5, 1]
 
         layers: {
           path: {
@@ -750,7 +645,7 @@
             text: $text
             text-overflow: dots
             text-align: center-left
-            text-position: [90, 2]
+            text-position: [90, 1]
           }
         }
       }
@@ -768,7 +663,7 @@
             text: $text
             text-overflow: dots
             text-align: center-left
-            text-position: [90, 2]
+            text-position: [90, 1]
           }
         }
       }
@@ -776,7 +671,7 @@
       touch-mode: {
         extends: $basic-button
         text: Touch Mode
-        text-position: [5, 2]
+        text-position: [5, 1]
 
         image: button-underline.png
 
@@ -786,7 +681,7 @@
             text: Disabled
             text-overflow: dots
             text-align: center-left
-            text-position: [90, 2]
+            text-position: [90, 1]
 
             selected: {
               text: Enabled

@@ -42,8 +42,10 @@ namespace Kaixo::Processing {
             
             float output = 0;
             for (auto& voice : voices) {
-                voice.process();
-                output += voice.result;
+                if (voice.active()) {
+                    voice.process();
+                    output += voice.result;
+                }
             }
 
             delay.input = output;
@@ -76,6 +78,10 @@ namespace Kaixo::Processing {
 
     void MiniSynthFMProcessor::quality(Quality val) {
         params.quality = val;
+        params.oscillator[0].quality(val);
+        params.oscillator[1].quality(val);
+        params.oscillator[2].quality(val);
+        params.filter.quality = val;
     }
 
     // ------------------------------------------------

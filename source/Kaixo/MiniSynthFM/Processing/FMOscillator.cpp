@@ -9,12 +9,25 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    std::size_t FMOscillatorParameters::oversample() const {
+        switch (m_Quality) {
+        case Quality::Low: return 1;
+        case Quality::Normal: return 2;
+        case Quality::High: return 4;
+        case Quality::Ultra: return 8;
+        case Quality::Extreme: return 16;
+        default: return 1;
+        }
+    }
+
+    // ------------------------------------------------
+
     FMOscillator::FMOscillator(FMOscillatorParameters& p) 
         : params(p) 
     {}
 
     // ------------------------------------------------
-
+    
     void FMOscillator::trigger() {
         m_Phase = 0;
     }
@@ -28,18 +41,21 @@ namespace Kaixo::Processing {
         }
     }
 
-    void FMOscillator::fm(float phase) { m_PhaseModulation += phase; }
+    void FMOscillator::fm(float phase, std::size_t os) { m_PhaseModulation[os] += phase; }
 
     // ------------------------------------------------
 
     void FMOscillator::process() {
         updateFrequency();
         float delta = m_Frequency / sampleRate();
-        float phase = Math::Fast::fmod1(m_Phase + m_PhaseModulation + 10);
-        output = at(phase);
-        fmOutput = fmAt(phase);
+        std::size_t os = params.oversample();
+        for (std::size_t i = 0; i < os; ++i) {
+            float phase = Math::Fast::fmod1(m_Phase + (i * delta / os) + m_PhaseModulation[i] + 10);
+            output[i] = at(phase);
+            fmOutput[i] = fmAt(phase);
+            m_PhaseModulation[i] = 0;
+        }
         m_Phase = Math::Fast::fmod1(m_Phase + delta);
-        m_PhaseModulation = 0;
         
         m_DidCycle = m_Phase < delta;
     }
@@ -93,9 +109,10 @@ namespace Kaixo::Processing {
         };
 
         // requires 0 <= p <= 1
-        float xd = Math::Fast::max(m_Frequency / 30000.f, 0.002f);
+        float xd = Math::Fast::max(m_Frequency / 35000.f, 0.002f);
+        float xd2 = Math::Fast::max(m_Frequency / 12000.f, 0.002f);
         switch (params.m_Waveform) {
-        case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
+        case Waveform::Sine: return Math::Fast::nsin(0.5 - p);
         case Waveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * p);
         case Waveform::Saw: return saw(p, xd);
         case Waveform::Square: return square(p, xd);

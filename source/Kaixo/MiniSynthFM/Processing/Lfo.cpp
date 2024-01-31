@@ -72,7 +72,7 @@ namespace Kaixo::Processing {
 
     float Lfo::at(float x) {
         switch (params.m_Waveform) {
-        case LfoWaveform::Sine: return Math::Fast::nsin(x - 0.5);
+        case LfoWaveform::Sine: return Math::Fast::nsin(0.5 - x);
         case LfoWaveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * x);
         case LfoWaveform::Saw: return 1 - 2 * x;
         case LfoWaveform::Square: return 1 - 2 * (x > 0.5);

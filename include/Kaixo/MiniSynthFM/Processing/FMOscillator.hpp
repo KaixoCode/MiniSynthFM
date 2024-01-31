@@ -48,6 +48,10 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
+        std::size_t oversample() const;
+
+        // ------------------------------------------------
+
     private:
         Note m_Tune = 0;
         float m_FrequencyMultiplier = 1;
@@ -79,8 +83,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float output{};
-        float fmOutput{};
+        float output[16]{};
+        float fmOutput[16]{};
 
         // ------------------------------------------------
 
@@ -89,7 +93,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         void note(float note);
-        void fm(float phase);
+        void fm(float phase, std::size_t os = 0);
 
         // ------------------------------------------------
 
@@ -104,8 +108,7 @@ namespace Kaixo::Processing {
 
     private:
         float m_Phase = 0;
-        float m_PhaseModulation = 0;
-        float m_PreviousPhaseModulation = 0;
+        float m_PhaseModulation[16]{};
         float m_Frequency = 440;
         float m_FrequencyOffset = 440;
         float m_NoteFrequency = 0;

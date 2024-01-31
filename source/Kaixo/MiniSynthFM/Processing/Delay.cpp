@@ -47,12 +47,13 @@ namespace Kaixo::Processing {
         m_FilterParameters.frequency = 0.8;
         m_FilterParameters.drive = 0.3;
         m_FilterParameters.resonance = 0.4;
+        m_FilterParameters.quality = Quality::Low;
         m_HighpassFilter[0].frequency(200);
         m_HighpassFilter[0].resonance(0.2);
         m_HighpassFilter[0].type(FilterType::HighPass);
 
         float back = input + m_Feedback * out1;
-        m_Filter.input = back;
+        m_Filter.input[0] = back;
         m_Filter.process();
         m_HighpassFilter.input = m_Filter.output;
         m_HighpassFilter.process();

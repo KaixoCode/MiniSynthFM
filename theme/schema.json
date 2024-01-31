@@ -130,6 +130,7 @@
     "load-preset": {
       "background": "drawable",
       "button": "drawable",
+      "search": "text-area",
       "bank": "drawable",
       "preset": "drawable"
     }

@@ -29,6 +29,10 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
+        std::size_t oversample() const;
+
+        // ------------------------------------------------
+
     };
 
     // ------------------------------------------------
@@ -46,7 +50,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float input = 0;
+        float input[16]{};
         float output = 0;
 
         // ------------------------------------------------
@@ -57,6 +61,7 @@ namespace Kaixo::Processing {
         
         void process() override;
         void prepare(double sampleRate, std::size_t maxBufferSize) override;
+        void reset() override;
 
         // ------------------------------------------------
         
@@ -66,6 +71,7 @@ namespace Kaixo::Processing {
 
     private:
         StereoEqualizer<3, float, Kaixo::Math::Fast, false> m_Filter{};
+        AAFilter m_AAF{};
 
         Random m_Random{};
         std::size_t m_Counter = 0;

@@ -64,13 +64,13 @@ namespace Kaixo::Processing {
         auto env2level = envelope[1].output * params.envelopeLevel[1];
         auto env3level = envelope[2].output * params.envelopeLevel[2];
         
-        auto op1level = oscillator[0].output * params.volume[0];
-        auto op2level = oscillator[1].output * params.volume[1];
-        auto op3level = oscillator[2].output * params.volume[2];
+        auto op1level = oscillator[0].output[0] * params.volume[0];
+        auto op2level = oscillator[1].output[0] * params.volume[1];
+        auto op3level = oscillator[2].output[0] * params.volume[2];
         
-        auto op1fm = oscillator[0].fmOutput * params.volume[0];
-        auto op2fm = oscillator[1].fmOutput * params.volume[1];
-        auto op3fm = oscillator[2].fmOutput * params.volume[2];
+        auto op1fm = oscillator[0].fmOutput[0] * params.volume[0];
+        auto op2fm = oscillator[1].fmOutput[0] * params.volume[1];
+        auto op3fm = oscillator[2].fmOutput[0] * params.volume[2];
 
         auto lfolevel = previousLfoLevel; 
 
@@ -138,9 +138,15 @@ namespace Kaixo::Processing {
         oscillator[1].note(note + params.pitchBend * 24 - 12 + fm2 * 24 * getAllANoOp(ModDestination::Op2FM));
         oscillator[2].note(note + params.pitchBend * 24 - 12 + fm3 * 24 * getAllANoOp(ModDestination::Op3FM));
 
-        oscillator[0].fm(4 * fm1 * (getAllOpFM(ModDestination::Op1FM)));
-        oscillator[1].fm(4 * fm2 * (getAllOpFM(ModDestination::Op2FM)));
-        oscillator[2].fm(4 * fm3 * (getAllOpFM(ModDestination::Op3FM)));
+        for (std::size_t i = 0; i < params.oversample(); ++i) {
+            op1fm = oscillator[0].fmOutput[i] * params.volume[0];
+            op2fm = oscillator[1].fmOutput[i] * params.volume[1];
+            op3fm = oscillator[2].fmOutput[i] * params.volume[2];
+
+            oscillator[0].fm(4 * fm1 * (getAllOpFM(ModDestination::Op1FM)), i);
+            oscillator[1].fm(4 * fm2 * (getAllOpFM(ModDestination::Op2FM)), i);
+            oscillator[2].fm(4 * fm3 * (getAllOpFM(ModDestination::Op3FM)), i);
+        }
 
         if (getOp1(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[0]);
         if (getOp2(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[1]);
@@ -161,25 +167,19 @@ namespace Kaixo::Processing {
         for (auto& lfo : lfo) lfo.process();
         for (auto& env : envelope) env.process();
 
-        auto os = params.oversample();
-        oversample(os);
-        float out = 0;
-        for (std::size_t i = 0; i < os; ++i) {
-            doModulations();
+        doModulations();
 
-            for (auto& osc : oscillator) osc.process();
+        for (auto& osc : oscillator) osc.process();
 
-            filter.input =
-                params.outputOscillator[0] * oscillator[0].output * params.volume[0] +
-                params.outputOscillator[1] * oscillator[1].output * params.volume[1] +
-                params.outputOscillator[2] * oscillator[2].output * params.volume[2];
-
-            filter.process();
-            out += filter.output * envelope[2].output * params.envelopeLevel[2];
+        for (std::size_t i = 0; i < params.oversample(); ++i) {
+            filter.input[i] =
+                params.outputOscillator[0] * oscillator[0].output[i] * params.volume[0] +
+                params.outputOscillator[1] * oscillator[1].output[i] * params.volume[1] +
+                params.outputOscillator[2] * oscillator[2].output[i] * params.volume[2];
         }
-        oversample(1); // reset oversample
 
-        result = out / os;
+        filter.process();
+        result = filter.output * envelope[2].output * params.envelopeLevel[2];
     }
 
     // ------------------------------------------------
