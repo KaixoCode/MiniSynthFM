@@ -110,7 +110,6 @@ namespace Kaixo::Processing {
 
         // requires 0 <= p <= 1
         float xd = Math::Fast::max(m_Frequency / 35000.f, 0.002f);
-        float xd2 = Math::Fast::max(m_Frequency / 12000.f, 0.002f);
         switch (params.m_Waveform) {
         case Waveform::Sine: return Math::Fast::nsin(0.5 - p);
         case Waveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * p);
