@@ -71,7 +71,27 @@ namespace Kaixo::Processing {
 
     private:
         StereoEqualizer<3, float, Kaixo::Math::Fast, false> m_Filter{};
-        AAFilter m_AAF{};
+
+        struct AAFilter {
+            double sampleRateIn = 44100;
+            double sampleRateOut = 48000;
+
+            AAFilter() {
+                params.normalisedTransitionWidth = 0.01;
+            }
+
+            float process(float s) {
+                params.f0 = 0.5 * sampleRateOut - 2;
+                params.sampleRate = sampleRateIn;
+                params.recalculateParameters();
+                return filter.process(s, params);
+            }
+
+            void reset() { params.reset(); }
+
+            EllipticFilter filter;
+            EllipticParameters params;
+        } m_AAF{};
 
         Random m_Random{};
         std::size_t m_Counter = 0;

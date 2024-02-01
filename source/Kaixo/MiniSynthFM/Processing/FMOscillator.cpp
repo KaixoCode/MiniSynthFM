@@ -47,17 +47,36 @@ namespace Kaixo::Processing {
 
     void FMOscillator::process() {
         updateFrequency();
-        float delta = m_Frequency / sampleRate();
-        std::size_t os = params.oversample();
-        for (std::size_t i = 0; i < os; ++i) {
-            float phase = Math::Fast::fmod1(m_Phase + (i * delta / os) + m_PhaseModulation[i] + 10);
-            output[i] = at(phase);
-            fmOutput[i] = fmAt(phase);
-            m_PhaseModulation[i] = 0;
-        }
-        m_Phase = Math::Fast::fmod1(m_Phase + delta);
+
+        auto os = params.oversample();
         
-        m_DidCycle = m_Phase < delta;
+        switch (simd_path::path) {
+        case simd_path::s512:
+            switch (os) {
+            case 16: return processImpl<simd<float, 512>>();
+            case  8: return processImpl<simd<float, 256>>();
+            case  4: 
+            case  2: return processImpl<simd<float, 128>>();
+            default: return processImpl<float>();
+            }
+        case simd_path::s256:
+            switch (os) {
+            case 16: 
+            case  8: return processImpl<simd<float, 256>>();
+            case  4:
+            case  2: return processImpl<simd<float, 128>>();
+            default: return processImpl<float>();
+            }
+        case simd_path::s128:
+            switch (os) {
+            case 16:
+            case  8: 
+            case  4:
+            case  2: return processImpl<simd<float, 128>>();
+            default: return processImpl<float>();
+            }
+        case simd_path::s0: return processImpl<float>();
+        }
     }
 
     // ------------------------------------------------
@@ -83,27 +102,67 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
-    float FMOscillator::at(float p) {
+    template<std::size_t N>
+    __forceinline constexpr auto ct_foreach(auto lambda) {
+        return[&]<std::size_t ...Is>(std::index_sequence<Is...>) {
+            return lambda.template operator() < Is... > ();
+        }(std::make_index_sequence<N>{});
+    }
 
-        constexpr auto g = [](auto x) {
+    // ------------------------------------------------
+
+    template<class SimdType>
+    void FMOscillator::processImpl() {
+        constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
+        float delta = m_Frequency / sampleRate();
+        std::size_t os = params.oversample();
+
+        for (std::size_t i = 0; i < os; i += Count) {
+            const SimdType offset = ct_foreach<Count>([&]<std::size_t ...Is> {
+                return SimdType{ float(i + Is)... };
+            });
+
+            SimdType _output = Kaixo::at<SimdType>(output, i);
+            SimdType _fmOutput = Kaixo::at<SimdType>(fmOutput, i);
+
+            SimdType phase = Math::Fast::fmod1((offset * (delta / os)) + (m_Phase + m_PhaseModulation[i] + 10));
+            _output = this->at<SimdType>(phase);
+            _fmOutput = this->fmAt<SimdType>(phase);
+
+            Kaixo::store(output + i, _output);
+            Kaixo::store(fmOutput + i, _fmOutput);
+        }
+
+        std::memset(m_PhaseModulation, 0, sizeof(m_PhaseModulation));
+        m_Phase = Math::Fast::fmod1(m_Phase + delta);
+
+        m_DidCycle = m_Phase < delta;
+    }
+
+    // ------------------------------------------------
+
+    template<class SimdType>
+    SimdType FMOscillator::at(SimdType p) {
+
+        constexpr auto g = [](SimdType x) {
             return (x - 1) * x * (2 * x - 1);
         };
         
-        constexpr auto saw = [](float x, float nf) {
-            float v1 = Math::Fast::fmod1(x - nf + 1);
-            float v2 = Math::Fast::fmod1(x + nf);
-            float v3 = x;
+        constexpr auto saw = [](SimdType x, SimdType nf) {
+            SimdType v1 = Math::Fast::fmod1(x - nf + 1);
+            SimdType v2 = Math::Fast::fmod1(x + nf);
+            SimdType v3 = x;
 
             return (g(v1) + g(v2) - 2 * g(v3)) / (6.f * nf * nf);
         };
         
-        constexpr auto square = [](float x, float nf) {
-            float v1 = Math::Fast::fmod1(x - nf + 1);
-            float v2 = Math::Fast::fmod1(x + nf);
-            float v3 = x;
-            float v4 = Math::Fast::fmod1(2.5 - x - nf);
-            float v5 = Math::Fast::fmod1(1.5 - x + nf);
-            float v6 = Math::Fast::fmod1(1.5 - x);
+        constexpr auto square = [](SimdType x, SimdType nf) {
+            SimdType v1 = Math::Fast::fmod1(x - nf + 1);
+            SimdType v2 = Math::Fast::fmod1(x + nf);
+            SimdType v3 = x;
+            SimdType v4 = Math::Fast::fmod1(2.5 - x - nf);
+            SimdType v5 = Math::Fast::fmod1(1.5 - x + nf);
+            SimdType v6 = Math::Fast::fmod1(1.5 - x);
 
             return (g(v1) + g(v2) - 2 * g(v3) + g(v4) + g(v5) - 2 * g(v6)) / (6.f * nf * nf);
         };
@@ -118,10 +177,11 @@ namespace Kaixo::Processing {
         }
     }
 
-    float FMOscillator::fmAt(float p) {
+    template<class SimdType>
+    SimdType FMOscillator::fmAt(SimdType p) {
         // requires 0 <= p <= 1
         switch (params.m_Waveform) {
-        case Waveform::Sine: return Math::Fast::nsin(p - 0.5);
+        case Waveform::Sine: return Math::Fast::nsin(0.5 - p);
         case Waveform::Triangle: return 2 * (2 * p - 1) * ((2 * p - 1) * Math::Fast::sign(0.5 - p) + 1);
         case Waveform::Saw: return 4 * (p - p * p);
         case Waveform::Square: return 1 - Math::Fast::abs(2 - 4 * p);

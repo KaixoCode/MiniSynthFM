@@ -123,9 +123,17 @@ namespace Kaixo::Processing {
         void updateFrequency();
 
         // ------------------------------------------------
+        
+        template<class SimdType>
+        void processImpl();
 
-        float at(float p);
-        float fmAt(float p);
+        // ------------------------------------------------
+
+        template<class SimdType>
+        SimdType at(SimdType p);
+
+        template<class SimdType>
+        SimdType fmAt(SimdType p);
 
         // ------------------------------------------------
 

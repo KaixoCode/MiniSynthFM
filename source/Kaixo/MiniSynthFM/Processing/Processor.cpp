@@ -87,8 +87,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::init() {
-        std::memset(params.routing, 0, sizeof(params.routing));
-        //params.routing.reset();
+        params.resetRouting();
     }
 
     constexpr void forAllModulation(auto lambda) {
@@ -126,7 +125,7 @@ namespace Kaixo::Processing {
     }
 
     void MiniSynthFMProcessor::deserialize(basic_json& data) {
-        std::memset(params.routing, 0, sizeof(params.routing));
+        params.resetRouting();
 
         forAllModulation([&](ModSource src, ModDestination dst) {
             auto sname = toString(src);

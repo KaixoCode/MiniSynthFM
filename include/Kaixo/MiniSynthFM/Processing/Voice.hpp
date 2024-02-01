@@ -52,6 +52,13 @@ namespace Kaixo::Processing {
         
         bool routing[(int)ModDestination::Amount][(int)ModSource::Amount]{};
 
+        //std::array<std::bitset<(int)ModSource::Amount>, (int)ModDestination::Amount> routing{};
+
+        void resetRouting() {
+            std::memset(routing, 0, sizeof(routing));
+            //for (auto& m : routing) m.reset();
+        }
+
         // ------------------------------------------------
         
         std::size_t oversample() const;
