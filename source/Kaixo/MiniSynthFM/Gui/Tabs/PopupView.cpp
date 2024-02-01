@@ -53,8 +53,8 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    void PopupView::open(auto c, std::string_view text, bool withBack) {
-        m_Callback = c;
+    void PopupView::open(std::function<void(bool)> c, std::string_view text, bool withBack) {
+        m_Callback = std::move(c);
         m_Message->setText(text);
         m_Requests++;
         m_BackButton->setVisible(withBack);

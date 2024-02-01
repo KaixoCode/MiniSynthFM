@@ -25,7 +25,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        void open(auto c, std::string_view text, bool withBack = true);
+        void open(std::function<void(bool)> c, std::string_view text, bool withBack = true);
 
         // ------------------------------------------------
 
