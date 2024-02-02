@@ -12,6 +12,29 @@
   
   <!-- ================================================ -->
 
+  <param name="Mod Wheel Amount"
+         short-name="Amount"
+         default="50"
+         transform="Range[0.f, 100.f]"
+         format="Percent"
+         interface="$self.params.modWheelAmount = $value"/>
+
+  <param name="Velocity Amount"
+         short-name="Amount"
+         default="50"
+         transform="Range[0.f, 100.f]"
+         format="Percent"
+         interface="$self.params.velocityAmount = $value"/>
+
+  <param name="Random Amount"
+         short-name="Amount"
+         default="50"
+         transform="Range[0.f, 100.f]"
+         format="Percent"
+         interface="$self.params.randomAmount = $value"/>
+
+  <!-- ================================================ -->
+
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">
     <param name="Volume"
            description="Adjust the volume of the operator. This affects both the output jack, and the output toggle."
@@ -86,7 +109,7 @@
 
     <param name="Depth"
            description="Control the depth of the LFO."
-           default="100"
+           default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.lfoLevel[$lfo] = $value"/>

@@ -33,27 +33,46 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     Point<> PatchBay::Jack::holePosition() const {
-        return position() + Point{ 32, 15 };
+        return settings.patchBay.getLocalPoint(this, Point{ 32, 15 });
     }
 
     // ------------------------------------------------
 
     void PatchBay::Jack::mouseDrag(const juce::MouseEvent& event) {
         auto e = event.getEventRelativeTo(&settings.patchBay);
+
+        if (m_Clicked && Storage::flag(Setting::TouchMode)) {
+            auto diff = std::chrono::steady_clock::now() - m_ClickedAt;
+            auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
+
+            if (millis < 100) {
+                settings.patchBay.beginCable(m_Id);
+            } else {
+                settings.patchBay.removeCable(m_Id);
+            }
+        }
+
+        m_Clicked = false;
+
         settings.patchBay.moveCable({ e.x, e.y });
     }
 
     void PatchBay::Jack::mouseDown(const juce::MouseEvent& event) {
-        if (event.mods.isLeftButtonDown()) {
-            settings.patchBay.beginCable(m_Id);
-        }
+        m_ClickedAt = std::chrono::steady_clock::now(); 
+        m_Clicked = true;
 
-        if (event.mods.isRightButtonDown()) {
-            settings.patchBay.removeCable(m_Id);
-        }
+        if (!Storage::flag(Setting::TouchMode)) {
+            if (event.mods.isLeftButtonDown()) {
+                settings.patchBay.beginCable(m_Id);
+            }
 
-        auto e = event.getEventRelativeTo(&settings.patchBay);
-        settings.patchBay.moveCable({ e.x, e.y });
+            if (event.mods.isRightButtonDown()) {
+                settings.patchBay.removeCable(m_Id);
+            }
+
+            auto e = event.getEventRelativeTo(&settings.patchBay);
+            settings.patchBay.moveCable({ e.x, e.y });
+        }
     }
 
     void PatchBay::Jack::mouseUp(const juce::MouseEvent& event) {
@@ -163,7 +182,7 @@ namespace Kaixo::Gui {
             segment.vy *= damp;
             segment.vy = std::clamp(segment.vy, -50.f, 50.f);
             segment.y += segment.vy;
-            segment.y = std::clamp(segment.y, 0.f, (float)self.height());
+            segment.y = segment.y;
 
             path.lineTo({ x, segment.y });
         }
@@ -289,7 +308,7 @@ namespace Kaixo::Gui {
             if (id != m_CurrentConnection.begin && // Not same jack
                 jack->input() != begin->input() && // Not both same type
                 jack->output() != begin->output() &&
-                jack->dimensions().contains(m_LastMousePosition)) // Hover
+                jack->localDimensions().contains(jack->getLocalPoint(this, m_LastMousePosition))) // Hover
             {
                 m_CurrentConnection.end = id;
                 // Check for existing connection

@@ -64,8 +64,9 @@ namespace Kaixo::Gui {
             .editable = false,
             .lineHeight = 14,
         });
+        timer->setVisible(false);
 
-        presetName = &add<TextView>({ 6, 6, 256, 20 }, {
+        presetName = &add<TextView>({ 6, 83, 256, 20 }, {
             .graphics = T.display.main.presetName,
             .padding = { 4, 3 },
             .multiline = false,
@@ -73,27 +74,31 @@ namespace Kaixo::Gui {
             .lineHeight = 14,
         });
 
-        add<Button>({ 264, 6, 20, 20 }, {
+        add<Button>({ 264, 83, 20, 20 }, {
             .callback = [&](bool) {
                 context.controller<MiniSynthFMController>().presetDatabase.loadPreviousPreset();
             },
             .graphics = T.display.main.previousPreset,
         });
 
-        add<Button>({ 286, 6, 20, 20 }, {
+        add<Button>({ 286, 83, 20, 20 }, {
             .callback = [&](bool) {
                 context.controller<MiniSynthFMController>().presetDatabase.loadNextPreset();
             },
             .graphics = T.display.main.nextPreset,
         });
 
-        description = &add<TextView>({ 6, 28, 300, 54 }, {
+        description = &add<TextView>({ 6, 105, 300, 54 }, {
             .graphics = T.display.main.description,
             .padding = { 4, 3 },
             .multiline = true,
             .editable = false,
             .lineHeight = 16,
         });
+
+        // ------------------------------------------------
+
+        add<ImageView>({ .image = T.display.main.foreground, .enableMouse = false });
 
         // ------------------------------------------------
 

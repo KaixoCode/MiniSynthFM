@@ -67,8 +67,8 @@
         main: {
           image: {
             source: knob.png
-            frames: 181
-            frames-per-row: 10
+            frames: 46
+            frames-per-row: 7
             size: [ 27, 27 ]
             position: [ 18, 11 ]
           }
@@ -110,6 +110,21 @@
           image: { 
             source: basic-waveforms.png
             frames: 4
+            size: [ 64, 64 ]
+            position: [0, 0]
+          }
+        }
+      }
+    }
+
+    $lfo-waveform-knob: { 
+      extends: $main-knob
+
+      layers: {
+        background: {
+          image: { 
+            source: lfo-waveforms.png
+            frames: 6
             size: [ 64, 64 ]
             position: [0, 0]
           }
@@ -301,33 +316,8 @@
 
   // ------------------------------------------------
 
-  font: $main-font
-  font-small: $small-font 
-
-  // ------------------------------------------------
-
   background: background.png
-
-  // ------------------------------------------------
-
-  scrollbar: {
-    background-color: $display-color
-  }
-
-  // ------------------------------------------------
-
-  slider: $slider
-  knob: $main-knob
-  knob-bi: $main-knob-bi
-
-  waveform-knob1: $basic-waveform-knob
-
-  led: $led
-  toggle: $toggle
-  threeway-toggle: $threeway-toggle
-
-  output-jack: $output-jack
-  input-jack: $jack
+  background-no-piano: background-no-piano.png
 
   // ------------------------------------------------
 
@@ -380,31 +370,6 @@
         pressed: [60, 60, 60]
       }
     }    
-  }
-
-  text: $text-area
-
-  led-text: {
-    extends: $text-area
-
-    text-color: $display-color
-    caret-color: $display-color
-    placeholder-color: {
-      value: $display-color
-      focused: [0, 0, 0, 0]
-      transition: 1
-    }
-
-    background: {
-      image-edges: [2, 2, 2, 2]
-
-      image: button-underline.png
-
-      focused: {
-        image: button-hover.png
-      }
-    }
-    
   }
 
   // ------------------------------------------------
@@ -466,7 +431,7 @@
       depth: $main-knob
       synced: $vertical-toggle
       tempo: $main-knob
-      waveform: $main-knob
+      waveform: $lfo-waveform-knob
     }
 
     jacks: {
@@ -512,7 +477,30 @@
 
   // ------------------------------------------------
 
+  midi: {
+    mod-wheel-led: $led
+    velocity-led: $led
+    random-led: $led
+
+    parameters: {
+      mod-wheel-amount: $main-knob
+      velocity-amount: $main-knob
+      random-amount: $main-knob
+    }
+
+    jacks: {
+      mod-wheel: $output-jack
+      velocity: $output-jack
+      random: $output-jack
+    }
+  }
+
+  // ------------------------------------------------
+
   display: {
+    
+    // ------------------------------------------------
+
     popup: {
       background: {
         image: popup-background.png
@@ -533,7 +521,10 @@
       message: $display-text-area
     }
 
+    // ------------------------------------------------
+
     main: {
+      foreground: main-tab-foreground.png
       background: display-background.png
       button: {
         extends: $basic-button-select
@@ -567,6 +558,8 @@
       description: $display-text-area
     }
 
+    // ------------------------------------------------
+
     load-preset: {
       background: load-preset-background.png
       button: {
@@ -580,6 +573,10 @@
       }
 
       search: $display-text-area
+
+      scrollbar: {
+        background-color: $display-color
+      }
 
       preset: {
         extends: $basic-button
@@ -597,6 +594,8 @@
         text-align: center-left
       }
     }
+
+    // ------------------------------------------------
 
     save-preset: {
       background: display-background.png
@@ -621,6 +620,8 @@
       type: $display-text-area
       description: $display-text-area
     }
+
+    // ------------------------------------------------
 
     settings: {
       background: display-background.png
@@ -709,6 +710,34 @@
           }
         }
       }
+
+      show-piano: {
+        extends: $basic-button
+        text: Show Piano
+        text-position: [5, 1]
+
+        image: button-underline.png
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: Hide
+            text-overflow: dots
+            text-align: center-left
+            text-position: [90, 1]
+
+            selected: {
+              text: Show
+            }
+          }
+        }
+      }
     }
+    
+    // ------------------------------------------------
+
   }
+  
+  // ------------------------------------------------
+
 }

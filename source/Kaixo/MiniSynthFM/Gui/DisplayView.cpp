@@ -20,7 +20,15 @@ namespace Kaixo::Gui {
         : View(c)
     {
 
+        // ------------------------------------------------
+
+        add<ImageView>({ .image = T.display.background });
+
+        // ------------------------------------------------
+
         auto& popup = add<PopupView>();
+
+        // ------------------------------------------------
 
         auto& tabs = context.tabControl(0);
 
@@ -28,6 +36,8 @@ namespace Kaixo::Gui {
         tabs.add(1, *(load = &add<LoadPresetTab>({ .popup = popup })));
         tabs.add(2, add<PresetTab>({ .popup = popup }));
         tabs.add(3, add<SettingsTab>({ .popup = popup }));
+
+        // ------------------------------------------------
 
         tabs.addButton(0, add<Button>({ 313, 6, 35, 35 }, {
             .graphics = T.display.main.button
@@ -45,15 +55,30 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.button
         }));
 
+        // ------------------------------------------------
+
         tabs.tab(1).addCallback([&](bool v) {
-            if (v) load->reloadBanks();
+            if (v) {
+                load->reloadBanks();
+            }
         });
 
+        // ------------------------------------------------
+
         tabs.select(0);
+
+        // ------------------------------------------------
 
         // Move popup to end of views, so it draws on top
         removeChildComponent(&popup);
         addChildComponent(&popup);
+
+        // ------------------------------------------------
+
+        add<ImageView>({ .image = T.display.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+
     }
 
     // ------------------------------------------------

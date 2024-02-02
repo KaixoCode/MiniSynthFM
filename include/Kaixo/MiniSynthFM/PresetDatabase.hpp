@@ -113,6 +113,7 @@ namespace Kaixo {
 
         private:
             mutable std::mutex m_Mutex{};
+            std::atomic_bool m_Loaded = false;
             std::vector<Preset> m_Presets{};
 
             // ------------------------------------------------

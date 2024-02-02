@@ -125,7 +125,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         m_Banks = &add<ScrollView>({ 6, 6, 100, Height - 12 }, {
-            .scrollbar = T.scrollbar,
+            .scrollbar = T.display.loadPreset.scrollbar,
             .margin = { 0, 0, 0, 0 },
             .gap = 2,
             .barThickness = 5,
@@ -154,7 +154,7 @@ namespace Kaixo::Gui {
         });
 
         m_Presets = &add<ScrollView>({ 113, 28, 193, Height - 34 }, {
-            .scrollbar = T.scrollbar,
+            .scrollbar = T.display.loadPreset.scrollbar,
             .margin = { 0, 0, 0, 0 },
             .gap = 2,
             .barThickness = 5,
@@ -163,12 +163,22 @@ namespace Kaixo::Gui {
             .alignChildren = Theme::Align::Left
         });
 
+        // ------------------------------------------------
+
+        add<ImageView>({ .image = T.display.loadPreset.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+
         reloadBanks();
+
+        // ------------------------------------------------
+
     }
 
     // ------------------------------------------------
 
     void LoadPresetTab::reloadBanks() {
+        saveState(); // Save current state
         m_Banks->clear();
 
         auto& database = context.controller<MiniSynthFMController>().presetDatabase;
@@ -179,15 +189,19 @@ namespace Kaixo::Gui {
             m_Banks->add<Bank>({ Width, 20 }, Bank::Settings{
                 .self = *this,
                 .bankIndex = index++
-                });
+            });
         }
 
         select((Bank&)*m_Banks->views().front());
+        m_Banks->updateDimensions();
+        loadState(); // Load back state
     }
 
     // ------------------------------------------------
 
     void LoadPresetTab::select(Bank& bank) {
+        if (bank.selected()) return; // already selected
+
         m_Presets->clear();
 
         for (auto& b : m_Banks->views()) {
@@ -208,10 +222,44 @@ namespace Kaixo::Gui {
                 .self = *this,
                 .bankIndex = bank.settings.bankIndex,
                 .presetIndex = index++
-                });
+            });
         }
 
         m_Presets->updateDimensions();
+    }
+
+    // ------------------------------------------------
+
+    void LoadPresetTab::saveState() {
+        m_State.scrolled = m_Presets->scrolled();
+        for (auto& b : m_Banks->views()) {
+            if (!b->selected()) continue;
+            if (auto bank = dynamic_cast<Bank*>(b.get())) {
+                auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+                if (bank->settings.bankIndex >= database.banks.size()) break; // Does not exist anymore!
+
+                m_State.bank = database.banks[bank->settings.bankIndex].name;
+                return;
+            }
+        }
+
+        m_State.bank = "Factory";
+    }
+
+    void LoadPresetTab::loadState() {
+        for (auto& b : m_Banks->views()) {
+            if (auto bank = dynamic_cast<Bank*>(b.get())) {
+                auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+                if (bank->settings.bankIndex >= database.banks.size()) break; // Does not exist anymore!
+
+                if (m_State.bank == database.banks[bank->settings.bankIndex].name) {
+                    select(*bank);
+                    break;
+                }
+            }
+        }
+
+        m_Presets->scrollTo(m_State.scrolled);
     }
 
     // ------------------------------------------------

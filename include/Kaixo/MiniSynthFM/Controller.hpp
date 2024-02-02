@@ -17,6 +17,7 @@ namespace Kaixo {
 	
 	constexpr std::string_view ThemePath = "themepath";
 	constexpr std::string_view PresetPath = "presetpath";
+	constexpr std::string_view ShowPiano = "showpiano";
 
 	// ------------------------------------------------
 	
@@ -36,7 +37,7 @@ namespace Kaixo {
 	// ------------------------------------------------
 	
 	enum class ModSource { 
-		Note, Velocity, Random, PitchBend, ModWheel,
+		Velocity, Random, ModWheel,
 		Op1, Op2, Op3, 
 		Envelope1, Envelope2, Envelope3,
 		LFO, 
@@ -53,6 +54,9 @@ namespace Kaixo {
 
 	constexpr std::string_view toString(ModSource source) {
 		switch (source) {
+		case ModSource::Velocity: return "velocity";
+		case ModSource::Random: return "random";
+		case ModSource::ModWheel: return "mod-wheel";
 		case ModSource::Op1: return "op1";
 		case ModSource::Op2: return "op2";
 		case ModSource::Op3: return "op3";
@@ -80,6 +84,10 @@ namespace Kaixo {
 	}
 
 	constexpr ModSource sourceFromString(std::string_view source) {
+		if (source == "mod-wheel") return ModSource::ModWheel;
+		if (source == "random") return ModSource::Random;
+		if (source == "velocity") return ModSource::Velocity;
+		if (source == "op1") return ModSource::Op1;
 		if (source == "op1") return ModSource::Op1;
 		if (source == "op2") return ModSource::Op2;
 		if (source == "op3") return ModSource::Op3;

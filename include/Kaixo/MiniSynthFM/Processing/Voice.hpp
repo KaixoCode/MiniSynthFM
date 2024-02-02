@@ -43,6 +43,13 @@ namespace Kaixo::Processing {
 
         float pitchBend = 0;
         float modWheel = 0;
+        float modWheelAmount = 0;
+        float velocityAmount = 0;
+        float randomAmount = 0;
+
+        // ------------------------------------------------
+
+        Random random{};
 
         // ------------------------------------------------
 
@@ -52,12 +59,7 @@ namespace Kaixo::Processing {
         
         bool routing[(int)ModDestination::Amount][(int)ModSource::Amount]{};
 
-        //std::array<std::bitset<(int)ModSource::Amount>, (int)ModDestination::Amount> routing{};
-
-        void resetRouting() {
-            std::memset(routing, 0, sizeof(routing));
-            //for (auto& m : routing) m.reset();
-        }
+        void resetRouting();
 
         // ------------------------------------------------
         
@@ -104,7 +106,6 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
-        Random random{};
         float randomValue = 0;
 
         // ------------------------------------------------

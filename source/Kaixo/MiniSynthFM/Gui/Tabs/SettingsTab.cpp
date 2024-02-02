@@ -18,9 +18,9 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        zoom.addButton(0, add<Button>({ 6 + 0 * 50, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
-        zoom.addButton(1, add<Button>({ 6 + 1 * 50, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
-        zoom.addButton(2, add<Button>({ 6 + 2 * 50, 116, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
+        zoom.addButton(0, add<Button>({ 6 + 0 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
+        zoom.addButton(1, add<Button>({ 6 + 1 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
+        zoom.addButton(2, add<Button>({ 6 + 2 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
 
         zoom.tab(0).addCallback([&](bool v) { if (v) context.scale(0.5); });
         zoom.tab(1).addCallback([&](bool v) { if (v) context.scale(0.7); });
@@ -101,6 +101,27 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.touchMode,
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::flag(Setting::TouchMode));
+
+        add<Button>({ 6, 116, 300, 20 }, {
+            .callback = [&](bool state) {
+                Storage::set<bool>(ShowPiano, state);
+                if (state) {
+                    context.window().setSize(SYNTH_InitialSize);
+                } else {
+                    context.window().setSize(1205, 476);
+                }
+                context.repaint();
+            },
+            .graphics = T.display.settings.showPiano,
+            .behaviour = Button::Behaviour::Toggle,
+        }).value(Storage::flag(ShowPiano));
+
+        // ------------------------------------------------
+
+        add<ImageView>({ .image = T.display.settings.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+
     }
 
     // ------------------------------------------------

@@ -18,6 +18,12 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    void VoiceParameters::resetRouting() {
+        std::memset(routing, 0, sizeof(routing));
+    }
+
+    // ------------------------------------------------
+
     std::size_t VoiceParameters::oversample() const {
         switch (quality) {
         case Quality::Low: return 1;
@@ -41,7 +47,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMVoice::trigger() {
-        randomValue = random.next() * 2 - 1;
+        randomValue = params.random.next() * 2 - 1;
         for (auto& osc : oscillator) osc.trigger();
         for (auto& env : envelope) env.trigger();
         for (auto& lfo : lfo) lfo.trigger();
@@ -54,11 +60,9 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
     
     void MiniSynthFMVoice::doModulations() {
-        auto notelevel = currentNote() / 60.f - 1.;
-        auto velocitylevel = velocity;
-        auto modwheellevel = params.modWheel;
-        auto pitchbendlevel = params.pitchBend;
-        auto randomlevel = randomValue;
+        auto velocitylevel = velocity * params.velocityAmount;
+        auto modwheellevel = params.modWheel * params.modWheelAmount;
+        auto randomlevel = randomValue * params.randomAmount;
 
         auto env1level = envelope[0].output * params.envelopeLevel[0];
         auto env2level = envelope[1].output * params.envelopeLevel[1];
@@ -76,8 +80,6 @@ namespace Kaixo::Processing {
 
         auto getAllM = [&](ModDestination dest) {
             float amount = 1;
-            if (params.routing[(int)dest][(int)ModSource::Note]) amount *= notelevel;
-            if (params.routing[(int)dest][(int)ModSource::PitchBend]) amount *= pitchbendlevel;
             if (params.routing[(int)dest][(int)ModSource::ModWheel]) amount *= modwheellevel;
             if (params.routing[(int)dest][(int)ModSource::Random]) amount *= randomlevel;
             if (params.routing[(int)dest][(int)ModSource::Velocity]) amount *= velocitylevel;
@@ -95,8 +97,6 @@ namespace Kaixo::Processing {
         lfolevel = lfo[0].output * params.lfoLevel[0] * getAllM(ModDestination::LfoDepth);
         previousLfoLevel = lfolevel; // Store for recursive
 
-        auto getNote  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Note] * notelevel; };
-        auto getPB    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::PitchBend] * pitchbendlevel; };
         auto getMW    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::ModWheel] * modwheellevel; };
         auto getRand  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Random] * randomlevel; };
         auto getVel   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Velocity] * velocitylevel; };
@@ -112,14 +112,14 @@ namespace Kaixo::Processing {
         auto getOp3FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3fm; };
 
         auto getAllA = [&](ModDestination dest) {
-            return getNote(dest) + getVel(dest)  + getPB(dest) + 
+            return getVel(dest)  + 
                    getMW(dest)   + getRand(dest) + getOp1(dest) + 
                    getOp2(dest)  + getOp3(dest)  + getEnv1(dest) + 
                    getEnv2(dest) + getEnv3(dest) + getLfo(dest);
         };
         
         auto getAllANoOp = [&](ModDestination dest) {
-            return getNote(dest) + getVel(dest)  + getPB(dest) + 
+            return getVel(dest)  +
                    getMW(dest)   + getRand(dest) + getEnv1(dest) + 
                    getEnv2(dest) + getEnv3(dest) + getLfo(dest);
         };

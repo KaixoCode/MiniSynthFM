@@ -84,6 +84,10 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
+        add<ImageView>({ .image = T.display.savePreset.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+
         reloadPresetInformation();
 
         // ------------------------------------------------

@@ -28,6 +28,9 @@ namespace Kaixo::Processing {
         registerInterface<ModInterface>();
         registerInterface<PianoInterface>();
         registerInterface<TimerInterface>();
+        registerInterface<ModWheelInterface>();
+        registerInterface<VelocityInterface>();
+        registerInterface<RandomInterface>();
     }
 
     // ------------------------------------------------
@@ -99,6 +102,9 @@ namespace Kaixo::Processing {
             lambda(ModSource::Op2, dst);
             lambda(ModSource::Op3, dst);
             lambda(ModSource::LFO, dst);
+            lambda(ModSource::ModWheel, dst);
+            lambda(ModSource::Random, dst);
+            lambda(ModSource::Velocity, dst);
         };
 
         doAllS(ModDestination::LfoDepth);

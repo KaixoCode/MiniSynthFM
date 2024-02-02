@@ -45,6 +45,10 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
+        add<ImageView>({ .image = T.display.popup.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+
         setVisible(false);
 
         // ------------------------------------------------

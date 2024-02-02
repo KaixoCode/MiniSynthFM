@@ -1,5 +1,7 @@
 {
   "envelope": {
+    "background": "drawable",
+    "foreground": "drawable",
     "led": "drawable",
     "parameters": {
       "loop": "drawable",
@@ -14,6 +16,8 @@
     }
   },
   "gain": {
+    "background": "drawable",
+    "foreground": "drawable",
     "led": "drawable",
     "parameters": {
       "gate": "drawable",
@@ -26,6 +30,8 @@
     }
   },
   "lfo": {
+    "background": "drawable",
+    "foreground": "drawable",
     "led": "drawable",
     "parameters": {
       "frequency": "drawable",
@@ -40,6 +46,8 @@
     }
   },
   "filter": {
+    "background": "drawable",
+    "foreground": "drawable",
     "parameters": {
       "keytrack": "drawable",
       "cutoff": "drawable",
@@ -51,6 +59,8 @@
     }
   },
   "delay": {
+    "background": "drawable",
+    "foreground": "drawable",
     "parameters": {
       "time": "drawable",
       "feedback": "drawable",
@@ -61,6 +71,8 @@
     }
   },
   "oscillator": {
+    "background": "drawable",
+    "foreground": "drawable",
     "parameters": {
       "volume": "drawable",
       "tune": "drawable",
@@ -76,52 +88,87 @@
       "sync": "drawable"
     }
   },
-  "global": {
+  "midi": {
+    "background": "drawable",
+    "foreground": "drawable",
+    "mod-wheel-led": "drawable",
+    "velocity-led": "drawable",
+    "random-led": "drawable",
     "parameters": {
-      "glide": "drawable",
-      "legato": "drawable",
-      "voices": "drawable",
-      "quality": "drawable"
+      "mod-wheel-amount": "drawable",
+      "velocity-amount": "drawable",
+      "random-amount": "drawable"
+    },
+    "jacks": {
+      "mod-wheel": "drawable",
+      "velocity": "drawable",
+      "random": "drawable"
     }
   },
   "cables": {
-    "cable1": { "color": "color", "end": "drawable" },
-    "cable2": { "color": "color", "end": "drawable" },
-    "cable3": { "color": "color", "end": "drawable" },
-    "cable4": { "color": "color", "end": "drawable" },
-    "cable5": { "color": "color", "end": "drawable" }
+    "cable1": {
+      "color": "color",
+      "end": "drawable"
+    },
+    "cable2": {
+      "color": "color",
+      "end": "drawable"
+    },
+    "cable3": {
+      "color": "color",
+      "end": "drawable"
+    },
+    "cable4": {
+      "color": "color",
+      "end": "drawable"
+    },
+    "cable5": {
+      "color": "color",
+      "end": "drawable"
+    }
   },
   "piano": {
     "black-key": "drawable",
-    "white-key": "drawable"  
+    "white-key": "drawable"
   },
   "display": {
+    "background": "drawable",
+    "foreground": "drawable",
     "popup": {
       "background": "drawable",
+      "foreground": "drawable",
       "message": "text-area",
       "back-button": "drawable",
       "confirm-button": "drawable"
     },
     "main": {
       "background": "drawable",
+      "foreground": "drawable",
       "button": "drawable",
       "preset-name": "text-area",
       "next-preset": "drawable",
       "previous-preset": "drawable",
-      "description": "text-area"
+      "description": "text-area",
+
+      "parameters": {
+        "quality": "drawable"
+      }
     },
     "settings": {
       "background": "drawable",
+      "foreground": "drawable",
       "button": "drawable",
       "zoom-button": "drawable",
       "theme-path": "drawable",
       "default-theme": "drawable",
       "reload-theme": "drawable",
       "preset-path": "drawable",
-      "touch-mode": "drawable"
+      "touch-mode": "drawable",
+      "show-piano": "drawable"
     },
     "save-preset": {
       "background": "drawable",
+      "foreground": "drawable",
       "button": "drawable",
       "name": "text-area",
       "author": "text-area",
@@ -131,29 +178,16 @@
     },
     "load-preset": {
       "background": "drawable",
+      "foreground": "drawable",
       "button": "drawable",
       "search": "text-area",
       "bank": "drawable",
-      "preset": "drawable"
+      "preset": "drawable",
+      "scrollbar": "drawable"
     }
   },
-  "knob": "drawable",
-  "knob-bi": "drawable",
-  "waveform-knob1": "drawable",
-  "slider": "drawable",
-  "led": "drawable",
-  "input-jack": "drawable",
-  "textless-input-jack": "drawable",
-  "output-jack": "drawable",
-  "toggle": "drawable",
-  "threeway-toggle": "drawable",
-  "tooltip": {
-    "text-color": "color",
-    "font": "font",
-    "background": "drawable"
-  },
-  "text": "text-area",
-  "led-text": "text-area",
   "background": "drawable",
-  "scrollbar": "drawable"
+  "foreground": "drawable",
+  "background-no-piano": "drawable",
+  "foreground-no-piano": "drawable"
 }

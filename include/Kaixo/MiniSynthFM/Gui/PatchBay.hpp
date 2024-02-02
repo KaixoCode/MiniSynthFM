@@ -84,6 +84,8 @@ namespace Kaixo::Gui {
 
         private:
             PatchBay::JackId m_Id = npos;
+            bool m_Clicked = false;
+            std::chrono::time_point<std::chrono::steady_clock> m_ClickedAt;
 
             // ------------------------------------------------
             

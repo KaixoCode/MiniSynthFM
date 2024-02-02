@@ -59,6 +59,24 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    float ModWheelInterface::operator()() {
+        return self<MiniSynthFMProcessor>().params.modWheel;
+    }
+
+    // ------------------------------------------------
+    
+    float VelocityInterface::operator()() {
+        return self<MiniSynthFMProcessor>().voices.lastTriggered().velocity;
+    }
+    
+    // ------------------------------------------------
+    
+    float RandomInterface::operator()() {
+        return self<MiniSynthFMProcessor>().voices.lastTriggered().randomValue;
+    }
+
+    // ------------------------------------------------
+
 }
 
 // ------------------------------------------------

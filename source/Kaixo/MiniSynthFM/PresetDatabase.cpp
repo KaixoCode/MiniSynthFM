@@ -171,11 +171,15 @@ namespace Kaixo {
                 }
             }
         }
+        m_Loaded = true;
     }
 
     // ------------------------------------------------
 
     const std::vector<PresetDatabase::Bank::Preset>& PresetDatabase::Bank::presets() {
+        while (!m_Loaded) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
         std::lock_guard _{ m_Mutex };
         return m_Presets;
     }
