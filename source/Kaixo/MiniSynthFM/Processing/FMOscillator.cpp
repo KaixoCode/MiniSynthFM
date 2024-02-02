@@ -124,8 +124,9 @@ namespace Kaixo::Processing {
 
             SimdType _output = Kaixo::at<SimdType>(output, i);
             SimdType _fmOutput = Kaixo::at<SimdType>(fmOutput, i);
+            SimdType _phaseMod = Kaixo::at<SimdType>(m_PhaseModulation, i);
 
-            SimdType phase = Math::Fast::fmod1((offset * (delta / os)) + (m_Phase + m_PhaseModulation[i] + 10));
+            SimdType phase = Math::Fast::fmod1((offset * (delta / os)) + (_phaseMod + (m_Phase + 10)));
             _output = this->at<SimdType>(phase);
             _fmOutput = this->fmAt<SimdType>(phase);
 
