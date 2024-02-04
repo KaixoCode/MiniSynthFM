@@ -7,6 +7,10 @@
 
 // ------------------------------------------------
 
+#include "Kaixo/MiniSynthFM/Controller.hpp"
+
+// ------------------------------------------------
+
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
@@ -104,6 +108,70 @@ namespace Kaixo::Processing {
         float m_Phase = 0;
         float m_ReleaseValue = 0;
         float m_AttackValue = 0;
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+    
+    class SimdADSREnvelope : public ModuleContainer {
+    public:
+
+        // ------------------------------------------------
+
+        ADSREnvelopeParameters& params;
+
+        // ------------------------------------------------
+
+        SimdADSREnvelope(ADSREnvelopeParameters& p)
+            : params(p)
+        {
+            for (auto& env : envs) registerModule(env);
+        }
+
+        // ------------------------------------------------
+        
+        ADSREnvelope envs[Voices]{ params, params, params, params, params, params, params, params };
+
+        // ------------------------------------------------
+
+        float output[Voices]{};
+
+        // ------------------------------------------------
+
+        bool active() const override {
+            for (auto& env : envs) 
+                if (env.active()) return true;
+            return false;
+        }
+
+        // ------------------------------------------------
+
+        void gate(std::size_t i, bool gate) {
+            envs[i].gate(gate);
+        }
+
+        void release(std::size_t i) {
+            envs[i].release();
+
+        }
+
+        void trigger(std::size_t i) {
+            envs[i].trigger();
+        }
+
+        // ------------------------------------------------
+        
+        template<class SimdType>
+        void process() {
+            std::size_t index = 0;
+            for (auto& env : envs) {
+                env.process();
+                output[index] = env.output;
+                ++index;
+            }
+        }
 
         // ------------------------------------------------
 

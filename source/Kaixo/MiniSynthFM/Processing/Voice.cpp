@@ -148,15 +148,15 @@ namespace Kaixo::Processing {
             oscillator[2].fm(4 * fm3 * (getAllOpFM(ModDestination::Op3FM)), i);
         }
 
-        if (getOp1(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[0]);
-        if (getOp2(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[1]);
-        if (getOp3(ModDestination::Op1Sync)) oscillator[0].hardSync(oscillator[2]);
-        if (getOp1(ModDestination::Op2Sync)) oscillator[1].hardSync(oscillator[0]);
-        if (getOp2(ModDestination::Op2Sync)) oscillator[1].hardSync(oscillator[1]);
-        if (getOp3(ModDestination::Op2Sync)) oscillator[1].hardSync(oscillator[2]);
-        if (getOp1(ModDestination::Op3Sync)) oscillator[2].hardSync(oscillator[0]);
-        if (getOp2(ModDestination::Op3Sync)) oscillator[2].hardSync(oscillator[1]);
-        if (getOp3(ModDestination::Op3Sync)) oscillator[2].hardSync(oscillator[2]);
+        if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1]) oscillator[0].hardSync(oscillator[0]);
+        if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1]) oscillator[0].hardSync(oscillator[1]);
+        if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1]) oscillator[0].hardSync(oscillator[2]);
+        if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2]) oscillator[1].hardSync(oscillator[0]);
+        if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2]) oscillator[1].hardSync(oscillator[1]);
+        if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2]) oscillator[1].hardSync(oscillator[2]);
+        if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3]) oscillator[2].hardSync(oscillator[0]);
+        if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3]) oscillator[2].hardSync(oscillator[1]);
+        if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3]) oscillator[2].hardSync(oscillator[2]);
 
         filter.frequencyModulation = getAllA(ModDestination::FilterFreq);
     }

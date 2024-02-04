@@ -21,6 +21,8 @@ namespace Kaixo::Processing {
         registerModule(parameters);
         registerModule(params);
         registerModule(voices);
+        registerModule(voice);
+        registerModule(simdVoices);
         registerModule(delay);
 
         registerInterface<EnvelopeInterface>();
@@ -43,17 +45,19 @@ namespace Kaixo::Processing {
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();
             
-            float output = 0;
-            for (auto& voice : voices) {
-                if (voice.active()) {
-                    voice.process();
-                    output += voice.result;
-                }
-            }
+            //float output = 0;
+            //for (auto& voice : voices) {
+            //    if (voice.active()) {
+            //        voice.process();
+            //        output += voice.result;
+            //    }
+            //}
 
-            delay.input = output;
-            delay.process();
-            outputBuffer()[i] = delay.output;
+            voice.process();
+
+            //delay.input = voice.output;
+            //delay.process();
+            outputBuffer()[i] = voice.output;
         }
 
         double nanos = timer.time<std::chrono::nanoseconds>();
@@ -67,10 +71,12 @@ namespace Kaixo::Processing {
 
     void MiniSynthFMProcessor::noteOn(Note note, double velocity, int channel) {
         voices.noteOn(note, velocity, channel);
+        simdVoices.noteOn(note, velocity, channel);
     }
 
     void MiniSynthFMProcessor::noteOff(Note note, double velocity, int channel) {
         voices.noteOff(note, velocity, channel);
+        simdVoices.noteOff(note, velocity, channel);
     }
 
     // ------------------------------------------------

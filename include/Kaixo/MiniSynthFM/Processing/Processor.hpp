@@ -48,6 +48,17 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
+        SimdMiniSynthFMVoice voice{ params };
+
+        VoiceBank<SimdVoice, Voices> simdVoices{
+            std::pair{ std::ref(voice), 0ull }, std::pair{ std::ref(voice), 1ull }, 
+            std::pair{ std::ref(voice), 2ull }, std::pair{ std::ref(voice), 3ull },
+            std::pair{ std::ref(voice), 4ull }, std::pair{ std::ref(voice), 5ull }, 
+            std::pair{ std::ref(voice), 6ull }, std::pair{ std::ref(voice), 7ull },
+        };
+
+        // ------------------------------------------------
+        
         void init() override;
         basic_json serialize() override;
         void deserialize(basic_json& data) override;

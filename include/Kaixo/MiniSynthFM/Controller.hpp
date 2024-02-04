@@ -27,6 +27,7 @@ namespace Kaixo {
 	constexpr std::size_t ADEnvelopes = 1;
 	constexpr std::size_t Envelopes = 3;
 	constexpr std::size_t Lfos = 1;
+	constexpr std::size_t MaxOversample = 16;
 
 	// ------------------------------------------------
 	
