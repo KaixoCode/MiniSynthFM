@@ -11,12 +11,34 @@ namespace Kaixo::Processing {
     
     Delay::Delay() {
         registerModule(m_Filter);
-        registerModule(m_HighpassFilter);
+    }
+
+    // ------------------------------------------------
+
+    void Delay::mix(float v) { m_Mix = v; }
+    void Delay::delay(float millis) { m_Delay = Math::Fast::clamp(millis, 0, MaxDelaySeconds * 1000); }
+    void Delay::feedback(float fb) { m_Feedback = fb; }
+    void Delay::pingpong(bool v) { m_PingPong = v; }
+    void Delay::synced(bool v) { m_Synced = v; }
+    void Delay::tempo(float v) { tempo(normalToIndex(v, Tempo::Amount)); }
+    void Delay::tempo(Tempo v) { m_Tempo = v; }
+
+    // ------------------------------------------------
+
+    bool Delay::active() const {
+        return true; // TODO: implement
     }
 
     // ------------------------------------------------
     
     void Delay::process() {
+
+        // every 2 ms
+        float timer = 2 * sampleRate() / 1000.;
+        if (m_Counter++ > timer) {
+            m_RandomFrequency = m_Random.next();
+            m_Counter = 0;
+        }
 
         auto bars = [&]() {
             switch (m_Tempo) {
@@ -44,22 +66,28 @@ namespace Kaixo::Processing {
         if (m_PingPong) delay *= 2;
 
         float out1 = read(delay);
-        m_FilterParameters.frequency = 0.8;
-        m_FilterParameters.drive = 0.3;
-        m_FilterParameters.resonance = 0.4;
-        m_FilterParameters.quality = Quality::Low;
-        m_HighpassFilter[0].frequency(200);
-        m_HighpassFilter[0].resonance(0.2);
-        m_HighpassFilter[0].type(FilterType::HighPass);
 
-        float back = input + m_Feedback * out1;
-        m_Filter.input[0] = back;
+        m_Filter[0].frequency(200);
+        m_Filter[0].resonance(0.2);
+        m_Filter[0].type(FilterType::HighPass);
+        m_Filter[1].frequency(4000 + (m_RandomFrequency * 2 - 1) * 100);
+        m_Filter[1].resonance(0.4);
+        m_Filter[1].type(FilterType::LowPass);
+        m_Filter[1].type(FilterType::PeakingEQ);
+        m_Filter[2].frequency(3600);
+        m_Filter[2].resonance(0.25);
+        m_Filter[2].gain(-2.4);
+        m_Filter[3].type(FilterType::PeakingEQ);
+        m_Filter[3].frequency(4400);
+        m_Filter[3].resonance(0);
+        m_Filter[3].gain(2.4);
+
+        float drive = 0.4;
+        float fedBack = 2 * m_Feedback * out1;
+        m_Filter.input = input + fedBack + drive * (Math::Fast::tanh_like(1.2 * fedBack * out1) - fedBack);
         m_Filter.process();
-        m_HighpassFilter.input = m_Filter.output;
-        m_HighpassFilter.process();
-        back = m_HighpassFilter.output.average();
-
-        m_Samples[m_Write] = back;
+        float back = m_Filter.output.average();
+        m_Samples[m_Write] = 0.4 * Math::Fast::tanh_like(1.115 * back) + 0.64 * back;
 
         if (m_PingPong) {
             float out2 = read(delay * 0.5);
@@ -69,17 +97,14 @@ namespace Kaixo::Processing {
         }
 
         m_Write = (m_Write + 1) % size();
-        m_Delay = m_TargetDelay;
-        //m_Delay = m_Delay * m_Smooth + m_TargetDelay * (1 - m_Smooth);
     }
 
     void Delay::prepare(double sampleRate, std::size_t maxBufferSize) {
+        ModuleContainer::prepare(sampleRate, maxBufferSize);
         resize(sampleRate * MaxDelaySeconds * 2);
-        m_Smooth = Math::smoothCoef(0.99, 48000. / sampleRate);
     }
 
     void Delay::reset() {
-        m_Delay = m_TargetDelay;
         std::ranges::fill(m_Samples, 0);
     }
 

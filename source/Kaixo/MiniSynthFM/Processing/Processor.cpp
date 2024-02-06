@@ -20,9 +20,8 @@ namespace Kaixo::Processing {
     MiniSynthFMProcessor::MiniSynthFMProcessor() {
         registerModule(parameters);
         registerModule(params);
-        registerModule(voices);
+        registerModule(bank);
         registerModule(voice);
-        registerModule(simdVoices);
         registerModule(delay);
 
         registerInterface<EnvelopeInterface>();
@@ -42,22 +41,28 @@ namespace Kaixo::Processing {
 
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
+
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();
             
-            //float output = 0;
-            //for (auto& voice : voices) {
-            //    if (voice.active()) {
-            //        voice.process();
-            //        output += voice.result;
-            //    }
-            //}
+            if (voice.active()) {
+                switch (simd_path::path) {
+                case simd_path::s512: 
+                case simd_path::s256: voice.process<simd<float, 256>>(); break;
+                case simd_path::s128: voice.process<simd<float, 128>>(); break;
+                case simd_path::s0:   voice.process<float>(); break;
+                }
+                delay.input = voice.output;
+            } else {
+                delay.input = 0;
+            }
 
-            voice.process();
-
-            //delay.input = voice.output;
-            //delay.process();
-            outputBuffer()[i] = voice.output;
+            if (delay.active()) {
+                delay.process();
+                outputBuffer()[i] = delay.output;
+            } else {
+                outputBuffer()[i] = { 0, 0 };
+            }
         }
 
         double nanos = timer.time<std::chrono::nanoseconds>();
@@ -70,13 +75,11 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::noteOn(Note note, double velocity, int channel) {
-        voices.noteOn(note, velocity, channel);
-        simdVoices.noteOn(note, velocity, channel);
+        bank.noteOn(note, velocity, channel);
     }
 
     void MiniSynthFMProcessor::noteOff(Note note, double velocity, int channel) {
-        voices.noteOff(note, velocity, channel);
-        simdVoices.noteOff(note, velocity, channel);
+        bank.noteOff(note, velocity, channel);
     }
 
     // ------------------------------------------------

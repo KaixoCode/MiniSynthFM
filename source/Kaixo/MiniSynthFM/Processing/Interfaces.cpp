@@ -20,13 +20,15 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     float EnvelopeInterface::operator()() {
-        return self<MiniSynthFMProcessor>().voices.lastTriggered().envelope[settings.index].output;
+        std::size_t voice = self<MiniSynthFMProcessor>().bank.lastTriggered().settings.index;
+        return self<MiniSynthFMProcessor>().voice.envelope[settings.index].output[voice];
     }
 
     // ------------------------------------------------
 
     float LfoInterface::operator()() {
-        return self<MiniSynthFMProcessor>().voices.lastTriggered().lfo[settings.index].output * 0.5 + 0.5;
+        std::size_t voice = self<MiniSynthFMProcessor>().bank.lastTriggered().settings.index;
+        return self<MiniSynthFMProcessor>().voice.lfo[settings.index].output[voice] * 0.5 + 0.5;
     }
 
     // ------------------------------------------------
@@ -38,7 +40,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     bool PianoInterface::pressed(Note note) {
-        for (auto& voice : self<MiniSynthFMProcessor>().voices) {
+        for (auto& voice : self<MiniSynthFMProcessor>().bank) {
             if (voice.pressed && voice.note == note) return true;
         }
 
@@ -66,13 +68,14 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
     
     float VelocityInterface::operator()() {
-        return self<MiniSynthFMProcessor>().voices.lastTriggered().velocity;
+        return self<MiniSynthFMProcessor>().bank.lastTriggered().velocity;
     }
     
     // ------------------------------------------------
     
     float RandomInterface::operator()() {
-        return self<MiniSynthFMProcessor>().voices.lastTriggered().randomValue;
+        std::size_t voice = self<MiniSynthFMProcessor>().bank.lastTriggered().settings.index;
+        return self<MiniSynthFMProcessor>().voice.randomValue[voice];
     }
 
     // ------------------------------------------------

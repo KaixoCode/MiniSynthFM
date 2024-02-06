@@ -42,19 +42,21 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         ParameterDatabase<MiniSynthFMProcessor> parameters{ this };
-        VoiceParameters params;
-        VoiceBank<MiniSynthFMVoice, Voices> voices{ params, params, params, params, params, params, params, params };
-        Delay delay;
+        VoiceParameters params{};
+        MiniSynthFMVoice voice{ params };
+        Delay delay{};
 
         // ------------------------------------------------
         
-        SimdMiniSynthFMVoice voice{ params };
-
-        VoiceBank<SimdVoice, Voices> simdVoices{
-            std::pair{ std::ref(voice), 0ull }, std::pair{ std::ref(voice), 1ull }, 
-            std::pair{ std::ref(voice), 2ull }, std::pair{ std::ref(voice), 3ull },
-            std::pair{ std::ref(voice), 4ull }, std::pair{ std::ref(voice), 5ull }, 
-            std::pair{ std::ref(voice), 6ull }, std::pair{ std::ref(voice), 7ull },
+        VoiceBank<VoiceBankVoice, Voices> bank{
+            VoiceBankVoice::Settings{ voice, 0ull }, 
+            VoiceBankVoice::Settings{ voice, 1ull }, 
+            VoiceBankVoice::Settings{ voice, 2ull }, 
+            VoiceBankVoice::Settings{ voice, 3ull }, 
+            VoiceBankVoice::Settings{ voice, 4ull }, 
+            VoiceBankVoice::Settings{ voice, 5ull }, 
+            VoiceBankVoice::Settings{ voice, 6ull }, 
+            VoiceBankVoice::Settings{ voice, 7ull }, 
         };
 
         // ------------------------------------------------

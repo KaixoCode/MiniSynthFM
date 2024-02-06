@@ -40,13 +40,17 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void mix(float v) { m_Mix = v; }
-        void delay(float millis) { m_TargetDelay = Math::Fast::clamp(millis, 0, MaxDelaySeconds * 1000); }
-        void feedback(float fb) { m_Feedback = fb; }
-        void pingpong(bool v) { m_PingPong = v; }
-        void synced(bool v) { m_Synced = v; }
-        void tempo(float v) { tempo(normalToIndex(v, Tempo::Amount)); }
-        void tempo(Tempo v) { m_Tempo = v; }
+        void mix(float v);
+        void delay(float millis);
+        void feedback(float fb);
+        void pingpong(bool v);
+        void synced(bool v);
+        void tempo(float v);
+        void tempo(Tempo v);
+
+        // ------------------------------------------------
+        
+        bool active() const override;
 
         // ------------------------------------------------
 
@@ -69,17 +73,16 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
     private:
-        StereoEqualizer<1, float, Kaixo::Math::Fast, false> m_HighpassFilter{};
-        FilterParameters m_FilterParameters;
-        CustomFilter m_Filter{ m_FilterParameters };
+        StereoEqualizer<4, float, Kaixo::Math::Fast, false> m_Filter{};
         std::vector<float> m_Samples{};
         std::size_t m_Write = 0;
+        std::size_t m_Counter = 0;
         Tempo m_Tempo = Tempo::T1_6;
+        Random m_Random{};
         float m_Delay = 0;
-        float m_TargetDelay = 0;
-        float m_Smooth = 0.99;
         float m_Feedback = 0.5;
         float m_Mix = true;
+        float m_RandomFrequency = 0;
         bool m_PingPong = false;
         bool m_Synced = false;
 
