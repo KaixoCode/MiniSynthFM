@@ -8,6 +8,10 @@
 
 // ------------------------------------------------
 
+#include "Kaixo/MiniSynthFM/Controller.hpp"
+
+// ------------------------------------------------
+
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
@@ -96,6 +100,50 @@ namespace Kaixo::Processing {
         float m_Noise = 0;
 
         Random m_Random{};
+
+        // ------------------------------------------------
+
+    };
+
+    // ------------------------------------------------
+    
+    class SimdLfo : public ModuleContainer {
+    public:
+        
+        // ------------------------------------------------
+
+        LfoParameters& params;
+
+        // ------------------------------------------------
+
+        SimdLfo(LfoParameters& p)
+            : params(p) 
+        {
+            for (auto& l : lfo) 
+                registerModule(l);
+        }
+
+        // ------------------------------------------------
+        
+        float output[Voices]{};
+
+        // ------------------------------------------------
+        
+        Lfo lfo[Voices]{ params, params, params, params, params, params, params, params };
+
+        // ------------------------------------------------
+        
+        void trigger(std::size_t i) { lfo[i].trigger(); }
+
+        // ------------------------------------------------
+        
+        template<class SimdType>
+        void process() {
+            for (std::size_t i = 0; i < Voices; ++i) {
+                lfo[i].process();
+                output[i] = lfo[i].output;
+            }
+        }
 
         // ------------------------------------------------
 

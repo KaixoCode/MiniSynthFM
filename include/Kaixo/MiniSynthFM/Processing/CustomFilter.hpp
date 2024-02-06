@@ -50,7 +50,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float input[16]{};
+        float input[MaxOversample]{};
         float output = 0;
 
         // ------------------------------------------------
@@ -103,6 +103,56 @@ namespace Kaixo::Processing {
 
     };
     
+    // ------------------------------------------------
+
+    class SimdCustomFilter : public ModuleContainer {
+    public:
+        
+        // ------------------------------------------------
+        
+        FilterParameters& params;
+
+        // ------------------------------------------------
+
+        SimdCustomFilter(FilterParameters& p)
+            : params(p)
+        {
+            for (auto& f : filter)
+                registerModule(f);
+        }
+
+        // ------------------------------------------------
+        
+        CustomFilter filter[Voices]{ params, params, params, params, params, params, params, params };
+
+        // ------------------------------------------------
+        
+        float note[Voices]{};
+        float frequencyModulation[Voices]{};
+        float input[MaxOversample][Voices]{};
+        float output[Voices]{};
+
+        // ------------------------------------------------
+        
+        template<class SimdType>
+        void process() {
+            
+            for (std::size_t j = 0; j < Voices; ++j) {
+                for (std::size_t i = 0; i < MaxOversample; ++i) {
+                    filter[j].input[i] = input[i][j];
+                }
+
+                filter[j].note = note[j];
+                filter[j].frequencyModulation = frequencyModulation[j];
+                filter[j].process();
+                output[j] = filter[j].output;
+            }
+        }
+
+        // ------------------------------------------------
+
+    };
+
     // ------------------------------------------------
 
 }
