@@ -57,15 +57,6 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        timer = &add<TextView>({ 6, 100, 100, 20 }, {
-            .graphics = T.display.main.presetName,
-            .padding = { 4, 3 },
-            .multiline = false,
-            .editable = false,
-            .lineHeight = 14,
-        });
-        timer->setVisible(false);
-
         presetName = &add<TextView>({ 6, 83, 256, 20 }, {
             .graphics = T.display.main.presetName,
             .padding = { 4, 3 },
@@ -94,6 +85,23 @@ namespace Kaixo::Gui {
             .multiline = true,
             .editable = false,
             .lineHeight = 16,
+        });
+
+        // ------------------------------------------------
+
+        timer = &add<TextView>({ 6, 6, 100, 20 }, {
+            .graphics = T.display.main.presetName,
+            .padding = { 4, 3 },
+            .multiline = false,
+            .editable = false,
+            .lineHeight = 14,
+        });
+
+        add<Knob>({ 6, 28, 64, 64 }, {
+            .graphics = T.display.main.parameters.quality,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.quality
         });
 
         // ------------------------------------------------

@@ -133,6 +133,7 @@ namespace Kaixo::Processing {
             for (auto& env : envelope) registerModule(env);
             for (auto& osc : oscillator) registerModule(osc);
             for (auto& lfo : lfo) registerModule(lfo);
+            registerModule(filter);
         }
 
         // ------------------------------------------------
@@ -251,13 +252,13 @@ namespace Kaixo::Processing {
                 }
 
                 oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1], oscillator[0]);
-                oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1], oscillator[1]);
-                oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1], oscillator[2]);
-                oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2], oscillator[0]);
+                oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2], oscillator[1]);
+                oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op3], oscillator[2]);
+                oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op1], oscillator[0]);
                 oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2], oscillator[1]);
-                oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2], oscillator[2]);
-                oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3], oscillator[0]);
-                oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3], oscillator[1]);
+                oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op3], oscillator[2]);
+                oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op1], oscillator[0]);
+                oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op2], oscillator[1]);
                 oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3], oscillator[2]);
 
                 Kaixo::store<SimdType>(filter.frequencyModulation + i, getAllA(ModDestination::FilterFreq));
