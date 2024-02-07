@@ -100,7 +100,7 @@ namespace Kaixo::Processing {
         
         SimdADSREnvelope envelope[Envelopes]{ params.envelope[0], params.envelope[1], params.envelope[2] };
         FMOscillator oscillator[Oscillators]{ params.oscillator[0], params.oscillator[1], params.oscillator[2] };
-        SimdCustomFilter filter{ params.filter };
+        CustomFilter filter{ params.filter };
         SimdLfo lfo[Lfos]{ params.lfo[0] };
 
         // ------------------------------------------------
