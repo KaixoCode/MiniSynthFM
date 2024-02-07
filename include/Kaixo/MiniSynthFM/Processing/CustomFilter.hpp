@@ -64,11 +64,17 @@ namespace Kaixo::Processing {
             auto y1 = Kaixo::at<SimdType>(y[m1], i);
             auto y2 = Kaixo::at<SimdType>(y[m2], i);
 
-            auto result = b0a0 * x0 + b1a0 * x1 + b2a0 * x2
-                                    - a1a0 * y1 - a2a0 * y2;
+            auto c0 = Kaixo::at<SimdType>(b0a0, i);
+            auto c1 = Kaixo::at<SimdType>(b1a0, i);
+            auto c2 = Kaixo::at<SimdType>(b2a0, i);
+            auto c3 = Kaixo::at<SimdType>(a1a0, i);
+            auto c4 = Kaixo::at<SimdType>(a2a0, i);
 
-            Kaixo::store(y[m0] + i, result);
-            Kaixo::store(x[m0] + i, input);
+            auto result = c0 * x0 + c1 * x1 + c2 * x2
+                                  - c3 * y1 - c4 * y2;
+
+            Kaixo::store<SimdType>(y[m0] + i, result);
+            Kaixo::store<SimdType>(x[m0] + i, input);
             
             return result;
         }
@@ -99,11 +105,11 @@ namespace Kaixo::Processing {
                 auto b1 = (1.0 - cosOmega);
                 auto b2 = (1.0 - cosOmega) / 2.0;
 
-                Kaixo::store(a1a0 + i, a1 / a0);
-                Kaixo::store(a2a0 + i, a2 / a0);
-                Kaixo::store(b0a0 + i, b0 / a0);
-                Kaixo::store(b1a0 + i, b1 / a0);
-                Kaixo::store(b2a0 + i, b2 / a0);
+                Kaixo::store<SimdType>(a1a0 + i, a1 / a0);
+                Kaixo::store<SimdType>(a2a0 + i, a2 / a0);
+                Kaixo::store<SimdType>(b0a0 + i, b0 / a0);
+                Kaixo::store<SimdType>(b1a0 + i, b1 / a0);
+                Kaixo::store<SimdType>(b2a0 + i, b2 / a0);
             }
         }
 
@@ -120,7 +126,7 @@ namespace Kaixo::Processing {
                 auto qValue = Math::Fast::powN<4>(Kaixo::at<SimdType>(q, i));
                 auto gainValue = Kaixo::at<SimdType>(gain, i);
 
-                auto A = Math::Fast::pow(10, gainValue / 40.0);
+                auto A = Math::Fast::pow(SimdType(10.f), gainValue / 40.0f);
                 auto  alpha = sinOmega * Math::sinh((log10_2 / 2.0) * (qValue * 4 + 0.2) * (omega / sinOmega));
 
                 auto a0 = 1.0 + alpha / A;
@@ -131,11 +137,11 @@ namespace Kaixo::Processing {
                 auto b2 = 1.0 - alpha * A;
 
                 // TODO: can probably cancel some stuff out here
-                Kaixo::store(a1a0 + i, a1 / a0);
-                Kaixo::store(a2a0 + i, a2 / a0);
-                Kaixo::store(b0a0 + i, b0 / a0);
-                Kaixo::store(b1a0 + i, b1 / a0);
-                Kaixo::store(b2a0 + i, b2 / a0);
+                Kaixo::store<SimdType>(a1a0 + i, a1 / a0);
+                Kaixo::store<SimdType>(a2a0 + i, a2 / a0);
+                Kaixo::store<SimdType>(b0a0 + i, b0 / a0);
+                Kaixo::store<SimdType>(b1a0 + i, b1 / a0);
+                Kaixo::store<SimdType>(b2a0 + i, b2 / a0);
             }
         }
     };
@@ -281,9 +287,9 @@ namespace Kaixo::Processing {
                 auto resonance = params.resonance * (1 - nfreq * nfreq * nfreq * nfreq);
 
                 // Less resonance when low frequency
-                if (nfreq < 0.01) {
-                    resonance *= 0.2 + 0.8 * (nfreq / 0.01);
-                }
+                resonance = Kaixo::iff<SimdType>(SimdType(0.01f) < nfreq, 
+                    [&] { return resonance * 0.2f + 0.8f * (nfreq / 0.01f); },
+                    [&] { return resonance; });
 
                 Kaixo::store<SimdType>(m_Filter[0].frequency + i, frequency);
                 Kaixo::store<SimdType>(m_Filter[0].q, resonance);
@@ -294,30 +300,30 @@ namespace Kaixo::Processing {
                 Kaixo::store<SimdType>(m_Filter[2].q, 0.2 - resonance * 0.2);
                 Kaixo::store<SimdType>(m_Filter[2].gain, resonance * 15 - params.drive * 12);
 
-                m_Filter[0].calculateLowpass();
-                m_Filter[1].calculatePeaking();
-                m_Filter[2].calculatePeaking();
+                m_Filter[0].calculateLowpass<SimdType>();
+                m_Filter[1].calculatePeaking<SimdType>();
+                m_Filter[2].calculatePeaking<SimdType>();
 
                 auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
 
-                SimdType res = 0;
+                SimdType res{};
                 if (params.oversample() == 1) {
-                    auto inputValue = Kaixo::at<SimdType>(input[0]);
+                    auto inputValue = Kaixo::at<SimdType>(input[0], i);
                     res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
                 } else {
                     // TODO: aaf
                     //m_AAF.sampleRateIn = sampleRate() * params.oversample();
                     //m_AAF.sampleRateOut = sampleRate();
 
-                    for (std::size_t i = 0; i < params.oversample(); ++i) {
-                        auto inputValue = Kaixo::at<SimdType>(input[i]);
+                    for (std::size_t j = 0; j < params.oversample(); ++j) {
+                        auto inputValue = Kaixo::at<SimdType>(input[j], i);
                         inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
                         //res = m_AAF.process(input[i]);
                         res = inputValue;
                     }
                 }
 
-                auto filterOutput = m_Filter[2].process(m_Filter[1].process(m_Filter[0].process(res)));
+                auto filterOutput = m_Filter[2].process(m_Filter[1].process(m_Filter[0].process(res, i), i), i);
                 filterOutput = params.drive * Math::Fast::tanh_like(1.115 * filterOutput) + filterOutput * (1 - 0.9 * params.drive);
                 Kaixo::store<SimdType>(output + i, filterOutput);
             }
