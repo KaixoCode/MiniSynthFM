@@ -36,6 +36,111 @@ namespace Kaixo::Processing {
     };
 
     // ------------------------------------------------
+    
+    class ParallelFilter : public Module {
+    public:
+        float a1a0[Voices];
+        float a2a0[Voices];
+        float b0a0[Voices];
+        float b1a0[Voices];
+        float b2a0[Voices];
+        
+        float frequency[Voices];
+        float q[Voices];
+        float gain[Voices];
+
+        float x[3][Voices];
+        float y[3][Voices];
+
+        std::size_t m0 = 0;
+        std::size_t m1 = 1;
+        std::size_t m2 = 2;
+
+        template<class SimdType>
+        SimdType process(SimdType input, std::size_t i) {
+            auto x0 = input;
+            auto x1 = Kaixo::at<SimdType>(x[m1], i);
+            auto x2 = Kaixo::at<SimdType>(x[m2], i);
+            auto y1 = Kaixo::at<SimdType>(y[m1], i);
+            auto y2 = Kaixo::at<SimdType>(y[m2], i);
+
+            auto result = b0a0 * x0 + b1a0 * x1 + b2a0 * x2
+                                    - a1a0 * y1 - a2a0 * y2;
+
+            Kaixo::store(y[m0] + i, result);
+            Kaixo::store(x[m0] + i, input);
+            
+            return result;
+        }
+
+        void finalize() {
+            auto backup = m2;
+            m2 = m1;
+            m1 = m0;
+            m0 = backup;
+        }
+
+        template<class SimdType>
+        void calculateLowpass() {
+            constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
+            
+            for (std::size_t i = 0; i < Voices; i += Count) {
+                auto freq = Math::clamp(Kaixo::at<SimdType>(frequency, i) / sampleRate(), SimdType(0.f), SimdType(0.5f));
+                auto omega = 2 * std::numbers::pi * freq;
+                auto cosOmega = Math::ncos(freq);
+                auto sinOmega = Math::nsin(freq);
+                auto qValue = Math::Fast::powN<4>(Kaixo::at<SimdType>(q, i));
+                auto alpha = sinOmega / (qValue * 12 + 0.8);
+
+                auto a0 = 1.0 + alpha;
+                auto a1 = -2.0 * cosOmega;
+                auto a2 = 1.0 - alpha;
+                auto b0 = (1.0 - cosOmega) / 2.0;
+                auto b1 = (1.0 - cosOmega);
+                auto b2 = (1.0 - cosOmega) / 2.0;
+
+                Kaixo::store(a1a0 + i, a1 / a0);
+                Kaixo::store(a2a0 + i, a2 / a0);
+                Kaixo::store(b0a0 + i, b0 / a0);
+                Kaixo::store(b1a0 + i, b1 / a0);
+                Kaixo::store(b2a0 + i, b2 / a0);
+            }
+        }
+
+        template<class SimdType>
+        void calculatePeaking() {
+            constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
+            constexpr float log10_2 = std::numbers::ln2 / std::numbers::ln10;
+
+            for (std::size_t i = 0; i < Voices; i += Count) {
+                auto freq = Math::clamp(Kaixo::at<SimdType>(frequency, i) / sampleRate(), SimdType(0.f), SimdType(0.5f));
+                auto omega = 2 * std::numbers::pi * freq;
+                auto cosOmega = Math::Fast::ncos(freq);
+                auto sinOmega = Math::Fast::nsin(freq);
+                auto qValue = Math::Fast::powN<4>(Kaixo::at<SimdType>(q, i));
+                auto gainValue = Kaixo::at<SimdType>(gain, i);
+
+                auto A = Math::Fast::pow(10, gainValue / 40.0);
+                auto  alpha = sinOmega * Math::sinh((log10_2 / 2.0) * (qValue * 4 + 0.2) * (omega / sinOmega));
+
+                auto a0 = 1.0 + alpha / A;
+                auto a1 = -2.0 * cosOmega;
+                auto a2 = 1.0 - alpha / A;
+                auto b0 = 1.0 + alpha * A;
+                auto b1 = -2.0 * cosOmega;
+                auto b2 = 1.0 - alpha * A;
+
+                // TODO: can probably cancel some stuff out here
+                Kaixo::store(a1a0 + i, a1 / a0);
+                Kaixo::store(a2a0 + i, a2 / a0);
+                Kaixo::store(b0a0 + i, b0 / a0);
+                Kaixo::store(b1a0 + i, b1 / a0);
+                Kaixo::store(b2a0 + i, b2 / a0);
+            }
+        }
+    };
+
+    // ------------------------------------------------
 
     class CustomFilter : public ModuleContainer {
     public:
@@ -117,13 +222,13 @@ namespace Kaixo::Processing {
         SimdCustomFilter(FilterParameters& p)
             : params(p)
         {
-            for (auto& f : filter)
+            for (auto& f : m_Filter)
                 registerModule(f);
         }
 
         // ------------------------------------------------
         
-        CustomFilter filter[Voices]{ params, params, params, params, params, params, params, params };
+        ParallelFilter m_Filter[3]{};
 
         // ------------------------------------------------
         
@@ -134,18 +239,87 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
+        Random m_Random{};
+        std::size_t m_Counter = 0;
+        float m_RandomFrequency = 0;
+
+        // ------------------------------------------------
+
+        float m_Ratio = 0.99;
+        float m_FrequencyModulation[Voices];
+
+        // ------------------------------------------------
+        
         template<class SimdType>
         void process() {
-            
-            for (std::size_t j = 0; j < Voices; ++j) {
-                for (std::size_t i = 0; i < MaxOversample; ++i) {
-                    filter[j].input[i] = input[i][j];
+            constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
+
+            // every 2 ms
+            float timer = 2 * sampleRate() / 1000.;
+            if (m_Counter++ > timer) {
+                m_RandomFrequency = m_Random.next();
+                m_Counter = 0;
+            }
+
+            for (std::size_t i = 0; i < Voices; i += Count) {
+                auto noteValue = Kaixo::at<SimdType>(note, i);
+                auto freqMod = Kaixo::at<SimdType>(m_FrequencyModulation, i) * m_Ratio + 
+                               Kaixo::at<SimdType>(frequencyModulation, i) * (1 - m_Ratio);
+                Kaixo::store(m_FrequencyModulation + i, freqMod);
+
+                auto freqValue = Math::Fast::magnitude_to_log(params.frequency + freqMod, SimdType(16.f), SimdType(16000.f));
+
+                if (params.keytrack) {
+                    freqValue = Math::Fast::clamp(freqValue * Math::Fast::exp2((noteValue - 60) / 12.), SimdType(16.f), SimdType(16000.f));
+                } else {
+                    freqValue = Math::Fast::clamp(freqValue, SimdType(16.f), SimdType(16000.f));
                 }
 
-                filter[j].note = note[j];
-                filter[j].frequencyModulation = frequencyModulation[j];
-                filter[j].process();
-                output[j] = filter[j].output;
+                auto nfreq = (freqValue / 16000);
+                auto randRange = 24 * (1 - (1 - params.drive) * (1 - params.drive)) + 6 * (1 - nfreq * nfreq);
+                auto frequency = Math::Fast::clamp(freqValue + m_RandomFrequency * randRange * 2 - randRange, SimdType(16.f), SimdType(16000.f));
+                auto resonance = params.resonance * (1 - nfreq * nfreq * nfreq * nfreq);
+
+                // Less resonance when low frequency
+                if (nfreq < 0.01) {
+                    resonance *= 0.2 + 0.8 * (nfreq / 0.01);
+                }
+
+                Kaixo::store<SimdType>(m_Filter[0].frequency + i, frequency);
+                Kaixo::store<SimdType>(m_Filter[0].q, resonance);
+                Kaixo::store<SimdType>(m_Filter[1].frequency, frequency * 0.9);
+                Kaixo::store<SimdType>(m_Filter[1].q, resonance * 0.2 + 0.2);
+                Kaixo::store<SimdType>(m_Filter[1].gain, params.drive * 12 - resonance * 15);
+                Kaixo::store<SimdType>(m_Filter[2].frequency, frequency * 1.1);
+                Kaixo::store<SimdType>(m_Filter[2].q, 0.2 - resonance * 0.2);
+                Kaixo::store<SimdType>(m_Filter[2].gain, resonance * 15 - params.drive * 12);
+
+                m_Filter[0].calculateLowpass();
+                m_Filter[1].calculatePeaking();
+                m_Filter[2].calculatePeaking();
+
+                auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
+
+                SimdType res = 0;
+                if (params.oversample() == 1) {
+                    auto inputValue = Kaixo::at<SimdType>(input[0]);
+                    res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
+                } else {
+                    // TODO: aaf
+                    //m_AAF.sampleRateIn = sampleRate() * params.oversample();
+                    //m_AAF.sampleRateOut = sampleRate();
+
+                    for (std::size_t i = 0; i < params.oversample(); ++i) {
+                        auto inputValue = Kaixo::at<SimdType>(input[i]);
+                        inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
+                        //res = m_AAF.process(input[i]);
+                        res = inputValue;
+                    }
+                }
+
+                auto filterOutput = m_Filter[2].process(m_Filter[1].process(m_Filter[0].process(res)));
+                filterOutput = params.drive * Math::Fast::tanh_like(1.115 * filterOutput) + filterOutput * (1 - 0.9 * params.drive);
+                Kaixo::store<SimdType>(output + i, filterOutput);
             }
         }
 
