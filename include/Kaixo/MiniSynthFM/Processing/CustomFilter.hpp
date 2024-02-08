@@ -171,7 +171,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         float m_Ratio = 0.99;
-        float m_FrequencyModulation[Voices];
+        float m_FrequencyModulation[Voices]{};
 
         // ------------------------------------------------
 

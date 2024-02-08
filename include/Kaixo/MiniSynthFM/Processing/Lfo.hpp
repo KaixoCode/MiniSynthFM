@@ -121,7 +121,7 @@ namespace Kaixo::Processing {
         }
 
         // TODO: find way to parallelize this
-        for (std::size_t i = 0; i < Voices; i += Count) {
+        for (std::size_t i = 0; i < Voices; ++i) {
             if (m_Phase[i] < delta) {
                 m_Quantized[i] = m_Random.next() * 2 - 1;
             }
@@ -138,7 +138,7 @@ namespace Kaixo::Processing {
         case LfoWaveform::Sine: return Math::Fast::nsin(0.5 - x);
         case LfoWaveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * x);
         case LfoWaveform::Saw: return 1 - 2 * x;
-        case LfoWaveform::Square: return 1 - 2 * (x > 0.5);
+        case LfoWaveform::Square: return Kaixo::iff<SimdType>(x > 0.5f, [] { return 1.f; }, [] { return -1.f; });
         case LfoWaveform::Quantized: return Kaixo::at<SimdType>(m_Quantized, i);
         case LfoWaveform::Noise: return Kaixo::at<SimdType>(m_Noise, i);
         }
