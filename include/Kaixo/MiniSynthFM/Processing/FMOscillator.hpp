@@ -117,8 +117,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        template<class SimdType> KAIXO_INLINE SimdType at(SimdType p, SimdType freq);
-        template<class SimdType> KAIXO_INLINE SimdType fmAt(SimdType p);
+        template<class SimdType> KAIXO_INLINE std::pair<SimdType, SimdType> at(SimdType p, SimdType freq);
 
         // ------------------------------------------------
 
@@ -170,13 +169,10 @@ namespace Kaixo::Processing {
             auto delta = _frequency / sampleRate();
 
             for (std::size_t j = 0; j < os; ++j) {
-                SimdType _output = Kaixo::at<SimdType>(output[j], i);
-                SimdType _fmOutput = Kaixo::at<SimdType>(fmOutput[j], i);
                 SimdType _phaseMod = Kaixo::at<SimdType>(m_PhaseModulation[j], i);
 
                 SimdType phase = Math::Fast::fmod1((j * delta / os) + (_phaseMod + (_phase + 10)));
-                _output = this->at<SimdType>(phase, _frequency);
-                _fmOutput = this->fmAt<SimdType>(phase);
+                auto [_output, _fmOutput] = this->at<SimdType>(phase, _frequency);
 
                 Kaixo::store<SimdType>(output[j] + i, _output);
                 Kaixo::store<SimdType>(fmOutput[j] + i, _fmOutput);
@@ -194,7 +190,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     template<class SimdType>
-    KAIXO_INLINE SimdType FMOscillator::at(SimdType p, SimdType freq) {
+    KAIXO_INLINE std::pair<SimdType, SimdType> FMOscillator::at(SimdType p, SimdType freq) {
         constexpr auto g = [](SimdType x) {
             return (x - 1) * x * (2 * x - 1);
         };
@@ -221,21 +217,25 @@ namespace Kaixo::Processing {
         // requires 0 <= p <= 1
         auto xd = Math::Fast::max(freq / 35000.f, SimdType(0.002f));
         switch (params.m_Waveform) {
-        case Waveform::Sine: return Math::Fast::nsin(0.5 - p);
-        case Waveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * p);
-        case Waveform::Saw: return saw(p, xd);
-        case Waveform::Square: return square(p, xd);
+        case Waveform::Sine: {
+            auto val = Math::Fast::nsin(0.5 - p);
+            return { val, val };
         }
-    }
-
-    template<class SimdType>
-    KAIXO_INLINE SimdType FMOscillator::fmAt(SimdType p) {
-        // requires 0 <= p <= 1
-        switch (params.m_Waveform) {
-        case Waveform::Sine: return Math::Fast::nsin(0.5 - p);
-        case Waveform::Triangle: return 2 * (2 * p - 1) * ((2 * p - 1) * Math::Fast::sign(0.5 - p) + 1);
-        case Waveform::Saw: return 4 * (p - p * p);
-        case Waveform::Square: return 1 - Math::Fast::abs(2 - 4 * p);
+        case Waveform::Triangle: {
+            auto denorm = 2 * p - 1;
+            return {
+                1 - Math::Fast::abs(2 - 4 * p),
+                2 * denorm * (denorm * Math::Fast::sign(0.5 - p) + 1)
+            };
+        }
+        case Waveform::Saw: return {
+            saw(p, xd),
+            4 * (p - p * p)
+        };
+        case Waveform::Square: return {
+            square(p, xd),
+            1 - Math::Fast::abs(2 - 4 * p)
+        };
         }
     }
 

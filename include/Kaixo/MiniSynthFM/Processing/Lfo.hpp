@@ -125,6 +125,8 @@ namespace Kaixo::Processing {
             if (m_Phase[i] < delta) {
                 m_Quantized[i] = m_Random.next() * 2 - 1;
             }
+
+            // TODO: m_Noise
         }
     }
 
