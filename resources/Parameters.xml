@@ -14,6 +14,7 @@
 
   <param name="Mod Wheel Amount"
          short-name="Amount"
+         description="Attenuator for the mod wheel out jack. Changes the range of value that the jack outputs."
          default="50"
          transform="Range[0.f, 100.f]"
          format="Percent"
@@ -21,6 +22,7 @@
 
   <param name="Velocity Amount"
          short-name="Amount"
+         description="Attenuator for the velocity out jack. Changes the range of value that the jack outputs."
          default="50"
          transform="Range[0.f, 100.f]"
          format="Percent"
@@ -28,6 +30,7 @@
 
   <param name="Random Amount"
          short-name="Amount"
+         description="Attenuator for the random out jack. Changes the range of value that the jack outputs."
          default="50"
          transform="Range[0.f, 100.f]"
          format="Percent"

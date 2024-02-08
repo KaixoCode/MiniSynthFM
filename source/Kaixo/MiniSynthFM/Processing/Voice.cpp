@@ -48,6 +48,15 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
+    bool MiniSynthFMVoice::active(std::size_t i) const {
+        for (auto& env : envelope) {
+            if (env.active(i)) return true;
+        }
+        return false;
+    }
+
+    // ------------------------------------------------
+
     void MiniSynthFMVoice::trigger(std::size_t i, Note n, float vel) {
         velocity[i] = vel;
         note[i] = n;
@@ -68,6 +77,12 @@ namespace Kaixo::Processing {
     VoiceBankVoice::VoiceBankVoice(Settings s)
         : settings(s)
     {}
+
+    // ------------------------------------------------
+
+    bool VoiceBankVoice::active() const {
+        return settings.voice.active(settings.index);
+    }
 
     // ------------------------------------------------
 

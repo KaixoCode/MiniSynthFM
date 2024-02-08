@@ -60,7 +60,7 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Output,
             .patchBay = settings.patchBay,
             .source = ModSource::Envelope3
-        });
+        }).description("Route the gain envelope's signal to an input jack.");
             
         // ------------------------------------------------
             

@@ -45,7 +45,7 @@ namespace Kaixo::Processing {
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();
             
-            if (voice.active()) {
+            if (voice.ModuleContainer::active()) {
                 switch (simd_path::path) {
                 case simd_path::s512: 
                 case simd_path::s256: voice.process<simd<float, 256>>(); break;

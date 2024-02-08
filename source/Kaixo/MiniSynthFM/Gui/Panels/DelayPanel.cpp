@@ -25,8 +25,9 @@ namespace Kaixo::Gui {
     {
 
         // ------------------------------------------------
-
-        add<ImageView>({ .image = T.delay.background });
+        
+        add<ImageView>({ .image = T.delay.background })
+            .description("Delay effect");
 
         // ------------------------------------------------
             

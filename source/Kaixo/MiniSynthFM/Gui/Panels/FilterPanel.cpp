@@ -26,7 +26,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        add<ImageView>({ .image = T.filter.background });
+        add<ImageView>({ .image = T.filter.background })
+            .description("Filter Effect");
 
         // ------------------------------------------------
 
@@ -49,7 +50,7 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .destination = ModDestination::FilterFreq,
             .name = "Cutoff"
-        });
+        }).description("Modulate the cutoff frequency of the filter.");
 
         add<Knob>({ 76, 32, 64, 64 }, {
             .graphics = T.filter.parameters.resonance,

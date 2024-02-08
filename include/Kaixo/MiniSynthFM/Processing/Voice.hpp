@@ -87,6 +87,10 @@ namespace Kaixo::Processing {
         float output{};
 
         // ------------------------------------------------
+        
+        bool active(std::size_t i) const;
+
+        // ------------------------------------------------
 
         void trigger(std::size_t i, Note n, float vel);
         void release(std::size_t i);
@@ -131,6 +135,10 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         VoiceBankVoice(Settings s);
+
+        // ------------------------------------------------
+        
+        bool active() const override;
 
         // ------------------------------------------------
 
@@ -219,9 +227,9 @@ namespace Kaixo::Processing {
                 return getOp1FM(dest) + getOp2FM(dest) + getOp3FM(dest);
             };
 
-            auto fm1 = params.fm[0] * getAllM(ModDestination::Op1Amount);
-            auto fm2 = params.fm[1] * getAllM(ModDestination::Op2Amount);
-            auto fm3 = params.fm[2] * getAllM(ModDestination::Op3Amount);
+            auto fm1 = params.fm[0] + getAllA(ModDestination::Op1Amount);
+            auto fm2 = params.fm[1] + getAllA(ModDestination::Op2Amount);
+            auto fm3 = params.fm[2] + getAllA(ModDestination::Op3Amount);
 
             Kaixo::store<SimdType>(filter.note + i, _note + params.pitchBend * 24 - 12);
 

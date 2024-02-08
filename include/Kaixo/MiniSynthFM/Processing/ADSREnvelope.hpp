@@ -146,6 +146,10 @@ namespace Kaixo::Processing {
             return false;
         }
 
+        bool active(std::size_t i) const {
+            return envs[i].active();
+        }
+
         // ------------------------------------------------
 
         void gate(std::size_t i, bool gate) {
