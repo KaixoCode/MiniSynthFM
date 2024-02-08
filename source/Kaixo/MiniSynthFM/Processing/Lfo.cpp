@@ -8,6 +8,15 @@
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
+    
+    void LfoParameters::frequency(float hz) { m_Frequency = hz; }
+    void LfoParameters::tempo(float t) { m_Tempo = normalToIndex(t, Tempo::Amount); }
+    void LfoParameters::tempo(Tempo t) { m_Tempo = t; }
+    void LfoParameters::waveform(float w) { m_Waveform = normalToIndex(w, LfoWaveform::Amount); }
+    void LfoParameters::waveform(LfoWaveform w) { m_Waveform = w; }
+    void LfoParameters::synced(bool s) { m_Synced = s; }
+
+    // ------------------------------------------------
 
     float LfoParameters::bars() {
         switch (m_Tempo) {
@@ -50,35 +59,8 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
-    void Lfo::process() {
-        output = at(m_Phase);
-
-        float delta = 1. / params.samplesPerOscillation();
-        m_Phase = Math::fmod1(m_Phase + delta);
-
-        // Phase wrapped around
-        if (m_Phase < delta) {
-            m_Quantized = m_Random.next() * 2 - 1;
-        }
-    }
-
-    // ------------------------------------------------
-
-    void Lfo::trigger() {
-        m_Phase = 0;
-    }
-
-    // ------------------------------------------------
-
-    float Lfo::at(float x) {
-        switch (params.m_Waveform) {
-        case LfoWaveform::Sine: return Math::Fast::nsin(0.5 - x);
-        case LfoWaveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * x);
-        case LfoWaveform::Saw: return 1 - 2 * x;
-        case LfoWaveform::Square: return 1 - 2 * (x > 0.5);
-        case LfoWaveform::Quantized: return m_Quantized;
-        case LfoWaveform::Noise: return m_Noise;
-        }
+    void Lfo::trigger(std::size_t i) {
+        m_Phase[i] = 0;
     }
 
     // ------------------------------------------------

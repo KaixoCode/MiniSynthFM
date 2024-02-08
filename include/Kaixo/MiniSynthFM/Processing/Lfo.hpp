@@ -32,12 +32,12 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void frequency(float hz) { m_Frequency = hz; }
-        void tempo(float t) { m_Tempo = normalToIndex(t, Tempo::Amount); }
-        void tempo(Tempo t) { m_Tempo = t; }
-        void waveform(float w) { m_Waveform = normalToIndex(w, LfoWaveform::Amount); }
-        void waveform(LfoWaveform w) { m_Waveform = w; }
-        void synced(bool s) { m_Synced = s; }
+        void frequency(float hz);
+        void tempo(float t);
+        void tempo(Tempo t);
+        void waveform(float w);
+        void waveform(LfoWaveform w);
+        void synced(bool s);
 
         // ------------------------------------------------
 
@@ -64,10 +64,10 @@ namespace Kaixo::Processing {
     };
 
     // ------------------------------------------------
-
+    
     class Lfo : public Module {
     public:
-
+        
         // ------------------------------------------------
 
         LfoParameters& params;
@@ -77,27 +77,29 @@ namespace Kaixo::Processing {
         Lfo(LfoParameters& p);
 
         // ------------------------------------------------
+        
+        float output[Voices]{};
 
-        float output = 0;
+        // ------------------------------------------------
+        
+        void trigger(std::size_t i);
+
+        // ------------------------------------------------
+        
+        template<class SimdType>
+        KAIXO_INLINE void process();
 
         // ------------------------------------------------
 
-        void process() override;
-
-        // ------------------------------------------------
-
-        void trigger();
-
-        // ------------------------------------------------
-
-        float at(float x);
+        template<class SimdType>
+        KAIXO_INLINE SimdType at(SimdType x, std::size_t i);
 
         // ------------------------------------------------
 
     private:
-        float m_Phase = 0;
-        float m_Quantized = 0;
-        float m_Noise = 0;
+        float m_Phase[Voices]{};
+        float m_Quantized[Voices]{};
+        float m_Noise[Voices]{};
 
         Random m_Random{};
 
@@ -107,47 +109,38 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
     
-    class SimdLfo : public ModuleContainer {
-    public:
-        
-        // ------------------------------------------------
+    template<class SimdType>
+    KAIXO_INLINE void Lfo::process() {
+        constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
 
-        LfoParameters& params;
-
-        // ------------------------------------------------
-
-        SimdLfo(LfoParameters& p)
-            : params(p) 
-        {
-            for (auto& l : lfo) 
-                registerModule(l);
+        float delta = 1. / params.samplesPerOscillation();
+        for (std::size_t i = 0; i < Voices; i += Count) {
+            auto phase = Kaixo::at<SimdType>(m_Phase, i);
+            Kaixo::store<SimdType>(output + i, this->at<SimdType>(phase, i));
+            Kaixo::store<SimdType>(m_Phase + i, Math::Fast::fmod1(phase + delta));
         }
 
-        // ------------------------------------------------
-        
-        float output[Voices]{};
-
-        // ------------------------------------------------
-        
-        Lfo lfo[Voices]{ params, params, params, params, params, params, params, params };
-
-        // ------------------------------------------------
-        
-        void trigger(std::size_t i) { lfo[i].trigger(); }
-
-        // ------------------------------------------------
-        
-        template<class SimdType>
-        void process() {
-            for (std::size_t i = 0; i < Voices; ++i) {
-                lfo[i].process();
-                output[i] = lfo[i].output;
+        // TODO: find way to parallelize this
+        for (std::size_t i = 0; i < Voices; i += Count) {
+            if (m_Phase[i] < delta) {
+                m_Quantized[i] = m_Random.next() * 2 - 1;
             }
         }
+    }
 
-        // ------------------------------------------------
+    // ------------------------------------------------
 
-    };
+    template<class SimdType>
+    KAIXO_INLINE SimdType Lfo::at(SimdType x, std::size_t i) {
+        switch (params.m_Waveform) {
+        case LfoWaveform::Sine: return Math::Fast::nsin(0.5 - x);
+        case LfoWaveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * x);
+        case LfoWaveform::Saw: return 1 - 2 * x;
+        case LfoWaveform::Square: return 1 - 2 * (x > 0.5);
+        case LfoWaveform::Quantized: return Kaixo::at<SimdType>(m_Quantized, i);
+        case LfoWaveform::Noise: return Kaixo::at<SimdType>(m_Noise, i);
+        }
+    }
 
     // ------------------------------------------------
 

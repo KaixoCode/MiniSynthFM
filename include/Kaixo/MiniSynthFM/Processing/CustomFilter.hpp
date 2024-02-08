@@ -201,7 +201,7 @@ namespace Kaixo::Processing {
     KAIXO_INLINE SimdType ParallelFilter::processLowpass(SimdType input, SimdType frequency, SimdType q, std::size_t i) {
         auto freq = Math::Fast::clamp(frequency / sampleRate(), SimdType(0.f), SimdType(0.5f));
         auto omega = 2 * std::numbers::pi * freq;
-        auto cosOmega = Math::Fast::ncos(freq);
+        auto cosOmega = 0.f - Math::Fast::nsin(freq - 0.25f);
         auto sinOmega = Math::Fast::nsin(freq);
         auto qValue = Math::Fast::powN<4>(q);
         auto alpha = sinOmega / (qValue * 12 + 0.8);
@@ -239,7 +239,7 @@ namespace Kaixo::Processing {
         constexpr float log10_2 = std::numbers::ln2 / std::numbers::ln10;
         auto freq = Math::Fast::clamp(frequency / sampleRate(), SimdType(0.f), SimdType(0.5f));
         auto omega = 2 * std::numbers::pi * freq;
-        auto cosOmega = Math::Fast::ncos(freq);
+        auto cosOmega = 0.f - Math::Fast::nsin(freq - 0.25f);
         auto sinOmega = Math::Fast::nsin(freq);
         auto qValue = 2 * q + 0.2;
 
