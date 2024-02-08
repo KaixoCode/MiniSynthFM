@@ -315,7 +315,7 @@ namespace Kaixo::Processing {
 
             // Less resonance when low frequency
             resonance = Kaixo::iff<SimdType>(nfreq < SimdType(0.01f),
-                [&] { return resonance * 0.2f + 0.8f * (nfreq / 0.01f); },
+                [&] { return resonance * (0.2f + 0.8f * (nfreq / 0.01f)); },
                 [&] { return resonance; });
 
             auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
