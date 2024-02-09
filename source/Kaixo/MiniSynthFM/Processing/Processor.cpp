@@ -71,7 +71,16 @@ namespace Kaixo::Processing {
         double nanosUsedPerSample = nanos / outputBuffer().size();
         double availableNanosPerSample = 1e9 / sampleRate();
         double percentUsed = 100 * nanosUsedPerSample / availableNanosPerSample;
-        timerPercent = 0.99 * timerPercent + 0.01 * percentUsed;
+
+        timerPercentMax = timerPercentMax * 0.99 + 0.01 * percentUsed;
+        timerNanosPerSampleMax = timerNanosPerSampleMax * 0.99 + 0.01 * nanosUsedPerSample;
+
+        auto now = std::chrono::steady_clock::now();
+        if (now - lastMeasure >= std::chrono::milliseconds(250)) {
+            lastMeasure = now;
+            timerPercent = timerPercentMax;
+            timerNanosPerSample = timerNanosPerSampleMax;
+        }
     }
 
     // ------------------------------------------------

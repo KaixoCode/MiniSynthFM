@@ -10,6 +10,7 @@
 #include "Kaixo/Core/Gui/Views/TextView.hpp"
 #include "Kaixo/Core/Gui/Knob.hpp"
 #include "Kaixo/Core/Gui/Button.hpp"
+#include "Kaixo/Core/Gui/TabControl.hpp"
 #include "Kaixo/Core/Theme/Theme.hpp"
 
 // ------------------------------------------------
@@ -43,7 +44,12 @@ namespace Kaixo::Gui {
 
         TextView* description = nullptr;
         TextView* presetName = nullptr;
-        TextView* timer = nullptr;
+        Button* cpuUsage = nullptr;
+        Button* simdOptimizations = nullptr;
+
+        // ------------------------------------------------
+        
+        TabControl advancedInfo{};
 
         // ------------------------------------------------
 

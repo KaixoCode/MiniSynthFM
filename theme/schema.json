@@ -148,7 +148,14 @@
       "preset-name": "text-area",
       "next-preset": "drawable",
       "previous-preset": "drawable",
-      "description": "text-area"
+      "description": "text-area",
+      "advanced-info": {
+        "background": "drawable",
+        "foreground": "drawable",
+        "button": "drawable",
+        "cpu-usage": "drawable",
+        "simd-optimizations": "drawable"
+      }
     },
     "settings": {
       "background": "drawable",

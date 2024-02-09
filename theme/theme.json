@@ -536,6 +536,54 @@
         }
       }
 
+      advanced-info: {
+        background: {
+          background-color: [27, 27, 27]
+        }
+
+        button: {
+          extends: $basic-button-select
+          layers: {
+            img: {
+              image: next-preset.png
+            }
+          }
+        }
+
+        cpu-usage: {
+          extends: $basic-button
+          text: CPU Usage
+          text-position: [5, 1]
+
+          layers: {
+            path: {
+              extends: $display-text
+              text: $text
+              text-overflow: dots
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
+
+        simd-optimizations: {
+          extends: $basic-button
+          text: Optimizations
+          text-position: [5, 1]
+
+          layers: {
+            path: {
+              extends: $display-text
+              text: $text
+              text-overflow: dots
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
+      }
+      
+
       next-preset: {
         extends: $basic-button
         layers: {

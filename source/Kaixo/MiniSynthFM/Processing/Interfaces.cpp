@@ -13,7 +13,11 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
-    float TimerInterface::operator()() {
+    float TimerInterface::nanosPerSample() {
+        return self<MiniSynthFMProcessor>().timerNanosPerSample;
+    }
+
+    float TimerInterface::percent() {
         return self<MiniSynthFMProcessor>().timerPercent;
     }
 

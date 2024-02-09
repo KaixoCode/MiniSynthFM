@@ -74,6 +74,10 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
         
         float timerPercent = 0;
+        float timerNanosPerSample = 0;
+        float timerPercentMax = 0;
+        float timerNanosPerSampleMax = 0;
+        std::chrono::time_point<std::chrono::steady_clock> lastMeasure;
 
         // ------------------------------------------------
 

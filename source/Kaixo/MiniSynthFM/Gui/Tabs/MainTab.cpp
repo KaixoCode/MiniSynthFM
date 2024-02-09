@@ -37,9 +37,11 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void MainTab::onIdle() {
-        float value = context.interface<Processing::TimerInterface>()();
-        timer->settings.text = std::format("{:.2f} %", value);
-        timer->repaint();
+        auto interface = context.interface<Processing::TimerInterface>();
+        auto percent = interface->percent();
+        auto nanos = interface->nanosPerSample();
+        cpuUsage->settings.text = std::format("{:.2f} % {:.2f} ns", percent, nanos);
+        cpuUsage->repaint();
     }
 
     // ------------------------------------------------
@@ -89,12 +91,12 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        timer = &add<TextView>({ 6, 6, 100, 20 }, {
-            .graphics = T.display.main.presetName,
-            .padding = { 4, 3 },
-            .multiline = false,
-            .editable = false,
-            .lineHeight = 14,
+        add<Button>({ 286, 6, 20, 20 }, {
+            .callback = [&](bool val) {
+                advancedInfo.select(val);
+            },
+            .graphics = T.display.main.advancedInfo.button,
+            .behaviour = Button::Behaviour::Toggle
         });
 
         // ------------------------------------------------
@@ -103,10 +105,26 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        // TODO: toggle to view advanced information like
-        //  - CPU usage
-        //  - Which SIMD types are used
-        //  - etc.
+        auto& advanced = add<View>({ 6, 6, 278, 74 });
+
+        // ------------------------------------------------
+
+        advanced.add<ImageView>({ .image = T.display.main.advancedInfo.background });
+
+        cpuUsage = &advanced.add<Button>({ 0, 0, 278, 20 }, {
+            .graphics = T.display.main.advancedInfo.cpuUsage,
+        });
+        
+        simdOptimizations = &advanced.add<Button>({ 0, 22, 278, 20 }, {
+            .graphics = T.display.main.advancedInfo.simdOptimizations,
+        });
+
+        advanced.add<ImageView>({ .image = T.display.main.advancedInfo.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+
+        advancedInfo.add(1, advanced);
+        advancedInfo.select(0);
 
         // ------------------------------------------------
 

@@ -15,12 +15,13 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
     
-    class TimerInterface : public TypedInterface<float()> {
+    class TimerInterface : public Interface {
     public:
 
         // ------------------------------------------------
 
-        float operator()() override;
+        float nanosPerSample();
+        float percent();
 
         // ------------------------------------------------
 
