@@ -148,11 +148,7 @@
       "preset-name": "text-area",
       "next-preset": "drawable",
       "previous-preset": "drawable",
-      "description": "text-area",
-
-      "parameters": {
-        "quality": "drawable"
-      }
+      "description": "text-area"
     },
     "settings": {
       "background": "drawable",
@@ -164,7 +160,11 @@
       "reload-theme": "drawable",
       "preset-path": "drawable",
       "touch-mode": "drawable",
-      "show-piano": "drawable"
+      "show-piano": "drawable",
+      "parameters": {
+        "quality": "drawable",
+        "export-quality": "drawable"
+      }
     },
     "save-preset": {
       "background": "drawable",

@@ -96,6 +96,15 @@ namespace Kaixo::Processing {
         params.filter.quality = val;
     }
 
+
+    void MiniSynthFMProcessor::exportQuality(float val) {
+        exportQquality(normalToIndex(val, Quality::Amount));
+    }
+
+    void MiniSynthFMProcessor::exportQquality(Quality val) {
+        // TODO:
+    }
+
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::init() {

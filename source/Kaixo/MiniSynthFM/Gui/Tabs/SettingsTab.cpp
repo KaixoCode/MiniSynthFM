@@ -17,22 +17,52 @@ namespace Kaixo::Gui {
         add<ImageView>({ .image = T.display.settings.background });
 
         // ------------------------------------------------
+        
+        auto& scrollView = add<ScrollView>({ 0, 0, 312, 165 }, {
+            .scrollbar = T.display.loadPreset.scrollbar,
+            .margin = { 6, 6, 6, 6 },
+            .gap = 2,
+            .barThickness = 5,
+            .barPadding = { 2, 6, 6, 6 },
+            .keepBarSpace = false,
+            .alignChildren = Theme::Align::Left
+        });
 
-        zoom.addButton(0, add<Button>({ 6 + 0 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
-        zoom.addButton(1, add<Button>({ 6 + 1 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
-        zoom.addButton(2, add<Button>({ 6 + 2 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
+        // ------------------------------------------------
 
-        zoom.tab(0).addCallback([&](bool v) { if (v) context.scale(0.5); });
-        zoom.tab(1).addCallback([&](bool v) { if (v) context.scale(0.7); });
-        zoom.tab(2).addCallback([&](bool v) { if (v) context.scale(1.0); });
+        //zoom.addButton(0, add<Button>({ 6 + 0 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
+        //zoom.addButton(1, add<Button>({ 6 + 1 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
+        //zoom.addButton(2, add<Button>({ 6 + 2 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
 
-        auto zoomFactor = context.scale();
-        if (zoomFactor == 0.5) zoom.select(0);
-        else if (zoomFactor == 0.7) zoom.select(1);
-        else if (zoomFactor == 1.0) zoom.select(2);
-        else zoom.select(2);
+        //zoom.tab(0).addCallback([&](bool v) { if (v) context.scale(0.5); });
+        //zoom.tab(1).addCallback([&](bool v) { if (v) context.scale(0.7); });
+        //zoom.tab(2).addCallback([&](bool v) { if (v) context.scale(1.0); });
 
-        themePath = &add<Button>({ 6, 6, 300, 20 }, {
+        //auto zoomFactor = context.scale();
+        //if (zoomFactor == 0.5) zoom.select(0);
+        //else if (zoomFactor == 0.7) zoom.select(1);
+        //else if (zoomFactor == 1.0) zoom.select(2);
+        //else zoom.select(2);
+
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.quality,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.quality,
+        });
+        
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.exportQuality,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.exportQuality,
+        });
+        
+        scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.reloadTheme
+        });
+
+        themePath = &scrollView.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 themeChooser.launchAsync(
                         juce::FileBrowserComponent::openMode
@@ -53,7 +83,7 @@ namespace Kaixo::Gui {
             .text = std::string{ T.name() },
         });
 
-        add<Button>({ 6, 28, 300, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 Storage::set<std::string>(Setting::LoadedTheme, Theme::Default);
                 T.openDefault();
@@ -63,7 +93,7 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.defaultTheme
         });
 
-        add<Button>({ 6, 50, 300, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 T.reopen();
                 themePath->settings.text = T.name();
@@ -74,7 +104,7 @@ namespace Kaixo::Gui {
 
         std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-        presetPath = &add<Button>({ 6, 72, 300, 20 }, {
+        presetPath = &scrollView.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 themeChooser.launchAsync(
                         juce::FileBrowserComponent::openMode
@@ -94,7 +124,7 @@ namespace Kaixo::Gui {
             .text = storedPresetPath
         });
 
-        add<Button>({ 6, 94, 300, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .callback = [&](bool state) {
                 Storage::set<bool>(Setting::TouchMode, state);
             },
@@ -102,7 +132,7 @@ namespace Kaixo::Gui {
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::flag(Setting::TouchMode));
 
-        add<Button>({ 6, 116, 300, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .callback = [&](bool state) {
                 Storage::set<bool>(ShowPiano, state);
                 if (state) {
@@ -115,6 +145,8 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.showPiano,
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::flag(ShowPiano));
+
+        scrollView.updateDimensions();
 
         // ------------------------------------------------
 

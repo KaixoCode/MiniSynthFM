@@ -732,6 +732,38 @@
           }
         }
       }
+
+      parameters: {
+        quality: {
+          extends: $basic-button
+          text: Live Quality
+          text-position: [5, 1]
+
+          layers: {
+            value: {
+              extends: $display-text
+              text: $value
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
+
+        export-quality: {
+          extends: $basic-button
+          text: Export Quality
+          text-position: [5, 1]
+
+          layers: {
+            value: {
+              extends: $display-text
+              text: $value
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
+      }
     }
     
     // ------------------------------------------------

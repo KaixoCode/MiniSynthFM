@@ -92,12 +92,19 @@
 
   <!-- ================================================ -->
 
-  <param name="Quality" 
+  <param name="Quality"
          default="1" 
          steps="5" 
          transform="Group[5]"
          format="Group[Low, Normal, High, Ultra, Extreme]"
          interface="$self.quality($value)"/>
+
+  <param name="Export Quality" 
+         default="4" 
+         steps="5" 
+         transform="Group[5]"
+         format="Group[Low, Normal, High, Ultra, Extreme]"
+         interface="$self.exportQuality($value)"/>
 
   <!-- ================================================ -->
 

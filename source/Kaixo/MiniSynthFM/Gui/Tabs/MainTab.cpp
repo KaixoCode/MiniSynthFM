@@ -97,16 +97,16 @@ namespace Kaixo::Gui {
             .lineHeight = 14,
         });
 
-        add<Knob>({ 6, 28, 64, 64 }, {
-            .graphics = T.display.main.parameters.quality,
-            .tooltipName = false,
-            .tooltipValue = false,
-            .param = Synth.quality
-        });
-
         // ------------------------------------------------
 
         add<ImageView>({ .image = T.display.main.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+        
+        // TODO: toggle to view advanced information like
+        //  - CPU usage
+        //  - Which SIMD types are used
+        //  - etc.
 
         // ------------------------------------------------
 

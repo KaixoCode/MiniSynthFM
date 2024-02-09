@@ -38,6 +38,9 @@ namespace Kaixo::Processing {
         
         void quality(float val);
         void quality(Quality val);
+        
+        void exportQuality(float val);
+        void exportQquality(Quality val);
 
         // ------------------------------------------------
 
