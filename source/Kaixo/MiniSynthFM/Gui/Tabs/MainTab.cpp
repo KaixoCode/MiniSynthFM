@@ -39,8 +39,7 @@ namespace Kaixo::Gui {
     void MainTab::onIdle() {
         auto interface = context.interface<Processing::TimerInterface>();
         auto percent = interface->percent();
-        auto nanos = interface->nanosPerSample();
-        cpuUsage->settings.text = std::format("{:.2f} % {:.2f} ns", percent, nanos);
+        cpuUsage->settings.text = std::format("{:.2f} %", percent);
         cpuUsage->repaint();
     }
 
