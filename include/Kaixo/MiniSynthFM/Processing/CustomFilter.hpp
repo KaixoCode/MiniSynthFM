@@ -21,16 +21,19 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
+        FilterParameters(Quality& q);
+
+        // ------------------------------------------------
+
+        Quality& quality;
+
+        // ------------------------------------------------
+
         float frequency = 0;
         float resonance = 0;
         float drive = 0;
         bool keytrack = false;
-        Quality quality = Quality::Normal;
-
-        // ------------------------------------------------
-
-        std::size_t oversample() const;
-
+        
         // ------------------------------------------------
 
     };
@@ -280,7 +283,9 @@ namespace Kaixo::Processing {
     void CustomFilter::process() {
         constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
 
-        m_AAF.settings.sampleRateIn = params.oversample() * sampleRate();
+        const auto oversampleAmount = oversampleForQuality(params.quality);
+
+        m_AAF.settings.sampleRateIn = oversampleAmount * sampleRate();
         m_AAF.settings.sampleRateOut = sampleRate();
         m_AAF.settings.passbandAmplitudedB = -1;
         m_AAF.settings.stopbandAmplitudedB = -80;
@@ -321,11 +326,11 @@ namespace Kaixo::Processing {
             auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
 
             SimdType res{};
-            if (params.oversample() == 1) {
+            if (oversampleAmount == 1) {
                 auto inputValue = Kaixo::at<SimdType>(input[0], i);
                 res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
             } else {
-                for (std::size_t j = 0; j < params.oversample(); ++j) {
+                for (std::size_t j = 0; j < oversampleAmount; ++j) {
                     auto inputValue = Kaixo::at<SimdType>(input[j], i);
                     inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
                     res = m_AAF.process<SimdType>(inputValue, i);
@@ -338,7 +343,6 @@ namespace Kaixo::Processing {
             filterOutput = params.drive * Math::Fast::tanh_like(1.115 * filterOutput) + filterOutput * (1 - 0.9 * params.drive);
             
             Kaixo::store<SimdType>(output + i, filterOutput);
-
         }
 
         m_Filter[0].finalize();

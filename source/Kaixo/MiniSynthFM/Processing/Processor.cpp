@@ -39,6 +39,8 @@ namespace Kaixo::Processing {
     void MiniSynthFMProcessor::process() {
         Timer timer{};
 
+        params.quality = offline() ? m_ExportQuality : m_LiveQuality;
+
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
 
@@ -89,11 +91,7 @@ namespace Kaixo::Processing {
     }
 
     void MiniSynthFMProcessor::quality(Quality val) {
-        params.quality = val;
-        params.oscillator[0].quality(val);
-        params.oscillator[1].quality(val);
-        params.oscillator[2].quality(val);
-        params.filter.quality = val;
+        m_LiveQuality = val;
     }
 
 
@@ -102,7 +100,7 @@ namespace Kaixo::Processing {
     }
 
     void MiniSynthFMProcessor::exportQquality(Quality val) {
-        // TODO:
+        m_ExportQuality = val;
     }
 
     // ------------------------------------------------

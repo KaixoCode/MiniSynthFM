@@ -8,17 +8,10 @@
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
-
-    std::size_t FilterParameters::oversample() const {
-        switch (quality) {
-        case Quality::Low: return 1;
-        case Quality::Normal: return 2;
-        case Quality::High: return 4;
-        case Quality::Ultra: return 8;
-        case Quality::Extreme: return 16;
-        default: return 1;
-        }
-    }
+    
+    FilterParameters::FilterParameters(Quality& q)
+        : quality(q) 
+    {}
 
     // ------------------------------------------------
     

@@ -24,15 +24,20 @@ namespace Kaixo::Processing {
     struct FMOscillatorParameters : public Module {
 
         // ------------------------------------------------
+        
+        FMOscillatorParameters(Quality& q);
+
+        // ------------------------------------------------
+        
+        Quality& quality;
+
+        // ------------------------------------------------
 
         void tune(Note t);
         void octave(int o);
 
         void waveform(Waveform wf);
         void waveform(float val);
-
-        void quality(Quality val);
-        void quality(float val);
 
         // ------------------------------------------------
         
@@ -44,16 +49,11 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        std::size_t oversample() const;
-
-        // ------------------------------------------------
-
     private:
         Note m_Tune = 0;
         float m_FrequencyMultiplier = 1;
         int m_Octave = 0;
         Waveform m_Waveform = Waveform::Sine;
-        Quality m_Quality = Quality::Normal;
         bool m_FrequencyDirty = true;
 
         // ------------------------------------------------
@@ -159,7 +159,7 @@ namespace Kaixo::Processing {
     template<class SimdType>
     KAIXO_INLINE void FMOscillator::process() {
         constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
-        std::size_t os = params.oversample();
+        const auto oversampleAmount = oversampleForQuality(params.quality);
 
         for (std::size_t i = 0; i < Voices; i += Count) {
             auto _noteFrequency = Kaixo::at<SimdType>(m_NoteFrequency, i);
@@ -168,10 +168,10 @@ namespace Kaixo::Processing {
 
             auto delta = _frequency / sampleRate();
 
-            for (std::size_t j = 0; j < os; ++j) {
+            for (std::size_t j = 0; j < oversampleAmount; ++j) {
                 SimdType _phaseMod = Kaixo::at<SimdType>(m_PhaseModulation[j], i);
 
-                SimdType phase = Math::Fast::fmod1((j * delta / os) + (_phaseMod + (_phase + 10)));
+                SimdType phase = Math::Fast::fmod1((j * delta / oversampleAmount) + (_phaseMod + (_phase + 10)));
                 auto [_output, _fmOutput] = this->at<SimdType>(phase, _frequency);
 
                 Kaixo::store<SimdType>(output[j] + i, _output);
