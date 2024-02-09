@@ -645,7 +645,7 @@
         layers: {
           level: {
             extends: $display-text
-            text: ["0.5x", "0.7x", "1.0x"]
+            text: ["0.5x", "0.7x", "1.0x", "1.5x", "2.0x"]
             text-align: center-left
             text-position: [90, 1]
           }
@@ -742,6 +742,24 @@
             }
           }
         }
+      }
+
+      global-title: {      
+        extends: $display-text
+
+        text: Global Settings
+
+        image-edges: [2, 2, 2, 2]
+        image: button-underline.png
+      }
+      
+      preset-title: {      
+        extends: $display-text
+
+        text: Preset Settings
+
+        image-edges: [2, 2, 2, 2]
+        image: button-underline.png
       }
 
       parameters: {

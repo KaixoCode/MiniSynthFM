@@ -154,6 +154,8 @@
       "background": "drawable",
       "foreground": "drawable",
       "button": "drawable",
+      "preset-title": "drawable",
+      "global-title": "drawable",
       "zoom-button": "drawable",
       "theme-path": "drawable",
       "default-theme": "drawable",

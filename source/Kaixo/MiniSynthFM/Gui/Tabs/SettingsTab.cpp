@@ -30,6 +30,13 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
+        scrollView.add<ImageView>({ Width, 20 }, {
+            .image = T.display.settings.presetTitle,
+            .text = "Preset Settings",
+        });
+        
+        // ------------------------------------------------
+
         scrollView.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.phaseMode,
             .tooltipName = false,
@@ -52,7 +59,16 @@ namespace Kaixo::Gui {
             .tooltipValue = false,
             .param = Synth.exportQuality,
         });
-        
+
+        // ------------------------------------------------
+
+        scrollView.add<ImageView>({ Width, 20 }, {
+            .image = T.display.settings.globalTitle,
+            .text = "Global Settings",
+        });
+
+        // ------------------------------------------------
+
         themePath = &scrollView.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 themeChooser.launchAsync(
@@ -141,11 +157,11 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        constexpr float zoomLevels[3]{ 0.5, 0.7, 1.0 };
+        constexpr float zoomLevels[5]{ 0.5, 0.7, 1.0, 1.5, 2.0 };
 
         auto& zoom = scrollView.add<Knob>({ Width, 20 }, {
             .onchange = [&, zoomLevels](ParamValue v) {
-                auto value = zoomLevels[normalToIndex(v, 3)];
+                auto value = zoomLevels[normalToIndex(v, 5)];
                 auto current = context.scale();
                 if (value != current) {
                     context.scale(value);
@@ -153,21 +169,21 @@ namespace Kaixo::Gui {
                 }
             },
             .graphics = T.display.settings.zoomButton,
-            .steps = 3,
-            .resetValue = 1,
+            .steps = 5,
+            .resetValue = 2. / 4.,
         });
 
         if (auto zoomFactor = Storage::get<float>(WindowScale)) {
             context.scale(zoomFactor.value());
             for (auto [index, level] : std::views::enumerate(zoomLevels)) {
                 if (zoomFactor == level) {
-                    zoom.value(index / 2.);
+                    zoom.value(index / 4.);
                     break;
                 }
             }
         } else {
             context.scale(1);
-            zoom.value(1);
+            zoom.value(2. / 4.);
         }
 
         // ------------------------------------------------
