@@ -106,6 +106,13 @@
          format="Group[Low, Normal, High, Ultra, Extreme]"
          interface="$self.exportQuality($value)"/>
 
+  <param name="Phase Mode" 
+         default="1" 
+         steps="3" 
+         transform="Group[3]"
+         format="Group[Contiguous, Reset, Random]"
+         interface="$self.phaseMode($value)"/>
+
   <!-- ================================================ -->
 
   <module name="Lfo" count="1">

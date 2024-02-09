@@ -41,7 +41,13 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
     
-    void FMOscillator::trigger(std::size_t i) { m_Phase[i] = 0; }
+    void FMOscillator::trigger(std::size_t i) { 
+        switch (params.phaseMode) {
+        case PhaseMode::Contiguous: break; // Do nothing
+        case PhaseMode::Random: m_Phase[i] = Random::next(); break;
+        case PhaseMode::Reset: m_Phase[i] = 0; break;
+        }
+    }
 
     // ------------------------------------------------
     

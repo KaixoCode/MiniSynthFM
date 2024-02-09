@@ -159,7 +159,6 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
     private:
-        Random m_Random{};
         std::size_t m_Counter = 0;
         float m_RandomFrequency = 0;
 
@@ -295,7 +294,7 @@ namespace Kaixo::Processing {
         // every 2 ms
         float timer = 2 * sampleRate() / 1000.;
         if (m_Counter++ > timer) {
-            m_RandomFrequency = m_Random.next();
+            m_RandomFrequency = Random::next();
             m_Counter = 0;
         }
 

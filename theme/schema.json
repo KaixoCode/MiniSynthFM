@@ -162,6 +162,7 @@
       "touch-mode": "drawable",
       "show-piano": "drawable",
       "parameters": {
+        "phase-mode": "drawable",
         "quality": "drawable",
         "export-quality": "drawable"
       }

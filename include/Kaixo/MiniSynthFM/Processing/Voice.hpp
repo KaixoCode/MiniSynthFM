@@ -52,10 +52,6 @@ namespace Kaixo::Processing {
         float randomAmount = 0;
 
         // ------------------------------------------------
-
-        Random random{};
-
-        // ------------------------------------------------
         
         bool routing[(int)ModDestination::Amount][(int)ModSource::Amount]{};
 

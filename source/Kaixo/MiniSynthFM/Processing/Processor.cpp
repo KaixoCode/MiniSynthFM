@@ -96,11 +96,21 @@ namespace Kaixo::Processing {
 
 
     void MiniSynthFMProcessor::exportQuality(float val) {
-        exportQquality(normalToIndex(val, Quality::Amount));
+        exportQuality(normalToIndex(val, Quality::Amount));
     }
 
-    void MiniSynthFMProcessor::exportQquality(Quality val) {
+    void MiniSynthFMProcessor::exportQuality(Quality val) {
         m_ExportQuality = val;
+    }
+
+    void MiniSynthFMProcessor::phaseMode(float val) {
+        phaseMode(normalToIndex(val, PhaseMode::Amount));
+    }
+
+    void MiniSynthFMProcessor::phaseMode(PhaseMode val) {
+        for (auto& osc : params.oscillator) {
+            osc.phaseMode = val;
+        }
     }
 
     // ------------------------------------------------

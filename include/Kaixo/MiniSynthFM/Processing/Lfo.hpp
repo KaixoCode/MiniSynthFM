@@ -101,8 +101,6 @@ namespace Kaixo::Processing {
         float m_Quantized[Voices]{};
         float m_Noise[Voices]{};
 
-        Random m_Random{};
-
         // ------------------------------------------------
 
     };
@@ -123,7 +121,7 @@ namespace Kaixo::Processing {
         // TODO: find way to parallelize this
         for (std::size_t i = 0; i < Voices; ++i) {
             if (m_Phase[i] < delta) {
-                m_Quantized[i] = m_Random.next() * 2 - 1;
+                m_Quantized[i] = Random::next() * 2 - 1;
             }
 
             // TODO: m_Noise

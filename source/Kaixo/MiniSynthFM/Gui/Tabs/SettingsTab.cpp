@@ -18,31 +18,26 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        auto& scrollView = add<ScrollView>({ 0, 0, 312, 165 }, {
+        auto& scrollView = add<ScrollView>({ 6, 6, 300, 153 }, {
             .scrollbar = T.display.loadPreset.scrollbar,
-            .margin = { 6, 6, 6, 6 },
+            .margin = { 0, 0, 0, 0 },
             .gap = 2,
             .barThickness = 5,
-            .barPadding = { 2, 6, 6, 6 },
+            .barPadding = { 2, 0, 0, 0 },
             .keepBarSpace = false,
             .alignChildren = Theme::Align::Left
         });
 
         // ------------------------------------------------
 
-        //zoom.addButton(0, add<Button>({ 6 + 0 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[0] }));
-        //zoom.addButton(1, add<Button>({ 6 + 1 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[1] }));
-        //zoom.addButton(2, add<Button>({ 6 + 2 * 50, 138, 48, 20 }, { .graphics = T.display.settings.zoomButton[2] }));
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.phaseMode,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.phaseMode,
+        });
 
-        //zoom.tab(0).addCallback([&](bool v) { if (v) context.scale(0.5); });
-        //zoom.tab(1).addCallback([&](bool v) { if (v) context.scale(0.7); });
-        //zoom.tab(2).addCallback([&](bool v) { if (v) context.scale(1.0); });
-
-        //auto zoomFactor = context.scale();
-        //if (zoomFactor == 0.5) zoom.select(0);
-        //else if (zoomFactor == 0.7) zoom.select(1);
-        //else if (zoomFactor == 1.0) zoom.select(2);
-        //else zoom.select(2);
+        // ------------------------------------------------
 
         scrollView.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.quality,
@@ -58,10 +53,6 @@ namespace Kaixo::Gui {
             .param = Synth.exportQuality,
         });
         
-        scrollView.add<Button>({ Width, 20 }, {
-            .graphics = T.display.settings.reloadTheme
-        });
-
         themePath = &scrollView.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 themeChooser.launchAsync(
@@ -147,6 +138,37 @@ namespace Kaixo::Gui {
         }).value(Storage::flag(ShowPiano));
 
         scrollView.updateDimensions();
+
+        // ------------------------------------------------
+
+        constexpr float zoomLevels[3]{ 0.5, 0.7, 1.0 };
+
+        auto& zoom = scrollView.add<Knob>({ Width, 20 }, {
+            .onchange = [&, zoomLevels](ParamValue v) {
+                auto value = zoomLevels[normalToIndex(v, 3)];
+                auto current = context.scale();
+                if (value != current) {
+                    context.scale(value);
+                    Storage::set<float>(WindowScale, value);
+                }
+            },
+            .graphics = T.display.settings.zoomButton,
+            .steps = 3,
+            .resetValue = 1,
+        });
+
+        if (auto zoomFactor = Storage::get<float>(WindowScale)) {
+            context.scale(zoomFactor.value());
+            for (auto [index, level] : std::views::enumerate(zoomLevels)) {
+                if (zoomFactor == level) {
+                    zoom.value(index / 2.);
+                    break;
+                }
+            }
+        } else {
+            context.scale(1);
+            zoom.value(1);
+        }
 
         // ------------------------------------------------
 

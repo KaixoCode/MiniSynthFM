@@ -47,7 +47,7 @@ namespace Kaixo::Processing {
     void MiniSynthFMVoice::trigger(std::size_t i, Note n, float vel) {
         velocity[i] = vel;
         note[i] = n;
-        randomValue[i] = params.random.next();
+        randomValue[i] = Random::next();
         for (auto& osc : oscillator) osc.trigger(i);
         for (auto& env : envelope) env.trigger(i);
         for (auto& lfo : lfo) lfo.trigger(i);

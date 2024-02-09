@@ -18,6 +18,7 @@ namespace Kaixo {
 	constexpr std::string_view ThemePath = "themepath";
 	constexpr std::string_view PresetPath = "presetpath";
 	constexpr std::string_view ShowPiano = "showpiano";
+	constexpr std::string_view WindowScale = "windowscale";
 
 	// ------------------------------------------------
 	
@@ -47,6 +48,12 @@ namespace Kaixo {
 		default: return 1;
 		}
 	}
+
+	// ------------------------------------------------
+	
+	enum class PhaseMode {
+		Contiguous, Reset, Random, Amount
+	};
 
 	// ------------------------------------------------
 	

@@ -32,6 +32,10 @@ namespace Kaixo::Processing {
         Quality& quality;
 
         // ------------------------------------------------
+        
+        PhaseMode phaseMode = PhaseMode::Contiguous;
+
+        // ------------------------------------------------
 
         void tune(Note t);
         void octave(int o);

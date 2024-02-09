@@ -40,7 +40,10 @@ namespace Kaixo::Processing {
         void quality(Quality val);
         
         void exportQuality(float val);
-        void exportQquality(Quality val);
+        void exportQuality(Quality val);
+
+        void phaseMode(float val);
+        void phaseMode(PhaseMode val);
 
         // ------------------------------------------------
 

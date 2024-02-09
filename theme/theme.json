@@ -636,9 +636,20 @@
       }
 
       zoom-button: {
-        extends: $basic-button-select
-        text: ["0.5x", "0.7x", "1.0x"]
+        extends: $basic-button
+        
+        image: button-underline.png
+
+        text: Zoom
         text-position: [5, 1]
+        layers: {
+          level: {
+            extends: $display-text
+            text: ["0.5x", "0.7x", "1.0x"]
+            text-align: center-left
+            text-position: [90, 1]
+          }
+        }
       }
 
       default-theme: {
@@ -736,7 +747,7 @@
       parameters: {
         quality: {
           extends: $basic-button
-          text: Live Quality
+          text: Quality
           text-position: [5, 1]
 
           layers: {
@@ -751,8 +762,27 @@
 
         export-quality: {
           extends: $basic-button
-          text: Export Quality
+          text: Export
           text-position: [5, 1]
+
+          image: button-underline.png
+
+          layers: {
+            value: {
+              extends: $display-text
+              text: $value
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
+        
+        phase-mode: {
+          extends: $basic-button
+          text: Phase
+          text-position: [5, 1]
+
+          image: button-underline.png
 
           layers: {
             value: {
