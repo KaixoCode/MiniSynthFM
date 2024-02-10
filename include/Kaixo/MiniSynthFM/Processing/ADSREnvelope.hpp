@@ -136,7 +136,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float output[Voices]{};
+        alignas(sizeof(float) * Voices) float output[Voices]{};
 
         // ------------------------------------------------
 

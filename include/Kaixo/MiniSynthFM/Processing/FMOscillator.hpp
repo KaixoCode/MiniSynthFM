@@ -83,8 +83,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        float output[MaxOversample][Voices]{};
-        float fmOutput[MaxOversample][Voices]{};
+        alignas(sizeof(float) * Voices) float output[MaxOversample][Voices]{};
+        alignas(sizeof(float) * Voices) float fmOutput[MaxOversample][Voices]{};
 
         // ------------------------------------------------
 
@@ -93,7 +93,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
         template<class SimdType>
-        KAIXO_INLINE void hardSync(std::size_t i, SimdType shouldDo, FMOscillator& osc);
+        KAIXO_INLINE void hardSync(std::size_t i, FMOscillator& osc);
 
         // ------------------------------------------------
 
@@ -111,13 +111,13 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
 
     private:
-        float m_Phase[Voices]{};
-        float m_PhaseModulation[MaxOversample][Voices]{};
-        float m_Frequency[Voices]{};
-        float m_FrequencyOffset[Voices]{};
-        float m_NoteFrequency[Voices]{};
-        float m_DidCycle[Voices]{};
-        float m_Note[Voices]{};
+        alignas(sizeof(float) * Voices) float m_Phase[Voices]{};
+        alignas(sizeof(float) * Voices) float m_PhaseModulation[MaxOversample][Voices]{};
+        alignas(sizeof(float) * Voices) float m_Frequency[Voices]{};
+        alignas(sizeof(float) * Voices) float m_FrequencyOffset[Voices]{};
+        alignas(sizeof(float) * Voices) float m_NoteFrequency[Voices]{};
+        alignas(sizeof(float) * Voices) float m_DidCycle[Voices]{};
+        alignas(sizeof(float) * Voices) float m_Note[Voices]{};
 
         // ------------------------------------------------
 
@@ -137,19 +137,19 @@ namespace Kaixo::Processing {
 
     template<class SimdType>
     KAIXO_INLINE void FMOscillator::fm(std::size_t i, SimdType phase, std::size_t os) {
-        auto _phaseModulation = Kaixo::at<SimdType>(m_PhaseModulation[os], i);
+        auto _phaseModulation = Kaixo::aligned_at<SimdType>(m_PhaseModulation[os], i);
         Kaixo::store<SimdType>(m_PhaseModulation[os] + i, phase + _phaseModulation);
     }
 
     // ------------------------------------------------
     
     template<class SimdType>
-    KAIXO_INLINE void FMOscillator::hardSync(std::size_t i, SimdType shouldDo, FMOscillator& osc) {
-        auto _phase = Kaixo::at<SimdType>(m_Phase, i);
-        auto _oscphase = Kaixo::at<SimdType>(osc.m_Phase, i);
-        auto _frequency = Kaixo::at<SimdType>(m_Frequency, i);
-        auto _oscfrequency = Kaixo::at<SimdType>(osc.m_Frequency, i);
-        auto _didcycle = Kaixo::conditional<SimdType>(shouldDo, Kaixo::at<SimdType>(osc.m_DidCycle, i));
+    KAIXO_INLINE void FMOscillator::hardSync(std::size_t i, FMOscillator& osc) {
+        auto _phase = Kaixo::aligned_at<SimdType>(m_Phase, i);
+        auto _oscphase = Kaixo::aligned_at<SimdType>(osc.m_Phase, i);
+        auto _frequency = Kaixo::aligned_at<SimdType>(m_Frequency, i);
+        auto _oscfrequency = Kaixo::aligned_at<SimdType>(osc.m_Frequency, i);
+        auto _didcycle = Kaixo::aligned_at<SimdType>(osc.m_DidCycle, i);
 
         _phase = Kaixo::iff<SimdType>(_didcycle,
             [&] { return Math::Fast::fmod1(_oscphase * (_frequency / _oscfrequency)); },
@@ -166,14 +166,14 @@ namespace Kaixo::Processing {
         const auto oversampleAmount = oversampleForQuality(params.quality);
 
         for (std::size_t i = 0; i < Voices; i += Count) {
-            auto _noteFrequency = Kaixo::at<SimdType>(m_NoteFrequency, i);
+            auto _noteFrequency = Kaixo::aligned_at<SimdType>(m_NoteFrequency, i);
             auto _frequency = _noteFrequency * params.frequencyMultiplier();
-            auto _phase = Kaixo::at<SimdType>(m_Phase, i);
+            auto _phase = Kaixo::aligned_at<SimdType>(m_Phase, i);
 
             auto delta = _frequency / static_cast<float>(sampleRate());
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
-                SimdType _phaseMod = Kaixo::at<SimdType>(m_PhaseModulation[j], i);
+                SimdType _phaseMod = Kaixo::aligned_at<SimdType>(m_PhaseModulation[j], i);
 
                 SimdType phase = Math::Fast::fmod1((static_cast<float>(j) * delta / static_cast<float>(oversampleAmount)) + (_phaseMod + (_phase + 10.f)));
                 auto [_output, _fmOutput] = this->at<SimdType>(phase, _frequency);

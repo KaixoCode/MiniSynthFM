@@ -101,10 +101,10 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
-        float previousLfoLevel[Voices]{};
-        float velocity[Voices]{};
-        float note[Voices]{};
-        float randomValue[Voices]{};
+        alignas(sizeof(float) * Voices) float previousLfoLevel[Voices]{};
+        alignas(sizeof(float) * Voices) float velocity[Voices]{};
+        alignas(sizeof(float) * Voices) float note[Voices]{};
+        alignas(sizeof(float) * Voices) float randomValue[Voices]{};
 
         // ------------------------------------------------
 
@@ -149,27 +149,27 @@ namespace Kaixo::Processing {
         const auto oversampleAmount = oversampleForQuality(params.quality);
 
         for (std::size_t i = 0; i < Voices; i += Count) {
-            auto _velocity = Kaixo::at<SimdType>(velocity, i);
-            auto _random = Kaixo::at<SimdType>(randomValue, i);
-            auto _note = Kaixo::at<SimdType>(note, i);
+            auto _velocity = Kaixo::aligned_at<SimdType>(velocity, i);
+            auto _random = Kaixo::aligned_at<SimdType>(randomValue, i);
+            auto _note = Kaixo::aligned_at<SimdType>(note, i);
 
             auto velocitylevel = _velocity * params.velocityAmount;
             auto modwheellevel = params.modWheel * params.modWheelAmount;
             auto randomlevel = _random * params.randomAmount;
 
-            auto env1level = Kaixo::at<SimdType>(envelope[0].output, i) * params.envelopeLevel[0];
-            auto env2level = Kaixo::at<SimdType>(envelope[1].output, i) * params.envelopeLevel[1];
-            auto env3level = Kaixo::at<SimdType>(envelope[2].output, i) * params.envelopeLevel[2];
+            auto env1level = Kaixo::aligned_at<SimdType>(envelope[0].output, i) * params.envelopeLevel[0];
+            auto env2level = Kaixo::aligned_at<SimdType>(envelope[1].output, i) * params.envelopeLevel[1];
+            auto env3level = Kaixo::aligned_at<SimdType>(envelope[2].output, i) * params.envelopeLevel[2];
 
-            auto op1level = Kaixo::at<SimdType>(oscillator[0].output[0], i) * params.volume[0];
-            auto op2level = Kaixo::at<SimdType>(oscillator[1].output[0], i) * params.volume[1];
-            auto op3level = Kaixo::at<SimdType>(oscillator[2].output[0], i) * params.volume[2];
+            auto op1level = Kaixo::aligned_at<SimdType>(oscillator[0].output[0], i) * params.volume[0];
+            auto op2level = Kaixo::aligned_at<SimdType>(oscillator[1].output[0], i) * params.volume[1];
+            auto op3level = Kaixo::aligned_at<SimdType>(oscillator[2].output[0], i) * params.volume[2];
 
-            auto op1fm = Kaixo::at<SimdType>(oscillator[0].fmOutput[0], i) * params.volume[0];
-            auto op2fm = Kaixo::at<SimdType>(oscillator[1].fmOutput[0], i) * params.volume[1];
-            auto op3fm = Kaixo::at<SimdType>(oscillator[2].fmOutput[0], i) * params.volume[2];
+            auto op1fm = Kaixo::aligned_at<SimdType>(oscillator[0].fmOutput[0], i) * params.volume[0];
+            auto op2fm = Kaixo::aligned_at<SimdType>(oscillator[1].fmOutput[0], i) * params.volume[1];
+            auto op3fm = Kaixo::aligned_at<SimdType>(oscillator[2].fmOutput[0], i) * params.volume[2];
 
-            auto lfolevel = Kaixo::at<SimdType>(previousLfoLevel, i);
+            auto lfolevel = Kaixo::aligned_at<SimdType>(previousLfoLevel, i);
 
             auto getAllM = [&](ModDestination dest) {
                 SimdType amount = 1.f;
@@ -187,22 +187,22 @@ namespace Kaixo::Processing {
             };
 
             // Assign new value
-            lfolevel = Kaixo::at<SimdType>(lfo[0].output, i) * params.lfoLevel[0] * getAllM(ModDestination::LfoDepth);
+            lfolevel = Kaixo::aligned_at<SimdType>(lfo[0].output, i) * params.lfoLevel[0] * getAllM(ModDestination::LfoDepth);
             Kaixo::store<SimdType>(previousLfoLevel + i, lfolevel); // Store for recursive
 
-            auto getMW    = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::ModWheel] * modwheellevel; };
-            auto getRand  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Random] * randomlevel; };
-            auto getVel   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Velocity] * velocitylevel; };
-            auto getEnv1  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope1] * env1level; };
-            auto getEnv2  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope2] * env2level; };
-            auto getEnv3  = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Envelope3] * env3level; };
-            auto getLfo   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::LFO] * lfolevel; };
-            auto getOp1   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op1] * op1level; };
-            auto getOp2   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op2] * op2level; };
-            auto getOp3   = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3level; };
-            auto getOp1FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op1] * op1fm; };
-            auto getOp2FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op2] * op2fm; };
-            auto getOp3FM = [&](ModDestination dest) { return params.routing[(int)dest][(int)ModSource::Op3] * op3fm; };
+            auto getMW    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::ModWheel]) * modwheellevel; };
+            auto getRand  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Random]) * randomlevel; };
+            auto getVel   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Velocity]) * velocitylevel; };
+            auto getEnv1  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope1]) * env1level; };
+            auto getEnv2  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope2]) * env2level; };
+            auto getEnv3  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope3]) * env3level; };
+            auto getLfo   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::LFO]) * lfolevel; };
+            auto getOp1   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1level; };
+            auto getOp2   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2level; };
+            auto getOp3   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3level; };
+            auto getOp1FM = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1fm; };
+            auto getOp2FM = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2fm; };
+            auto getOp3FM = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3fm; };
 
             auto getAllA = [&](ModDestination dest) {
                 return getVel(dest)  + getMW(dest)   + getRand(dest) +
@@ -232,24 +232,24 @@ namespace Kaixo::Processing {
             oscillator[2].note<SimdType>(i, _note + (params.pitchBend * 24 - 12) + fm3 * 24.f * getAllANoOp(ModDestination::Op3FM));
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
-                op1fm = Kaixo::at<SimdType>(oscillator[0].fmOutput[j], i) * params.volume[0];
-                op2fm = Kaixo::at<SimdType>(oscillator[1].fmOutput[j], i) * params.volume[1];
-                op3fm = Kaixo::at<SimdType>(oscillator[2].fmOutput[j], i) * params.volume[2];
+                op1fm = Kaixo::aligned_at<SimdType>(oscillator[0].fmOutput[j], i) * params.volume[0];
+                op2fm = Kaixo::aligned_at<SimdType>(oscillator[1].fmOutput[j], i) * params.volume[1];
+                op3fm = Kaixo::aligned_at<SimdType>(oscillator[2].fmOutput[j], i) * params.volume[2];
 
                 oscillator[0].fm<SimdType>(i, 4.f * fm1 * getAllOpFM(ModDestination::Op1FM), j);
                 oscillator[1].fm<SimdType>(i, 4.f * fm2 * getAllOpFM(ModDestination::Op2FM), j);
                 oscillator[2].fm<SimdType>(i, 4.f * fm3 * getAllOpFM(ModDestination::Op3FM), j);
             }
 
-            oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1], oscillator[0]);
-            oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op2], oscillator[1]);
-            oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op3], oscillator[2]);
-            oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op1], oscillator[0]);
-            oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2], oscillator[1]);
-            oscillator[1].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op3], oscillator[2]);
-            oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op1], oscillator[0]);
-            oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op2], oscillator[1]);
-            oscillator[2].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3], oscillator[2]);
+            if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1]) oscillator[0].hardSync<SimdType>(i, oscillator[0]);
+            if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op2]) oscillator[0].hardSync<SimdType>(i, oscillator[1]);
+            if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op3]) oscillator[0].hardSync<SimdType>(i, oscillator[2]);
+            if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op1]) oscillator[1].hardSync<SimdType>(i, oscillator[0]);
+            if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2]) oscillator[1].hardSync<SimdType>(i, oscillator[1]);
+            if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op3]) oscillator[1].hardSync<SimdType>(i, oscillator[2]);
+            if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op1]) oscillator[2].hardSync<SimdType>(i, oscillator[0]);
+            if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op2]) oscillator[2].hardSync<SimdType>(i, oscillator[1]);
+            if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3]) oscillator[2].hardSync<SimdType>(i, oscillator[2]);
 
             Kaixo::store<SimdType>(filter.frequencyModulation + i, getAllA(ModDestination::FilterFreq));
         }
@@ -271,9 +271,9 @@ namespace Kaixo::Processing {
         for (std::size_t i = 0; i < Voices; i += Count) {
             for (std::size_t j = 0; j < oversampleForQuality(params.quality); ++j) {
                 SimdType filterInput =
-                    static_cast<float>(params.outputOscillator[0]) * Kaixo::at<SimdType>(oscillator[0].output[j], i) * params.volume[0] +
-                    static_cast<float>(params.outputOscillator[1]) * Kaixo::at<SimdType>(oscillator[1].output[j], i) * params.volume[1] +
-                    static_cast<float>(params.outputOscillator[2]) * Kaixo::at<SimdType>(oscillator[2].output[j], i) * params.volume[2];
+                    static_cast<float>(params.outputOscillator[0]) * Kaixo::aligned_at<SimdType>(oscillator[0].output[j], i) * params.volume[0] +
+                    static_cast<float>(params.outputOscillator[1]) * Kaixo::aligned_at<SimdType>(oscillator[1].output[j], i) * params.volume[1] +
+                    static_cast<float>(params.outputOscillator[2]) * Kaixo::aligned_at<SimdType>(oscillator[2].output[j], i) * params.volume[2];
                 Kaixo::store<SimdType>(filter.input[j] + i, filterInput);
             }
         }
@@ -283,8 +283,8 @@ namespace Kaixo::Processing {
         output = 0;
         for (std::size_t i = 0; i < Voices; i += Count) {
             output += Kaixo::sum<SimdType>(
-                Kaixo::at<SimdType>(filter.output, i) *
-                Kaixo::at<SimdType>(envelope[2].output, i) *
+                Kaixo::aligned_at<SimdType>(filter.output, i) *
+                Kaixo::aligned_at<SimdType>(envelope[2].output, i) *
                 params.envelopeLevel[2]);
         }
     }

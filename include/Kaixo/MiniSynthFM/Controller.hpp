@@ -23,7 +23,7 @@ namespace Kaixo {
 
 		enum path { P0, P1, P2, P3 };
 
-		static inline path choosePath() {
+		KAIXO_INLINE static path choosePath() {
 			simd_capability c = simdCapabilities();
 			if (c & Path3) return P3;
 			if (c & Path2) return P2;
@@ -31,7 +31,7 @@ namespace Kaixo {
 			return P0;
 		}
 
-		static inline auto execute(auto lambda) {
+		KAIXO_INLINE static auto execute(auto lambda) {
 			switch (path) {
 			case P0: return lambda.operator()<float>();
 			case P1: return lambda.operator()<simd<float, 128, Path1>>();
