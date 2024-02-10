@@ -58,7 +58,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        presetName = &add<TextView>({ 6, 83, 256, 20 }, {
+        presetName = &add<TextView>({ 6, 83, 234, 20 }, {
             .graphics = T.display.main.presetName,
             .padding = { 4, 3 },
             .multiline = false,
@@ -66,14 +66,14 @@ namespace Kaixo::Gui {
             .lineHeight = 14,
         });
 
-        add<Button>({ 264, 83, 20, 20 }, {
+        add<Button>({ 242, 83, 20, 20 }, {
             .callback = [&](bool) {
                 context.controller<MiniSynthFMController>().presetDatabase.loadPreviousPreset();
             },
             .graphics = T.display.main.previousPreset,
         });
 
-        add<Button>({ 286, 83, 20, 20 }, {
+        add<Button>({ 264, 83, 20, 20 }, {
             .callback = [&](bool) {
                 context.controller<MiniSynthFMController>().presetDatabase.loadNextPreset();
             },
@@ -90,7 +90,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<Button>({ 286, 6, 20, 20 }, {
+        add<Button>({ 286, 83, 20, 20 }, {
             .callback = [&](bool val) {
                 advancedInfo.select(val);
             },
@@ -104,18 +104,27 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        auto& advanced = add<View>({ 6, 6, 278, 74 });
+        auto& advanced = add<View>({ 6, 6, 300, 74 });
 
         // ------------------------------------------------
 
         advanced.add<ImageView>({ .image = T.display.main.advancedInfo.background });
 
-        cpuUsage = &advanced.add<Button>({ 0, 0, 278, 20 }, {
+        cpuUsage = &advanced.add<Button>({ 0, 0, 300, 20 }, {
             .graphics = T.display.main.advancedInfo.cpuUsage,
         });
         
-        simdOptimizations = &advanced.add<Button>({ 0, 22, 278, 20 }, {
+        std::string optimizations;
+        switch (simd_path::path) {
+        case simd_path::P0: optimizations = "No SIMD register available"; break;
+        case simd_path::P1: optimizations = "SSE/SSE2"; break;
+        case simd_path::P2: optimizations = "SSE 2/3/4.1/4.2"; break;
+        case simd_path::P3: optimizations = "SSE 2/3/4.1/4.2 AVX/AVX2"; break;
+        }
+
+        simdOptimizations = &advanced.add<Button>({ 0, 22, 300, 20 }, {
             .graphics = T.display.main.advancedInfo.simdOptimizations,
+            .text = optimizations,
         });
 
         advanced.add<ImageView>({ .image = T.display.main.advancedInfo.foreground, .enableMouse = false });

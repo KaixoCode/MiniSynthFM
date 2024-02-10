@@ -545,7 +545,7 @@
           extends: $basic-button-select
           layers: {
             img: {
-              image: next-preset.png
+              image: info-button.png
             }
           }
         }
@@ -561,7 +561,7 @@
               text: $text
               text-overflow: dots
               text-align: center-left
-              text-position: [90, 1]
+              text-position: [95, 1]
             }
           }
         }
@@ -577,13 +577,12 @@
               text: $text
               text-overflow: dots
               text-align: center-left
-              text-position: [90, 1]
+              text-position: [95, 1]
             }
           }
         }
       }
       
-
       next-preset: {
         extends: $basic-button
         layers: {
