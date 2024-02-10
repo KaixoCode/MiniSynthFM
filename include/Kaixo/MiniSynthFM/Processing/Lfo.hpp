@@ -133,9 +133,9 @@ namespace Kaixo::Processing {
     template<class SimdType>
     KAIXO_INLINE SimdType Lfo::at(SimdType x, std::size_t i) {
         switch (params.m_Waveform) {
-        case LfoWaveform::Sine: return Math::Fast::nsin(0.5 - x);
-        case LfoWaveform::Triangle: return 1 - Math::Fast::abs(2 - 4 * x);
-        case LfoWaveform::Saw: return 1 - 2 * x;
+        case LfoWaveform::Sine: return Math::Fast::nsin(0.5f - x);
+        case LfoWaveform::Triangle: return 1.f - Math::Fast::abs(2.f - 4.f * x);
+        case LfoWaveform::Saw: return 1.f - 2.f * x;
         case LfoWaveform::Square: return Kaixo::iff<SimdType>(x > 0.5f, [] { return 1.f; }, [] { return -1.f; });
         case LfoWaveform::Quantized: return Kaixo::at<SimdType>(m_Quantized, i);
         case LfoWaveform::Noise: return Kaixo::at<SimdType>(m_Noise, i);

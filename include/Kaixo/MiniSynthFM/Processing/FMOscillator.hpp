@@ -132,7 +132,7 @@ namespace Kaixo::Processing {
     template<class SimdType>
     KAIXO_INLINE void FMOscillator::note(std::size_t i, SimdType note) {
         Kaixo::store<SimdType>(m_Note + i, note);
-        Kaixo::store<SimdType>(m_NoteFrequency + i, 440.f * Math::Fast::exp2(((note - 69) / 12.f)));
+        Kaixo::store<SimdType>(m_NoteFrequency + i, 440.f * Math::Fast::exp2(((note - 69.f) / 12.f)));
     }
 
     template<class SimdType>
@@ -170,12 +170,12 @@ namespace Kaixo::Processing {
             auto _frequency = _noteFrequency * params.frequencyMultiplier();
             auto _phase = Kaixo::at<SimdType>(m_Phase, i);
 
-            auto delta = _frequency / sampleRate();
+            auto delta = _frequency / static_cast<float>(sampleRate());
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
                 SimdType _phaseMod = Kaixo::at<SimdType>(m_PhaseModulation[j], i);
 
-                SimdType phase = Math::Fast::fmod1((j * delta / oversampleAmount) + (_phaseMod + (_phase + 10)));
+                SimdType phase = Math::Fast::fmod1((static_cast<float>(j) * delta / static_cast<float>(oversampleAmount)) + (_phaseMod + (_phase + 10.f)));
                 auto [_output, _fmOutput] = this->at<SimdType>(phase, _frequency);
 
                 Kaixo::store<SimdType>(output[j] + i, _output);
@@ -196,49 +196,49 @@ namespace Kaixo::Processing {
     template<class SimdType>
     KAIXO_INLINE std::pair<SimdType, SimdType> FMOscillator::at(SimdType p, SimdType freq) {
         constexpr auto g = [](SimdType x) {
-            return (x - 1) * x * (2 * x - 1);
+            return (x - 1.f) * x * (2.f * x - 1.f);
         };
         
         constexpr auto saw = [](SimdType x, SimdType nf) {
-            SimdType v1 = Math::Fast::fmod1(x - nf + 1);
+            SimdType v1 = Math::Fast::fmod1(x - nf + 1.f);
             SimdType v2 = Math::Fast::fmod1(x + nf);
             SimdType v3 = x;
 
-            return (g(v1) + g(v2) - 2 * g(v3)) / (6.f * nf * nf);
+            return (g(v1) + g(v2) - 2.f * g(v3)) / (6.f * nf * nf);
         };
         
         constexpr auto square = [](SimdType x, SimdType nf) {
-            SimdType v1 = Math::Fast::fmod1(x - nf + 1);
+            SimdType v1 = Math::Fast::fmod1(x - nf + 1.f);
             SimdType v2 = Math::Fast::fmod1(x + nf);
             SimdType v3 = x;
-            SimdType v4 = Math::Fast::fmod1(2.5 - x - nf);
-            SimdType v5 = Math::Fast::fmod1(1.5 - x + nf);
-            SimdType v6 = Math::Fast::fmod1(1.5 - x);
+            SimdType v4 = Math::Fast::fmod1(2.5f - x - nf);
+            SimdType v5 = Math::Fast::fmod1(1.5f - x + nf);
+            SimdType v6 = Math::Fast::fmod1(1.5f - x);
 
-            return (g(v1) + g(v2) - 2 * g(v3) + g(v4) + g(v5) - 2 * g(v6)) / (6.f * nf * nf);
+            return (g(v1) + g(v2) - 2.f * g(v3) + g(v4) + g(v5) - 2.f * g(v6)) / (6.f * nf * nf);
         };
 
         // requires 0 <= p <= 1
         auto xd = Math::Fast::max(freq / 35000.f, SimdType(0.002f));
         switch (params.m_Waveform) {
         case Waveform::Sine: {
-            auto val = Math::Fast::nsin(0.5 - p);
+            auto val = Math::Fast::nsin(0.5f - p);
             return { val, val };
         }
         case Waveform::Triangle: {
-            auto denorm = 2 * p - 1;
+            auto denorm = 2.f * p - 1.f;
             return {
-                1 - Math::Fast::abs(2 - 4 * p),
-                2 * denorm * (denorm * Math::Fast::sign(0.5 - p) + 1)
+                1.f - Math::Fast::abs(2.f - 4.f * p),
+                2.f * denorm * (denorm * Math::Fast::sign(0.5f - p) + 1.f)
             };
         }
         case Waveform::Saw: return {
             saw(p, xd),
-            4 * (p - p * p)
+            4.f * (p - p * p)
         };
         case Waveform::Square: return {
             square(p, xd),
-            1 - Math::Fast::abs(2 - 4 * p)
+            1.f - Math::Fast::abs(2.f - 4.f * p)
         };
         }
     }

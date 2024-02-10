@@ -225,20 +225,20 @@ namespace Kaixo::Processing {
             auto fm2 = params.fm[1] + getAllA(ModDestination::Op2Amount);
             auto fm3 = params.fm[2] + getAllA(ModDestination::Op3Amount);
 
-            Kaixo::store<SimdType>(filter.note + i, _note + params.pitchBend * 24 - 12);
+            Kaixo::store<SimdType>(filter.note + i, _note + (params.pitchBend * 24 - 12));
 
-            oscillator[0].note<SimdType>(i, _note + params.pitchBend * 24 - 12 + fm1 * 24 * getAllANoOp(ModDestination::Op1FM));
-            oscillator[1].note<SimdType>(i, _note + params.pitchBend * 24 - 12 + fm2 * 24 * getAllANoOp(ModDestination::Op2FM));
-            oscillator[2].note<SimdType>(i, _note + params.pitchBend * 24 - 12 + fm3 * 24 * getAllANoOp(ModDestination::Op3FM));
+            oscillator[0].note<SimdType>(i, _note + (params.pitchBend * 24 - 12) + fm1 * 24.f * getAllANoOp(ModDestination::Op1FM));
+            oscillator[1].note<SimdType>(i, _note + (params.pitchBend * 24 - 12) + fm2 * 24.f * getAllANoOp(ModDestination::Op2FM));
+            oscillator[2].note<SimdType>(i, _note + (params.pitchBend * 24 - 12) + fm3 * 24.f * getAllANoOp(ModDestination::Op3FM));
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
                 op1fm = Kaixo::at<SimdType>(oscillator[0].fmOutput[j], i) * params.volume[0];
                 op2fm = Kaixo::at<SimdType>(oscillator[1].fmOutput[j], i) * params.volume[1];
                 op3fm = Kaixo::at<SimdType>(oscillator[2].fmOutput[j], i) * params.volume[2];
 
-                oscillator[0].fm<SimdType>(i, 4 * fm1 * (getAllOpFM(ModDestination::Op1FM)), j);
-                oscillator[1].fm<SimdType>(i, 4 * fm2 * (getAllOpFM(ModDestination::Op2FM)), j);
-                oscillator[2].fm<SimdType>(i, 4 * fm3 * (getAllOpFM(ModDestination::Op3FM)), j);
+                oscillator[0].fm<SimdType>(i, 4.f * fm1 * getAllOpFM(ModDestination::Op1FM), j);
+                oscillator[1].fm<SimdType>(i, 4.f * fm2 * getAllOpFM(ModDestination::Op2FM), j);
+                oscillator[2].fm<SimdType>(i, 4.f * fm3 * getAllOpFM(ModDestination::Op3FM), j);
             }
 
             oscillator[0].hardSync<SimdType>(i, params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1], oscillator[0]);
@@ -271,9 +271,9 @@ namespace Kaixo::Processing {
         for (std::size_t i = 0; i < Voices; i += Count) {
             for (std::size_t j = 0; j < oversampleForQuality(params.quality); ++j) {
                 SimdType filterInput =
-                    params.outputOscillator[0] * Kaixo::at<SimdType>(oscillator[0].output[j], i) * params.volume[0] +
-                    params.outputOscillator[1] * Kaixo::at<SimdType>(oscillator[1].output[j], i) * params.volume[1] +
-                    params.outputOscillator[2] * Kaixo::at<SimdType>(oscillator[2].output[j], i) * params.volume[2];
+                    static_cast<float>(params.outputOscillator[0]) * Kaixo::at<SimdType>(oscillator[0].output[j], i) * params.volume[0] +
+                    static_cast<float>(params.outputOscillator[1]) * Kaixo::at<SimdType>(oscillator[1].output[j], i) * params.volume[1] +
+                    static_cast<float>(params.outputOscillator[2]) * Kaixo::at<SimdType>(oscillator[2].output[j], i) * params.volume[2];
                 Kaixo::store<SimdType>(filter.input[j] + i, filterInput);
             }
         }

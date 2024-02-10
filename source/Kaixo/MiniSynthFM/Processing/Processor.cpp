@@ -48,12 +48,9 @@ namespace Kaixo::Processing {
                 osc.updateFrequency();
             
             if (voice.ModuleContainer::active()) {
-                switch (simd_path::path) {
-                case simd_path::s512: 
-                case simd_path::s256: voice.process<simd<float, 256>>(); break;
-                case simd_path::s128: voice.process<simd<float, 128>>(); break;
-                case simd_path::s0:   voice.process<float>(); break;
-                }
+                simd_path::execute([this]<class SimdType>() {
+                    voice.process<SimdType>();
+                });
                 delay.input = voice.output;
             } else {
                 delay.input = 0;

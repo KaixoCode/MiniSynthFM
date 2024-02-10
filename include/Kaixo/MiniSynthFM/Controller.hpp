@@ -14,6 +14,37 @@
 namespace Kaixo {
 
 	// ------------------------------------------------
+
+	struct simd_path {
+		constexpr static simd_capability Path0{}; // No SIMD
+		constexpr static simd_capability Path1 = Path0 | SSE | SSE2;
+		constexpr static simd_capability Path2 = Path1 | SSE3 | SSSE3 | SSE4_1 | SSE4_2;
+		constexpr static simd_capability Path3 = Path2 | AVX | AVX2;
+
+		enum path { P0, P1, P2, P3 };
+
+		static inline path choosePath() {
+			simd_capability c = simdCapabilities();
+			if (c & Path3) return P3;
+			if (c & Path2) return P2;
+			if (c & Path1) return P1;
+			return P0;
+		}
+
+		static inline auto execute(auto lambda) {
+			switch (path) {
+			case P0: return lambda.operator()<float>();
+			case P1: return lambda.operator()<simd<float, 128, Path1>>();
+			case P2: return lambda.operator()<simd<float, 128, Path2>>();
+			case P3: return lambda.operator()<simd<float, 256, Path3>>();
+			default: return lambda.operator()<float>();
+			}
+		}
+
+		static inline path path = choosePath();
+	};
+
+	// ------------------------------------------------
 	
 	constexpr std::string_view ThemePath = "themepath";
 	constexpr std::string_view PresetPath = "presetpath";

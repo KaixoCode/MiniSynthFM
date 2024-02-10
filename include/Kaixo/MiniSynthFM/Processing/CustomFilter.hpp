@@ -201,19 +201,19 @@ namespace Kaixo::Processing {
     
     template<class SimdType>
     KAIXO_INLINE SimdType ParallelFilter::processLowpass(SimdType input, SimdType frequency, SimdType q, std::size_t i) {
-        auto freq = Math::Fast::clamp(frequency / sampleRate(), SimdType(0.f), SimdType(0.5f));
-        auto omega = 2 * std::numbers::pi * freq;
+        auto freq = Math::Fast::clamp(frequency / static_cast<float>(sampleRate()), SimdType(0.f), SimdType(0.5f));
+        auto omega = 2.f * std::numbers::pi_v<float> * freq;
         auto cosOmega = 0.f - Math::Fast::nsin(freq - 0.25f);
         auto sinOmega = Math::Fast::nsin(freq);
         auto qValue = Math::Fast::powN<4>(q);
-        auto alpha = sinOmega / (qValue * 12 + 0.8);
+        auto alpha = sinOmega / (qValue * 12.f + 0.8f);
 
-        auto a0 = +1.0 + alpha;
-        auto a1 = -2.0 * cosOmega;
-        auto a2 = +1.0 - alpha;
-        auto b0 = (1.0 - cosOmega) / 2.0;
-        auto b1 = (1.0 - cosOmega);
-        auto b2 = (1.0 - cosOmega) / 2.0;
+        auto a0 = +1.0f + alpha;
+        auto a1 = -2.0f * cosOmega;
+        auto a2 = +1.0f - alpha;
+        auto b0 = (1.0f - cosOmega) / 2.0f;
+        auto b1 = (1.0f - cosOmega);
+        auto b2 = (1.0f - cosOmega) / 2.0f;
 
         auto b0a0 = b0 / a0;
         auto b1a0 = b1 / a0;
@@ -239,21 +239,21 @@ namespace Kaixo::Processing {
     template<class SimdType>
     KAIXO_INLINE SimdType ParallelFilter::processPeaking(SimdType input, SimdType frequency, SimdType q, SimdType gain, std::size_t i) {
         constexpr float log10_2 = std::numbers::ln2 / std::numbers::ln10;
-        auto freq = Math::Fast::clamp(frequency / sampleRate(), SimdType(0.f), SimdType(0.5f));
-        auto omega = 2 * std::numbers::pi * freq;
+        auto freq = Math::Fast::clamp(frequency / static_cast<float>(sampleRate()), SimdType(0.f), SimdType(0.5f));
+        auto omega = 2.f * std::numbers::pi_v<float> * freq;
         auto cosOmega = 0.f - Math::Fast::nsin(freq - 0.25f);
         auto sinOmega = Math::Fast::nsin(freq);
-        auto qValue = 2 * q + 0.2;
+        auto qValue = 2.f * q + 0.2f;
 
         auto A = Math::pow(SimdType(10.f), gain / 40.0f);
-        auto alpha = sinOmega * Math::Fast::sinh((log10_2 / 2.0) * (qValue * 4 + 0.2) * (omega / sinOmega));
+        auto alpha = sinOmega * Math::Fast::sinh((log10_2 / 2.0f) * (qValue * 4.f + 0.2f) * (omega / sinOmega));
 
-        auto a0 = +1.0 + alpha / A;
-        auto a1 = -2.0 * cosOmega;
-        auto a2 = +1.0 - alpha / A;
-        auto b0 = +1.0 + alpha * A;
-        auto b1 = -2.0 * cosOmega;
-        auto b2 = +1.0 - alpha * A;
+        auto a0 = +1.0f + alpha / A;
+        auto a1 = -2.0f * cosOmega;
+        auto a2 = +1.0f - alpha / A;
+        auto b0 = +1.0f + alpha * A;
+        auto b1 = -2.0f * cosOmega;
+        auto b2 = +1.0f - alpha * A;
 
         auto b0a0 = b0 / a0;
         auto b1a0 = b1 / a0;
@@ -307,15 +307,15 @@ namespace Kaixo::Processing {
             auto freqValue = Math::Fast::magnitude_to_log(params.frequency + freqMod, SimdType(16.f), SimdType(16000.f));
 
             if (params.keytrack) {
-                freqValue = Math::Fast::clamp(freqValue * Math::Fast::exp2((noteValue - 60) / 12.), SimdType(16.f), SimdType(16000.f));
+                freqValue = Math::Fast::clamp(freqValue * Math::Fast::exp2((noteValue - 60.f) / 12.f), SimdType(16.f), SimdType(16000.f));
             } else {
                 freqValue = Math::Fast::clamp(freqValue, SimdType(16.f), SimdType(16000.f));
             }
 
             auto nfreq = (freqValue / 16000.f);
-            auto randRange = 24 * (1 - (1 - params.drive) * (1 - params.drive)) + 6 * (1 - nfreq * nfreq);
+            auto randRange = 24.f * (1 - (1 - params.drive) * (1 - params.drive)) + 6.f * (1.f - nfreq * nfreq);
             auto frequency = Math::Fast::clamp(freqValue + (m_RandomFrequency * 2 - 1) * randRange, SimdType(16.f), SimdType(16000.f));
-            auto resonance = params.resonance * (1 - nfreq * nfreq * nfreq * nfreq);
+            auto resonance = params.resonance * (1.f - nfreq * nfreq * nfreq * nfreq);
 
             // Less resonance when low frequency
             resonance = Kaixo::iff<SimdType>(nfreq < SimdType(0.01f),
@@ -337,9 +337,9 @@ namespace Kaixo::Processing {
             }
 
             auto filterOutput = m_Filter[0].processLowpass<SimdType>(res, frequency, resonance, i);
-            filterOutput = m_Filter[1].processPeaking<SimdType>(filterOutput, frequency * 0.9, resonance * 0.2 + 0.2, params.drive * 12 - resonance * 15, i);
-            filterOutput = m_Filter[2].processPeaking<SimdType>(filterOutput, frequency * 1.1, 0.2 - resonance * 0.2, resonance * 15 - params.drive * 12, i);
-            filterOutput = params.drive * Math::Fast::tanh_like(1.115 * filterOutput) + filterOutput * (1 - 0.9 * params.drive);
+            filterOutput = m_Filter[1].processPeaking<SimdType>(filterOutput, frequency * 0.9f, resonance * 0.2f + 0.2f, params.drive * 12.f - resonance * 15.f, i);
+            filterOutput = m_Filter[2].processPeaking<SimdType>(filterOutput, frequency * 1.1f, 0.2f - resonance * 0.2f, resonance * 15.f - params.drive * 12.f, i);
+            filterOutput = params.drive * Math::Fast::tanh_like(1.115f * filterOutput) + filterOutput * (1.f - 0.9f * params.drive);
             
             Kaixo::store<SimdType>(output + i, filterOutput);
         }
