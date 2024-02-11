@@ -183,6 +183,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
     private:
+        std::chrono::time_point<std::chrono::steady_clock> m_LastChanging;
         std::vector<Jack*> m_Jacks;
         std::vector<Connection> m_Connections;
         Connection m_CurrentConnection{};
@@ -192,6 +193,7 @@ namespace Kaixo::Gui {
             Theme::Color color;
         } m_CableGraphics[5];
         bool m_Changing = false;
+        bool m_NotChangingButStillRedraw = false;
 
         // ------------------------------------------------
 

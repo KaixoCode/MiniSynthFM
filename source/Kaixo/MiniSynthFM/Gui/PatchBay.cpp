@@ -408,14 +408,32 @@ namespace Kaixo::Gui {
     bool PatchBay::changing() {
         if (!m_Changing) return false;
 
-        if (m_CurrentConnection.changing()) return true;
-
-        for (auto& connection : m_Connections) {
-            if (connection.changing()) return true;
+        if (m_CurrentConnection.changing()) {
+            m_NotChangingButStillRedraw = false;
+            return true;
         }
 
-        m_Changing = false;
-        return false;
+        for (auto& connection : m_Connections) {
+            if (connection.changing()) {
+                m_NotChangingButStillRedraw = false;
+                return true;
+            }
+        }
+
+        // Not actually changing, but still redrawing for another couple millis
+        if (!m_NotChangingButStillRedraw) {
+            m_LastChanging = std::chrono::steady_clock::now();
+            m_NotChangingButStillRedraw = true;
+        } else {
+            // Check if time since last change is greater than
+            auto now = std::chrono::steady_clock::now();
+            if (now - m_LastChanging > std::chrono::milliseconds(200)) {
+                m_Changing = false; // Finally set changing to false
+                m_NotChangingButStillRedraw = false;
+            }
+        }
+
+        return true;
     }
 
     // ------------------------------------------------
