@@ -19,7 +19,7 @@ namespace Kaixo {
 		using enum instruction_set;
 		constexpr static instruction_sets Path0{}; // No SIMD
 		constexpr static instruction_sets Path1 = Path0 | SSE | SSE2;
-		constexpr static instruction_sets Path2 = Path1 | SSE3 | SSE4_1;
+		constexpr static instruction_sets Path2 = Path1 | SSE3 | SSE4_1 | FMA;
 		constexpr static instruction_sets Path3 = Path2 | AVX | AVX2;
 
 		enum path { P0, P1, P2, P3 };
