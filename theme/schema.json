@@ -129,7 +129,9 @@
   },
   "piano": {
     "black-key": "drawable",
-    "white-key": "drawable"
+    "white-key": "drawable",
+    "mod-wheel": "drawable",
+    "pitch-wheel": "drawable"
   },
   "display": {
     "background": "drawable",

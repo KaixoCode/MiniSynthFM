@@ -369,7 +369,25 @@
         hovering: [40, 40, 40]
         pressed: [60, 60, 60]
       }
-    }    
+    }
+
+    mod-wheel: {
+      image: {
+        source: wheel.png
+        frames: 100
+        frames-per-row: 100
+        size: [35, 145]
+      }
+    }
+
+    pitch-wheel: {
+      image: {
+        source: wheel.png
+        frames: 100
+        frames-per-row: 100
+        size: [35, 145]
+      }
+    }
   }
 
   // ------------------------------------------------

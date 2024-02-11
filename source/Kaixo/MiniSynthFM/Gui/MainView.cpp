@@ -148,6 +148,27 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
+        add<Knob>({ 85, 491, 35, 145 }, {
+            .graphics = T.piano.modWheel,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.modWheelParameter
+        });
+        
+        add<Knob>({ 35, 491, 35, 145 }, {
+            .onchange = [&](ParamValue val) { 
+                context.beginEdit(Synth.pitchBendParameter); 
+                context.performEdit(Synth.pitchBendParameter, 0.5); 
+                context.endEdit(Synth.pitchBendParameter); 
+            },
+            .graphics = T.piano.pitchWheel,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.pitchBendParameter
+        });
+
+        // ------------------------------------------------
+        
         // Move patch bay to end of views, so it draws on top
         removeChildComponent(&patchBay);
         addChildComponent(&patchBay);
