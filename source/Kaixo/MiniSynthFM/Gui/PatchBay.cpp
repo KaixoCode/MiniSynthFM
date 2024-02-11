@@ -119,19 +119,10 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    void PatchBay::Connection::drawJacks(juce::Graphics& g, Point<> mouse, PatchBay& self) {
-        if (begin == npos && end == npos) return; // Nothing to draw
-
-        Point<float> a = self.m_Jacks[begin]->holePosition();
-        Point<float> b = mouse;
-
-        if (end != npos) {
-            b = self.m_Jacks[end]->holePosition();
-        }
+    void PatchBay::Connection::drawJacks(juce::Graphics& g, Point<float> a, Point<float> b, PatchBay& self) {
 
         if (a.x() > b.x()) std::swap(a, b);
         if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
-
 
         self.m_CableGraphics[m_Color].end.draw({
             .graphics = g,
@@ -144,7 +135,7 @@ namespace Kaixo::Gui {
         });
     }
 
-    void PatchBay::Connection::drawCable(juce::Graphics& g, Point<> mouse, PatchBay& self) {
+    void PatchBay::Connection::drawJacks(juce::Graphics& g, Point<> mouse, PatchBay& self) {
         if (begin == npos && end == npos) return; // Nothing to draw
 
         Point<float> a = self.m_Jacks[begin]->holePosition();
@@ -153,6 +144,11 @@ namespace Kaixo::Gui {
         if (end != npos) {
             b = self.m_Jacks[end]->holePosition();
         }
+
+        drawJacks(g, a, b, self);
+    }
+
+    void PatchBay::Connection::drawCable(juce::Graphics& g, Point<float> a, Point<float> b, PatchBay& self) {
 
         if (a.x() > b.x()) std::swap(a, b);
         if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
@@ -196,6 +192,19 @@ namespace Kaixo::Gui {
         path.applyTransform(juce::AffineTransform::translation(0, -3));
         g.setColour(self.m_CableGraphics[m_Color].color);
         g.strokePath(path, PathStrokeType{ 8.f, PathStrokeType::curved, PathStrokeType::rounded });
+    }
+
+    void PatchBay::Connection::drawCable(juce::Graphics& g, Point<> mouse, PatchBay& self) {
+        if (begin == npos && end == npos) return; // Nothing to draw
+
+        Point<float> a = self.m_Jacks[begin]->holePosition();
+        Point<float> b = mouse;
+
+        if (end != npos) {
+            b = self.m_Jacks[end]->holePosition();
+        }
+
+        drawCable(g, a, b, self);
     }
 
     // ------------------------------------------------
@@ -263,6 +272,24 @@ namespace Kaixo::Gui {
         for (auto& connection : m_Connections) {
             connection.drawCable(g, m_LastMousePosition, *this);
         }
+        
+        for (auto& [velocity, begin, end, connection] : m_FallingConnections) {
+            connection.drawJacks(g, begin, end, *this);
+        }
+        
+        for (auto& [velocity, begin, end, connection] : m_FallingConnections) {
+            connection.drawCable(g, begin, end, *this);
+            begin += velocity;
+            end += velocity;
+            velocity += { 0, 1 };
+        }
+
+        // Remove falling connections that are outside the window
+        for (auto it = m_FallingConnections.begin(); it != m_FallingConnections.end();) {
+            if (it->begin.y() > height() + 40 && it->end.y() > height() + 40) {
+                it = m_FallingConnections.erase(it);
+            } else ++it;
+        }
 
         m_CurrentConnection.drawJacks(g, m_LastMousePosition, *this);
         m_CurrentConnection.drawCable(g, m_LastMousePosition, *this);
@@ -314,7 +341,7 @@ namespace Kaixo::Gui {
                 // Check for existing connection
                 for (auto& connection : m_Connections) {
                     if (connection == m_CurrentConnection) {
-                        m_CurrentConnection.reset();
+                        dropCable();
                         return false; // Connection already exists, do not add it again
                     }
                 }
@@ -324,8 +351,19 @@ namespace Kaixo::Gui {
             }
         }
 
-        m_CurrentConnection.reset(); // No connection added, so reset
+        dropCable(); // No connection added, so drop the cable
         return false;
+    }
+
+    void PatchBay::dropCable() {
+        m_FallingConnections.push_back({
+            .velocity = { 0, 0 },
+            .begin = m_LastMousePosition,
+            .end = m_Jacks[m_CurrentConnection.begin]->holePosition(),
+            .connection = m_CurrentConnection
+        });
+
+        m_CurrentConnection.reset();
     }
 
     // ------------------------------------------------
@@ -407,6 +445,11 @@ namespace Kaixo::Gui {
 
     bool PatchBay::changing() {
         if (!m_Changing) return false;
+
+        if (!m_FallingConnections.empty()) {
+            m_NotChangingButStillRedraw = false;
+            return true;
+        }
 
         if (m_CurrentConnection.changing()) {
             m_NotChangingButStillRedraw = false;

@@ -123,7 +123,9 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void drawCable(juce::Graphics& g, Point<> mouse, PatchBay& self);
+            void drawCable(juce::Graphics& g, Point<float> begin, Point<float> end, PatchBay& self);
             void drawJacks(juce::Graphics& g, Point<> mouse, PatchBay& self);
+            void drawJacks(juce::Graphics& g, Point<float> begin, Point<float> end, PatchBay& self);
 
             // ------------------------------------------------
             
@@ -175,6 +177,7 @@ namespace Kaixo::Gui {
         void removeCable(JackId id);
         void moveCable(Point<> to);
         bool finishCable();
+        void dropCable();
 
         // ------------------------------------------------
         
@@ -183,17 +186,37 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
     private:
-        std::chrono::time_point<std::chrono::steady_clock> m_LastChanging;
         std::vector<Jack*> m_Jacks;
-        std::vector<Connection> m_Connections;
+        std::vector<Connection> m_Connections;        
         Connection m_CurrentConnection{};
+
+        // ------------------------------------------------
+
         Point<> m_LastMousePosition;
+
+        // ------------------------------------------------
+
         struct Cable {
             Theme::Drawable end;
             Theme::Color color;
         } m_CableGraphics[5];
+
+        // ------------------------------------------------
+
+        std::chrono::time_point<std::chrono::steady_clock> m_LastChanging;
         bool m_Changing = false;
         bool m_NotChangingButStillRedraw = false;
+
+        // ------------------------------------------------
+
+        struct FallingConnection {
+            Point<float> velocity;
+            Point<float> begin;
+            Point<float> end;
+            Connection connection;
+        };
+
+        std::vector<FallingConnection> m_FallingConnections;
 
         // ------------------------------------------------
 
