@@ -60,6 +60,10 @@ namespace Kaixo {
                 Bank& bank;
 
                 // ------------------------------------------------
+                
+                std::size_t id;
+
+                // ------------------------------------------------
 
                 enum class Type { Init, Factory, Normal } type = Type::Init;
 
@@ -97,9 +101,11 @@ namespace Kaixo {
             std::string name{};
             std::filesystem::path folder{};
 
+            std::size_t id;
+
             // ------------------------------------------------
 
-            Bank(PresetDatabase& d, Type t, std::string n = {}, std::filesystem::path f = {});
+            Bank(PresetDatabase& d, Type t, std::size_t id, std::string n = {}, std::filesystem::path f = {});
 
             // ------------------------------------------------
 
@@ -107,7 +113,7 @@ namespace Kaixo {
 
             // ------------------------------------------------
             
-            const std::vector<Preset>& presets();
+            const std::vector<Preset>& presets() const;
 
             // ------------------------------------------------
 
@@ -129,8 +135,15 @@ namespace Kaixo {
 
         // ------------------------------------------------
         
+        const Bank::Preset* preset(std::size_t id);
+        const Bank* bank(std::size_t id);
+
+        // ------------------------------------------------
+        
     private:
         std::thread m_LoadBanksThread{};
+        std::size_t m_PresetIdCounter{};
+        std::size_t m_BankIdCounter{};
 
         // ------------------------------------------------
 

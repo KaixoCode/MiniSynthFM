@@ -193,7 +193,10 @@
       "search": "text-area",
       "bank": "drawable",
       "preset": "drawable",
-      "scrollbar": "drawable"
+      "scrollbar": "drawable",
+      "bank-tab": "drawable",
+      "type-tab": "drawable",
+      "author-tab": "drawable"
     }
   },
   "background": "drawable",

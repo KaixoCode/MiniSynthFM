@@ -625,6 +625,36 @@
         background-color: $display-color
       }
 
+      bank-tab: {
+        extends: $basic-button-select
+        layers: {
+          icon: {
+            image: filters.png
+            image-offset: [0, 0]
+          }
+        }
+      }
+
+      type-tab: {
+        extends: $basic-button-select
+        layers: {
+          icon: {
+            image: filters.png
+            image-offset: [0, 20]
+          }
+        }
+      }
+
+      author-tab: {
+        extends: $basic-button-select
+        layers: {
+          icon: {
+            image: filters.png
+            image-offset: [0, 40]
+          }
+        }
+      }
+
       preset: {
         extends: $basic-button
         text: $text

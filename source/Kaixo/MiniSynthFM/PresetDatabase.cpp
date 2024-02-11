@@ -72,7 +72,7 @@ namespace Kaixo {
 
         banks.clear();
 
-        banks.emplace_back(*this, Bank::Type::Factory, "Factory");
+        banks.emplace_back(*this, Bank::Type::Factory, m_BankIdCounter++, "Factory");
         banks[0].reloadInformation();
 
         if (auto optPath = Storage::get<std::string>(PresetPath)) {
@@ -80,11 +80,11 @@ namespace Kaixo {
 
             if (!std::filesystem::exists(path)) return;
 
-            banks.emplace_back(*this, Bank::Type::Bank, "User", path);
+            banks.emplace_back(*this, Bank::Type::Bank, m_BankIdCounter++, "User", path);
 
             for (auto& entry : std::filesystem::directory_iterator(path)) {
                 if (entry.is_directory() && entry.exists()) {
-                    banks.emplace_back(*this, Bank::Type::Bank, entry.path().stem().string(), entry);
+                    banks.emplace_back(*this, Bank::Type::Bank, m_BankIdCounter++, entry.path().stem().string(), entry);
                 }
             }
         }
@@ -134,8 +134,8 @@ namespace Kaixo {
 
     // ------------------------------------------------
 
-    PresetDatabase::Bank::Bank(PresetDatabase& d, PresetDatabase::Bank::Type t, std::string n, std::filesystem::path f) 
-        : database(d), type(t), name(n), folder(f)
+    PresetDatabase::Bank::Bank(PresetDatabase& d, PresetDatabase::Bank::Type t, std::size_t id, std::string n, std::filesystem::path f)
+        : database(d), type(t), name(n), folder(f), id(id)
     {}
 
     // ------------------------------------------------
@@ -147,6 +147,7 @@ namespace Kaixo {
             m_Presets.emplace_back(Preset{
                 .database = database,
                 .bank = *this,
+                .id = database.m_PresetIdCounter++,
                 .type = Preset::Type::Init,
                 .name = "Init"
             }).reloadInformation();
@@ -155,6 +156,7 @@ namespace Kaixo {
                 m_Presets.emplace_back(Preset{
                     .database = database,
                     .bank = *this,
+                    .id = database.m_PresetIdCounter++,
                     .type = Preset::Type::Factory,
                     .name = std::string{ name }
                 }).reloadInformation();
@@ -165,6 +167,7 @@ namespace Kaixo {
                     m_Presets.emplace_back(Preset{
                         .database = database,
                         .bank = *this,
+                        .id = database.m_PresetIdCounter++,
                         .type = Preset::Type::Normal,
                         .path = entry.path()
                     }).reloadInformation();
@@ -176,7 +179,7 @@ namespace Kaixo {
 
     // ------------------------------------------------
 
-    const std::vector<PresetDatabase::Bank::Preset>& PresetDatabase::Bank::presets() {
+    const std::vector<PresetDatabase::Bank::Preset>& PresetDatabase::Bank::presets() const {
         while (!m_Loaded) {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
@@ -258,6 +261,28 @@ namespace Kaixo {
                 }
             }
         }
+    }
+
+    // ------------------------------------------------
+
+    const PresetDatabase::Bank::Preset* PresetDatabase::preset(std::size_t id) {
+        for (auto& bank : banks) {
+            for (auto& preset : bank.presets()) {
+                if (preset.id == id) {
+                    return &preset;
+                }
+            }
+        }
+
+        return nullptr;
+    }
+    
+    const PresetDatabase::Bank* PresetDatabase::bank(std::size_t id) {
+        for (auto& bank : banks) {
+            if (bank.id == id) return &bank;
+        }
+
+        return nullptr;
     }
 
     // ------------------------------------------------

@@ -59,7 +59,7 @@ namespace Kaixo::Gui {
 
         tabs.tab(1).addCallback([&](bool v) {
             if (v) {
-                load->reloadBanks();
+                load->reload();
             }
         });
 

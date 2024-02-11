@@ -10,6 +10,7 @@
 #include "Kaixo/Core/Gui/Views/TextView.hpp"
 #include "Kaixo/Core/Gui/Knob.hpp"
 #include "Kaixo/Core/Gui/Button.hpp"
+#include "Kaixo/Core/Gui/TabControl.hpp"
 #include "Kaixo/Core/Theme/Theme.hpp"
 
 // ------------------------------------------------
@@ -28,15 +29,31 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        class Bank : public View {
+        class Filter : public View {
         public:
+
+            // ------------------------------------------------
+            
+            enum class Type { Bank, Type, Author };
 
             // ------------------------------------------------
 
             struct Settings {
 
+                // ------------------------------------------------
+
                 LoadPresetTab& self;
-                std::size_t bankIndex;
+                Type type;
+
+                // ------------------------------------------------
+
+                std::size_t bankId; // Only set when type == Bank
+
+                // ------------------------------------------------
+                
+                std::string value; // Type,Author,or Bank
+
+                // ------------------------------------------------
 
             } settings;
 
@@ -46,7 +63,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            Bank(Context c, Settings s);
+            Filter(Context c, Settings s);
 
             // ------------------------------------------------
 
@@ -55,6 +72,14 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void paint(juce::Graphics& g) override;
+
+            // ------------------------------------------------
+            
+            void foreach(std::function<void(const PresetDatabase::Bank::Preset&)> callback);
+
+            // ------------------------------------------------
+            
+            std::string identifier();
 
             // ------------------------------------------------
 
@@ -72,8 +97,7 @@ namespace Kaixo::Gui {
                 // ------------------------------------------------
 
                 LoadPresetTab& self;
-                std::size_t bankIndex;
-                std::size_t presetIndex;
+                std::size_t presetId;
 
                 // ------------------------------------------------
 
@@ -99,7 +123,6 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             PresetData presetData();
-
             void load();
 
             // ------------------------------------------------
@@ -127,13 +150,43 @@ namespace Kaixo::Gui {
         } settings;
 
         // ------------------------------------------------
+
+        LoadPresetTab(Context c, Settings s);
+
+        // ------------------------------------------------
+
+        void reloadFilters(Filter::Type type);
+        void reload();
+
+        // ------------------------------------------------
+
+        void select(Filter& bank);
+
+        // ------------------------------------------------
         
+    private:
+        ScrollView* m_Filters;
+        ScrollView* m_Presets;
+        TextView* m_Search;
+
+        // ------------------------------------------------
+
+        TabControl m_FilterTabs;
+
+        // ------------------------------------------------
+
+        Filter::Type m_CurrentType;
+
+        // ------------------------------------------------
+
         struct State {
 
             // ------------------------------------------------
 
-            std::string bank;
+            Filter::Type type;
+            std::string value; // Bank,Type,or Author
             float scrolled;
+            std::string search;
 
             // ------------------------------------------------
 
@@ -141,26 +194,12 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        ScrollView* m_Banks;
-        ScrollView* m_Presets;
-        TextView* m_Search;
-
-        // ------------------------------------------------
-
-        LoadPresetTab(Context c, Settings s);
-
-        // ------------------------------------------------
-
-        void reloadBanks();
-
-        // ------------------------------------------------
-
-        void select(Bank& bank);
+        void saveState();
+        void loadState();
 
         // ------------------------------------------------
         
-        void saveState();
-        void loadState();
+        void applySearch();
 
         // ------------------------------------------------
 
