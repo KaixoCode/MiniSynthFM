@@ -114,12 +114,12 @@ namespace Kaixo::Gui {
             .graphics = T.display.main.advancedInfo.cpuUsage,
         });
         
-        std::string optimizations;
+        std::string optimizations = "No SIMD registers available";
         switch (simd_path::path) {
-        case simd_path::P0: optimizations = "No SIMD register available"; break;
+        case simd_path::P0: optimizations = "No SIMD registers available"; break;
         case simd_path::P1: optimizations = "SSE/SSE2"; break;
-        case simd_path::P2: optimizations = "SSE 2/3/4.1/4.2"; break;
-        case simd_path::P3: optimizations = "SSE 2/3/4.1/4.2 AVX/AVX2"; break;
+        case simd_path::P2: optimizations = "SSE/SSE2/3/4.1"; break;
+        case simd_path::P3: optimizations = "SSE/SSE2/3/4.1 AVX/AVX2"; break;
         }
 
         simdOptimizations = &advanced.add<Button>({ 0, 22, 300, 20 }, {

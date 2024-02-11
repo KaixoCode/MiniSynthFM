@@ -186,10 +186,10 @@ namespace Kaixo::Processing {
     KAIXO_INLINE SimdType ParallelAntiAliasFilter::process(SimdType input, std::size_t i) {
         SimdType res = input;
         for (auto& c : coefficients) {
-            auto output = (c.b[0] * res) + Kaixo::aligned_at<SimdType>(c.state[0], i);
+            auto output = (c.b[0] * res) + Kaixo::load<SimdType>(c.state[0], i);
 
             for (int j = 0; j < c.order - 1; ++j) {
-                Kaixo::store<SimdType>(c.state[j] + i, (c.b[j + 1] * res) - (c.a[j + 1] * output) + Kaixo::aligned_at<SimdType>(c.state[j + 1], i));
+                Kaixo::store<SimdType>(c.state[j] + i, (c.b[j + 1] * res) - (c.a[j + 1] * output) + Kaixo::load<SimdType>(c.state[j + 1], i));
             }
 
             Kaixo::store<SimdType>(c.state[c.order - 1] + i, (c.b[c.order] * res) - (c.a[c.order] * output));
@@ -223,10 +223,10 @@ namespace Kaixo::Processing {
         auto a2a0 = a2 / a0;
 
         auto x0 = input;
-        auto x1 = Kaixo::aligned_at<SimdType>(m_X[m_M1], i);
-        auto x2 = Kaixo::aligned_at<SimdType>(m_X[m_M2], i);
-        auto y1 = Kaixo::aligned_at<SimdType>(m_Y[m_M1], i);
-        auto y2 = Kaixo::aligned_at<SimdType>(m_Y[m_M2], i);
+        auto x1 = Kaixo::load<SimdType>(m_X[m_M1], i);
+        auto x2 = Kaixo::load<SimdType>(m_X[m_M2], i);
+        auto y1 = Kaixo::load<SimdType>(m_Y[m_M1], i);
+        auto y2 = Kaixo::load<SimdType>(m_Y[m_M2], i);
 
         auto result = b0a0 * x0 + b1a0 * x1 + b2a0 * x2
                                 - a1a0 * y1 - a2a0 * y2;
@@ -263,10 +263,10 @@ namespace Kaixo::Processing {
         auto a2a0 = a2 / a0;
 
         auto x0 = input;
-        auto x1 = Kaixo::aligned_at<SimdType>(m_X[m_M1], i);
-        auto x2 = Kaixo::aligned_at<SimdType>(m_X[m_M2], i);
-        auto y1 = Kaixo::aligned_at<SimdType>(m_Y[m_M1], i);
-        auto y2 = Kaixo::aligned_at<SimdType>(m_Y[m_M2], i);
+        auto x1 = Kaixo::load<SimdType>(m_X[m_M1], i);
+        auto x2 = Kaixo::load<SimdType>(m_X[m_M2], i);
+        auto y1 = Kaixo::load<SimdType>(m_Y[m_M1], i);
+        auto y2 = Kaixo::load<SimdType>(m_Y[m_M2], i);
 
         auto result = b0a0 * x0 + b1a0 * x1 + b2a0 * x2
                                 - a1a0 * y1 - a2a0 * y2;
@@ -300,9 +300,9 @@ namespace Kaixo::Processing {
         }
 
         for (std::size_t i = 0; i < Voices; i += Count) {
-            auto noteValue = Kaixo::aligned_at<SimdType>(note, i);
-            auto freqMod = Kaixo::aligned_at<SimdType>(m_FrequencyModulation, i) * m_Ratio + 
-                            Kaixo::aligned_at<SimdType>(frequencyModulation, i) * (1 - m_Ratio);
+            auto noteValue = Kaixo::load<SimdType>(note, i);
+            auto freqMod = Kaixo::load<SimdType>(m_FrequencyModulation, i) * m_Ratio + 
+                            Kaixo::load<SimdType>(frequencyModulation, i) * (1 - m_Ratio);
             Kaixo::store(m_FrequencyModulation + i, freqMod);
 
             auto freqValue = Math::Fast::magnitude_to_log(params.frequency + freqMod, SimdType(16.f), SimdType(16000.f));
@@ -327,11 +327,11 @@ namespace Kaixo::Processing {
 
             SimdType res{};
             if (oversampleAmount == 1) {
-                auto inputValue = Kaixo::aligned_at<SimdType>(input[0], i);
+                auto inputValue = Kaixo::load<SimdType>(input[0], i);
                 res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
             } else {
                 for (std::size_t j = 0; j < oversampleAmount; ++j) {
-                    auto inputValue = Kaixo::aligned_at<SimdType>(input[j], i);
+                    auto inputValue = Kaixo::load<SimdType>(input[j], i);
                     inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
                     res = m_AAF.process<SimdType>(inputValue, i);
                 }
