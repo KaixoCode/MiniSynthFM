@@ -61,7 +61,8 @@ namespace Kaixo {
     }
 
     PresetDatabase::~PresetDatabase() {
-        m_LoadBanksThread.join();
+        if (m_LoadBanksThread.joinable())
+            m_LoadBanksThread.join();
     }
 
     // ------------------------------------------------
