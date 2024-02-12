@@ -26,8 +26,8 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     bool Delay::active() const {
-        // If more than 100ms silence: inactive
-        return m_SamplesSilence < 0.1 * sampleRate();
+        // If more than 'delay' silence: inactive
+        return input != 0 || m_SamplesSilence < m_ActualDelay * sampleRate() / 1000.f;
     }
 
     // ------------------------------------------------
@@ -65,6 +65,7 @@ namespace Kaixo::Processing {
         }
 
         if (m_PingPong) delay *= 2;
+        m_ActualDelay = delay;
 
         float out1 = read(delay);
 
@@ -100,7 +101,7 @@ namespace Kaixo::Processing {
             myOutput = Math::Fast::abs(out1);
         }
 
-        if (myOutput < std::numeric_limits<float>::epsilon()) {
+        if (input == 0 && myOutput < std::numeric_limits<float>::epsilon()) {
             ++m_SamplesSilence;
         } else {
             m_SamplesSilence = 0;

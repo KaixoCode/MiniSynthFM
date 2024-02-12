@@ -80,6 +80,7 @@ namespace Kaixo::Processing {
         std::size_t m_SamplesSilence = 0;
         Tempo m_Tempo = Tempo::T1_6;
         float m_Delay = 0;
+        float m_ActualDelay = 0;
         float m_Feedback = 0.5;
         float m_Mix = true;
         float m_RandomFrequency = 0;
