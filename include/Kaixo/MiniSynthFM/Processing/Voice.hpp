@@ -228,7 +228,7 @@ namespace Kaixo::Processing {
             auto fm2 = params.fm[1] + getAllA(ModDestination::Op2Amount);
             auto fm3 = params.fm[2] + getAllA(ModDestination::Op3Amount);
 
-            Kaixo::store<SimdType>(filter.note + i, _note + (params.pitchBend * 24 - 12));
+            Kaixo::store<SimdType>(filter.note + i, _note + _pitchBend);
 
             oscillator[0].note<SimdType>(i, _note + _pitchBend + fm1 * 24.f * getAllANoOp(ModDestination::Op1FM));
             oscillator[1].note<SimdType>(i, _note + _pitchBend + fm2 * 24.f * getAllANoOp(ModDestination::Op2FM));
