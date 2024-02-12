@@ -179,16 +179,16 @@
     <param name="Attack"
            description="The attack of the envelope follows an exponential curve."
            default="10"
-           transform="Power[10.f, 5000.f, 2.f]"
+           transform="Power[1.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[$envelope].attack($value * $value * 4990 + 10)"/>
+           interface="$self.params.envelope[$envelope].attack($value * $value * 4999 + 1)"/>
 
     <param name="Decay"
            description="The decay of the envelope follows an exponential curve."
            default="200"
-           transform="Power[10.f, 5000.f, 2.f]"
+           transform="Power[1.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[$envelope].decay($value * $value * 4990 + 10)"/>
+           interface="$self.params.envelope[$envelope].decay($value * $value * 4999 + 1)"/>
 
     <param name="Sustain"
            description="Set the sustain value of the envelope."
@@ -200,9 +200,9 @@
     <param name="Release"
            description="The release of the envelope follows an exponential curve."
            default="60"
-           transform="Power[10.f, 5000.f, 2.f]"
+           transform="Power[1.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[$envelope].release($value * $value * 4990 + 10)"/>
+           interface="$self.params.envelope[$envelope].release($value * $value * 4999 + 1)"/>
   </module>
 
   <module name="Gain">
@@ -224,16 +224,16 @@
     <param name="Attack"
            description="The attack of the envelope follows an exponential curve."
            default="10"
-           transform="Power[10.f, 5000.f, 2.f]"
+           transform="Power[1.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[2].attack($value * $value * 4990 + 10)"/>
+           interface="$self.params.envelope[2].attack($value * $value * 4999 + 1)"/>
 
     <param name="Decay"
            description="The decay of the envelope follows an exponential curve."
            default="200"
-           transform="Power[10.f, 5000.f, 2.f]"
+           transform="Power[1.f, 5000.f, 2.f]"
            format="Time"
-           interface="$self.params.envelope[2].release($value * $value * 4990 + 10)"/>
+           interface="$self.params.envelope[2].release($value * $value * 4999 + 1)"/>
   </module>
 
   <!-- ================================================ -->
