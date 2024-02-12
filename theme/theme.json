@@ -906,6 +906,23 @@
             }
           }
         }
+        
+        pitch-bend-range: {
+          extends: $basic-button
+          text: $short-name
+          text-position: [5, 1]
+
+          image: button-underline.png
+
+          layers: {
+            value: {
+              extends: $display-text
+              text: $value
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
       }
     }
     

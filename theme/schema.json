@@ -173,6 +173,7 @@
       "touch-mode": "drawable",
       "show-piano": "drawable",
       "parameters": {
+        "pitch-bend-range": "drawable",
         "phase-mode": "drawable",
         "quality": "drawable",
         "export-quality": "drawable"

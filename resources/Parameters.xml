@@ -113,6 +113,14 @@
          format="Group[Contiguous, Reset, Random]"
          interface="$self.phaseMode($value)"/>
 
+  <param name="Pitch Bend Range"
+         short-name="Bend Range"
+         default="12"
+         steps="25"
+         transform="Integer[0, 25]"
+         format="Transpose"
+         interface="$self.params.pitchBendRange = normalToIndex($value, 25)"/>
+
   <!-- ================================================ -->
 
   <module name="Lfo" count="1">

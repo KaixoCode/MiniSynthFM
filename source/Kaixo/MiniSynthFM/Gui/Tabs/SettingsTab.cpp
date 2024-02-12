@@ -38,6 +38,15 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.pitchBendRange,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.pitchBendRange,
+        });
+        
+        // ------------------------------------------------
+
+        scrollView.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.phaseMode,
             .tooltipName = false,
             .tooltipValue = false,
