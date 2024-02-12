@@ -163,16 +163,19 @@ namespace Kaixo {
                 }).reloadInformation();
             }
         } else {
-            for (auto& entry : std::filesystem::directory_iterator(folder)) {
-                if (entry.is_regular_file()) {
-                    m_Presets.emplace_back(Preset{
-                        .database = database,
-                        .bank = *this,
-                        .id = database.m_PresetIdCounter++,
-                        .type = Preset::Type::Normal,
-                        .path = entry.path()
-                    }).reloadInformation();
-                }
+            std::vector<std::filesystem::path> files;
+            for (auto& file : std::filesystem::directory_iterator(folder)) {
+                if (file.is_regular_file()) files.push_back(file.path());
+            }
+            std::ranges::sort(files);
+            for (auto& path : files) {
+                m_Presets.emplace_back(Preset{
+                    .database = database,
+                    .bank = *this,
+                    .id = database.m_PresetIdCounter++,
+                    .type = Preset::Type::Normal,
+                    .path = path
+                }).reloadInformation();
             }
         }
         m_Loaded = true;
