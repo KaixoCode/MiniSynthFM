@@ -26,7 +26,8 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     bool Delay::active() const {
-        return true; // TODO: implement
+        // If more than 100ms silence: inactive
+        return m_SamplesSilence < 0.1 * sampleRate();
     }
 
     // ------------------------------------------------
@@ -89,11 +90,20 @@ namespace Kaixo::Processing {
         float back = m_Filter.output.average();
         m_Samples[m_Write] = 0.4 * Math::Fast::tanh_like(1.115 * back) + 0.64 * back;
 
+        float myOutput = 0;
         if (m_PingPong) {
             float out2 = read(delay * 0.5);
+            myOutput = Math::Fast::abs(out1 + out2);
             output = input * (1 - m_Mix) + m_Mix * Stereo{ out1, out2 };
         } else {
             output = input * (1 - m_Mix) + m_Mix * out1;
+            myOutput = Math::Fast::abs(out1);
+        }
+
+        if (myOutput < std::numeric_limits<float>::epsilon()) {
+            ++m_SamplesSilence;
+        } else {
+            m_SamplesSilence = 0;
         }
 
         m_Write = (m_Write + 1) % size();

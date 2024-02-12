@@ -77,6 +77,7 @@ namespace Kaixo::Processing {
         std::vector<float> m_Samples{};
         std::size_t m_Write = 0;
         std::size_t m_Counter = 0;
+        std::size_t m_SamplesSilence = 0;
         Tempo m_Tempo = Tempo::T1_6;
         float m_Delay = 0;
         float m_Feedback = 0.5;
