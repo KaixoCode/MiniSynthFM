@@ -14,6 +14,12 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+    constexpr float cableTension = 0.075;
+    constexpr float cableDamping = 0.069;
+    constexpr float cableGravity = 1.25;
+
+    // ------------------------------------------------
+
     PatchBay::Jack::Jack(Context c, Settings s)
         : View(c), settings(std::move(s))
     {
@@ -93,8 +99,8 @@ namespace Kaixo::Gui {
         end = npos;
 
         for (auto& segment : m_Segments) {
-            segment.y = 0;
-            segment.vy = 0;
+            segment.position = { 0, 0 };
+            segment.velocity = { 0, 0 };
         }
 
         m_Color = (m_Color + 1) % 5;
@@ -103,27 +109,23 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void PatchBay::Connection::initPosition(PatchBay& self) {
-        Point<float> a = self.m_Jacks[begin]->holePosition();
-        Point<float> b = self.m_Jacks[end]->holePosition();
+        if (begin == npos && end == npos) return;
+        auto beginPos = begin == npos ? end : begin;
+        auto endPos = end == npos ? begin : end;
+        Point<float> a = self.m_Jacks[beginPos]->holePosition();
+        Point<float> b = self.m_Jacks[endPos]->holePosition();
 
-        if (a.x() > b.x()) std::swap(a, b);
-        if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
-
-        float dy = (b.y() - a.y()) / (Segments + 1);
         for (std::size_t i = 0; i < Segments; ++i) {
+            float ratio = static_cast<float>(i) / Segments;
             auto& segment = m_Segments[i];
-            float y = a.y() + dy * (i + 1);
-            segment.y = y;
+            segment.position = a * (1 - ratio) + b * ratio;
+            segment.velocity = { 0, 0 };
         }
     }
 
     // ------------------------------------------------
 
     void PatchBay::Connection::drawJacks(juce::Graphics& g, Point<float> a, Point<float> b, PatchBay& self) {
-
-        if (a.x() > b.x()) std::swap(a, b);
-        if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
-
         self.m_CableGraphics[m_Color].end.draw({
             .graphics = g,
             .bounds = { a.x() - 13, a.y() - 13, 26, 26 },
@@ -136,52 +138,28 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::Connection::drawJacks(juce::Graphics& g, Point<> mouse, PatchBay& self) {
-        if (begin == npos && end == npos) return; // Nothing to draw
+        if (begin == npos && end == npos) return;
 
-        Point<float> a = self.m_Jacks[begin]->holePosition();
+        Point<float> a = mouse;
         Point<float> b = mouse;
 
-        if (end != npos) {
-            b = self.m_Jacks[end]->holePosition();
-        }
+        if (begin != npos) a = self.m_Jacks[begin]->holePosition();
+        if (end != npos) b = self.m_Jacks[end]->holePosition();
 
         drawJacks(g, a, b, self);
     }
 
     void PatchBay::Connection::drawCable(juce::Graphics& g, Point<float> a, Point<float> b, PatchBay& self) {
-
-        if (a.x() > b.x()) std::swap(a, b);
-        if (a.x() == b.x()) a.x(b.x() - 1); // make sure x is never the same
-
-        float currentDistance = a.getDistanceFrom(b);
-        float deltaDistance = currentDistance - m_Distance;
-        m_DeltaDistance = deltaDistance * 0.05 + m_DeltaDistance * 0.95;
-        m_Distance = currentDistance;
-        float extra = Math::clamp(100 - m_DeltaDistance * 5, 10, 200);
-
-        Catenary catenary{ a.x(), self.height() - a.y(), b.x(), self.height() - b.y(), extra, 5 };
+        m_Segments.front().position = a;
+        m_Segments.back().position = b;
 
         juce::Path path;
         path.startNewSubPath(a);
 
-        bool first = true;
-        float dx = (b.x() - a.x()) / (Segments + 1);
-        for (std::size_t i = 0; i < Segments; ++i) {
-            auto& segment = m_Segments[i];
-            float x = a.x() + dx * (i + 1);
-            float y = self.height() - catenary.calcY(x);
-
-            float half = Segments / 2.f;
-            float damp = 0.6 + 0.3 * (1 - ((i - half) * (i - half)) / (half * half));
-
-            path.lineTo({ x, segment.y });
-
-            segment.vy += (y - segment.y) * 0.15;
-            segment.vy *= damp;
-            segment.vy = std::clamp(segment.vy, -50.f, 50.f);
-            segment.y += segment.vy;
-            segment.y = segment.y;
+        for (std::size_t i = 1; i < Segments - 1; ++i) {
+            path.lineTo(m_Segments[i].position);
         }
+        simulationStep();
 
         path.lineTo(b);
 
@@ -195,14 +173,13 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::Connection::drawCable(juce::Graphics& g, Point<> mouse, PatchBay& self) {
-        if (begin == npos && end == npos) return; // Nothing to draw
+        if (begin == npos && end == npos) return;
 
-        Point<float> a = self.m_Jacks[begin]->holePosition();
+        Point<float> a = mouse;
         Point<float> b = mouse;
 
-        if (end != npos) {
-            b = self.m_Jacks[end]->holePosition();
-        }
+        if (begin != npos) a = self.m_Jacks[begin]->holePosition();
+        if (end != npos) b = self.m_Jacks[end]->holePosition();
 
         drawCable(g, a, b, self);
     }
@@ -231,13 +208,59 @@ namespace Kaixo::Gui {
         // If not connected, not changing
         if (end == npos && begin == npos) return false; 
         // If it's currently being moved, it's changing
-        if (end == npos && begin != npos) return true;
+        if (begin == npos && end != npos || begin != npos && end == npos) return true;
         // Otherwise, if any segment is moving, it's changing
         for (auto& segment : m_Segments) {
-            if (Math::Fast::abs(segment.vy) > 0.01)
+            if (segment.velocity.getDistanceFromOrigin() > 0.01)
                 return true;
         }
         return false;
+    }
+
+    // ------------------------------------------------
+
+    void PatchBay::Connection::simulationStep() {
+        for (std::size_t j = 0; j < 2; ++j) {
+            for (std::size_t i = 1; i < Segments - 1; ++i) {
+                auto& segment = m_Segments[i];
+
+                Point<float> prevPos = m_Segments[i - 1].position;
+                Point<float> curPos = m_Segments[i].position;
+                Point<float> nextPos = m_Segments[i + 1].position;
+
+                auto acceleration = cableTension * (prevPos - 2.f * curPos + nextPos);
+
+                segment.velocity += acceleration + Point<float>{ 0, cableGravity };
+                segment.velocity *= (1.0f - cableDamping); // Apply damping
+            }
+
+            for (std::size_t i = 1; i < Segments - 1; ++i) {
+                auto& segment = m_Segments[i];
+                segment.position += segment.velocity;
+            }
+        }
+    }
+
+    void PatchBay::Connection::simulationStepEndpoints() {
+
+        Point<float> curPos1 = m_Segments.front().position;
+        Point<float> nextPos1 = m_Segments[1].position;
+
+        auto acceleration1 = 0.1f * cableTension * (curPos1 - 2.f * curPos1 + nextPos1);
+
+        // Endpoints just have gravity
+        m_Segments.front().velocity += acceleration1 + Point<float>{ 0, cableGravity };
+        m_Segments.front().velocity *= (1.0f - 0.5 * cableDamping); // Apply damping
+        m_Segments.front().position += m_Segments.front().velocity;
+
+        Point<float> prevPos2 = m_Segments[Segments - 2].position;
+        Point<float> curPos2 = m_Segments.back().position;
+
+        auto acceleration2 = 0.1f * cableTension * (prevPos2 - 2.f * curPos2 + curPos2);
+
+        m_Segments.back().velocity += acceleration2 + Point<float>{ 0, cableGravity };
+        m_Segments.back().velocity *= (1.0f - 0.5 * cableDamping); // Apply damping
+        m_Segments.back().position += m_Segments.back().velocity;
     }
 
     // ------------------------------------------------
@@ -258,16 +281,13 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-
     Rect<int> PatchBay::Connection::bounding(PatchBay& self, Point<> mouse) const {
-        if (this->begin == npos) return {};
-        auto begin = self.m_Jacks[this->begin]->holePosition();
+        auto begin = this->begin == npos ? mouse : self.m_Jacks[this->begin]->holePosition();
         auto end = this->end == npos ? mouse : self.m_Jacks[this->end]->holePosition();
         return bounding(self, begin, end);
     }
 
     Rect<int> PatchBay::Connection::bounding(PatchBay& self, Point<> a, Point<> b) const {
-        if (this->begin == npos) return {};
         auto begin = a;
         auto end = b;
         auto minX = Math::min(begin.x(), end.x());
@@ -276,12 +296,15 @@ namespace Kaixo::Gui {
         auto maxY = Math::max(begin.y(), end.y());
 
         for (auto& segment : m_Segments) {
-            if (segment.y < minY) minY = segment.y;
-            if (segment.y > maxY) maxY = segment.y;
+            if (segment.position.y() < minY) minY = segment.position.y();
+            if (segment.position.y() > maxY) maxY = segment.position.y();
+            if (segment.position.x() < minX) minX = segment.position.x();
+            if (segment.position.x() > maxX) maxX = segment.position.x();
         }
 
         return Rect{ minX, minY, maxX - minX, maxY - minY }.expanded(13, 13);
     }
+
 
     void PatchBay::onIdle() {
         if (changing()) {
@@ -294,7 +317,7 @@ namespace Kaixo::Gui {
             }
 
             for (auto& connection : m_FallingConnections) {
-                bounding = bounding.getUnion(connection.connection.bounding(*this, connection.begin, connection.end));
+                bounding = bounding.getUnion(connection.bounding(*this, m_LastMousePosition));
             }
 
             bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
@@ -314,20 +337,26 @@ namespace Kaixo::Gui {
             connection.drawCable(g, m_LastMousePosition, *this);
         }
         
-        for (auto& [velocity, begin, end, connection] : m_FallingConnections) {
-            connection.drawJacks(g, begin, end, *this);
+        for (auto& connection : m_FallingConnections) {
+            connection.drawJacks(g, connection.m_Segments.front().position, connection.m_Segments.back().position, *this);
         }
         
-        for (auto& [velocity, begin, end, connection] : m_FallingConnections) {
-            connection.drawCable(g, begin, end, *this);
-            begin += velocity;
-            end += velocity;
-            velocity += { 0, 1 };
+        for (auto& connection : m_FallingConnections) {
+            connection.drawCable(g, connection.m_Segments.front().position, connection.m_Segments.back().position, *this);
+            connection.simulationStepEndpoints();
         }
 
         // Remove falling connections that are outside the window
         for (auto it = m_FallingConnections.begin(); it != m_FallingConnections.end();) {
-            if (it->begin.y() > height() + 40 && it->end.y() > height() + 40) {
+            bool oneAbove = false;
+            for (auto& segment : it->m_Segments) {
+                if (segment.position.y() < height() + 40) {
+                    oneAbove = true;
+                    break;
+                }
+            }
+
+            if (!oneAbove) {
                 it = m_FallingConnections.erase(it);
             } else ++it;
         }
@@ -342,6 +371,7 @@ namespace Kaixo::Gui {
         m_Changing = true;
         m_CurrentConnection.begin = id;
         m_CurrentConnection.end = npos;
+        m_CurrentConnection.initPosition(*this);
     }
 
     void PatchBay::removeCable(JackId id) {
@@ -352,8 +382,8 @@ namespace Kaixo::Gui {
             bool isEnd = connection.end == id;
             if (isBegin || isEnd) {
                 m_CurrentConnection = connection;
-                m_CurrentConnection.begin = isBegin ? connection.end : connection.begin;
-                m_CurrentConnection.end = npos;
+                if (m_CurrentConnection.begin == id) m_CurrentConnection.begin = npos;
+                if (m_CurrentConnection.end == id) m_CurrentConnection.end = npos;
                 removeConnection(connection);
                 m_Connections.erase(m_Connections.begin() + (i - 1));
                 break;
@@ -363,22 +393,26 @@ namespace Kaixo::Gui {
 
     void PatchBay::moveCable(Point<> to) {
         m_Changing = true;
+        m_LastLastMousePosition = m_LastMousePosition;
         m_LastMousePosition = to;
     }
 
     bool PatchBay::finishCable() {
         m_Changing = true;
-        if (m_CurrentConnection.begin == npos) return false;
+        if (m_CurrentConnection.begin == npos && m_CurrentConnection.end == npos) return false;
+        auto mouseId = m_CurrentConnection.begin == npos ? m_CurrentConnection.end : m_CurrentConnection.begin;
         // Find which jack hovering over
         for (JackId id = 0; id < m_Jacks.size(); ++id) {
             auto& jack = m_Jacks[id];
-            auto& begin = m_Jacks[m_CurrentConnection.begin];
-            if (id != m_CurrentConnection.begin && // Not same jack
+            auto& begin = m_Jacks[mouseId];
+            if (id != mouseId && // Not same jack
                 jack->input() != begin->input() && // Not both same type
                 jack->output() != begin->output() &&
                 jack->localDimensions().contains(jack->getLocalPoint(this, m_LastMousePosition))) // Hover
             {
-                m_CurrentConnection.end = id;
+                if (m_CurrentConnection.end == npos) m_CurrentConnection.end = id;
+                if (m_CurrentConnection.begin == npos) m_CurrentConnection.begin = id;
+
                 // Check for existing connection
                 for (auto& connection : m_Connections) {
                     if (connection == m_CurrentConnection) {
@@ -397,12 +431,19 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::dropCable() {
-        m_FallingConnections.push_back({
-            .velocity = { 0, 0 },
-            .begin = m_LastMousePosition,
-            .end = m_Jacks[m_CurrentConnection.begin]->holePosition(),
-            .connection = m_CurrentConnection
-        });
+        auto maxVelocity = 10;
+        auto velocity = m_LastMousePosition - m_LastLastMousePosition;
+        velocity = Rect<>{ -maxVelocity, -maxVelocity, 2 * maxVelocity, 2 * maxVelocity }.getConstrainedPoint(velocity);
+
+        if (m_CurrentConnection.begin == npos) {
+            m_CurrentConnection.m_Segments.front().velocity = velocity;
+        }
+
+        if (m_CurrentConnection.end == npos) {
+            m_CurrentConnection.m_Segments.back().velocity = velocity;
+        }
+
+        m_FallingConnections.push_back(m_CurrentConnection);
 
         m_CurrentConnection.reset();
     }

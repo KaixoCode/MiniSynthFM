@@ -101,7 +101,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            constexpr static std::size_t Segments = 7;
+            constexpr static std::size_t Segments = 9;
 
             // ------------------------------------------------
 
@@ -138,11 +138,16 @@ namespace Kaixo::Gui {
             Rect<int> bounding(PatchBay& self, Point<> mouse) const;
 
             // ------------------------------------------------
+            
+            void simulationStep();
+            void simulationStepEndpoints();
+
+            // ------------------------------------------------
 
         private:
             struct Segment {
-                float y = 0;
-                float vy = 1;
+                Point<float> position{ 0, 0 };
+                Point<float> velocity{ 0, 0 };
             };
 
             std::array<Segment, Segments> m_Segments;
@@ -192,13 +197,15 @@ namespace Kaixo::Gui {
 
     private:
         std::vector<Jack*> m_Jacks;
-        std::vector<Connection> m_Connections;        
+        std::vector<Connection> m_Connections;  
+        std::vector<Connection> m_FallingConnections;
         Connection m_CurrentConnection{};
         Rect<> m_LastBoundingBox{};
 
         // ------------------------------------------------
 
         Point<> m_LastMousePosition;
+        Point<> m_LastLastMousePosition;
 
         // ------------------------------------------------
 
@@ -212,17 +219,6 @@ namespace Kaixo::Gui {
         std::chrono::time_point<std::chrono::steady_clock> m_LastChanging;
         bool m_Changing = false;
         bool m_NotChangingButStillRedraw = false;
-
-        // ------------------------------------------------
-
-        struct FallingConnection {
-            Point<float> velocity;
-            Point<float> begin;
-            Point<float> end;
-            Connection connection;
-        };
-
-        std::vector<FallingConnection> m_FallingConnections;
 
         // ------------------------------------------------
 
