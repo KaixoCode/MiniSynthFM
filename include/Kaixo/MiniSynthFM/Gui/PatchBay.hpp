@@ -134,6 +134,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
             
+            Rect<int> bounding(PatchBay& self, Point<> a, Point<> b) const;
             Rect<int> bounding(PatchBay& self, Point<> mouse) const;
 
             // ------------------------------------------------
@@ -193,6 +194,7 @@ namespace Kaixo::Gui {
         std::vector<Jack*> m_Jacks;
         std::vector<Connection> m_Connections;        
         Connection m_CurrentConnection{};
+        Rect<> m_LastBoundingBox{};
 
         // ------------------------------------------------
 

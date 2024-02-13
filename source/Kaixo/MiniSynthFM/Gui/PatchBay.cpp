@@ -174,13 +174,13 @@ namespace Kaixo::Gui {
             float half = Segments / 2.f;
             float damp = 0.6 + 0.3 * (1 - ((i - half) * (i - half)) / (half * half));
 
+            path.lineTo({ x, segment.y });
+
             segment.vy += (y - segment.y) * 0.15;
             segment.vy *= damp;
             segment.vy = std::clamp(segment.vy, -50.f, 50.f);
             segment.y += segment.vy;
             segment.y = segment.y;
-
-            path.lineTo({ x, segment.y });
         }
 
         path.lineTo(b);
@@ -258,10 +258,18 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+
     Rect<int> PatchBay::Connection::bounding(PatchBay& self, Point<> mouse) const {
         if (this->begin == npos) return {};
         auto begin = self.m_Jacks[this->begin]->holePosition();
         auto end = this->end == npos ? mouse : self.m_Jacks[this->end]->holePosition();
+        return bounding(self, begin, end);
+    }
+
+    Rect<int> PatchBay::Connection::bounding(PatchBay& self, Point<> a, Point<> b) const {
+        if (this->begin == npos) return {};
+        auto begin = a;
+        auto end = b;
         auto minX = Math::min(begin.x(), end.x());
         auto maxX = Math::max(begin.x(), end.x());
         auto minY = Math::min(begin.y(), end.y());
@@ -272,11 +280,12 @@ namespace Kaixo::Gui {
             if (segment.y > maxY) maxY = segment.y;
         }
 
-        return { minX, minY, maxX - minX, maxY - minY };
+        return Rect{ minX, minY, maxX - minX, maxY - minY }.expanded(13, 13);
     }
 
     void PatchBay::onIdle() {
         if (changing()) {
+            // Find bounding box around all moving connections, so we only repaint the smallest necessary rectangle.
             Rect<int> bounding;
             for (auto& connection : m_Connections) {
                 if (connection.changing()) {
@@ -284,8 +293,13 @@ namespace Kaixo::Gui {
                 }
             }
 
+            for (auto& connection : m_FallingConnections) {
+                bounding = bounding.getUnion(connection.connection.bounding(*this, connection.begin, connection.end));
+            }
+
             bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
-            repaint(bounding);
+            repaint(bounding.getUnion(m_LastBoundingBox)); // Union with previous bounding box to clear previous position
+            m_LastBoundingBox = bounding;
         }
     }
 
