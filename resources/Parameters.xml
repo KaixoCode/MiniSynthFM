@@ -315,10 +315,10 @@
 
     <param name="Tempo"
            description="Set the delay time of the delay to a multiple of a bar."
-           default="3"
+           default="4"
            steps="8"
            transform="Group[8]"
-           format="Group[1/1, 1/2, 1/4, 1/6, 1/8, 1/16, 1/32, 1/64]"
+           format="Group[1/64, 1/32, 1/16, 1/8, 1/6, 1/4, 1/2, 1/1]"
            interface="$self.delay.tempo($value)"/>
 
     <param name="Pingpong"
