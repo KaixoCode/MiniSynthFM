@@ -283,6 +283,12 @@ namespace Kaixo::Gui {
         }
         }
 
+        std::ranges::sort(m_Filters->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
+            Filter& f1 = dynamic_cast<Filter&>(*a);
+            Filter& f2 = dynamic_cast<Filter&>(*b);
+            return f1.settings.value < f2.settings.value;
+        });
+
         select((Filter&)*m_Filters->views().front());
         m_Filters->updateDimensions();
         if (loadingSameType) loadState(); // Load back state
@@ -313,6 +319,12 @@ namespace Kaixo::Gui {
                 .self = *this,
                 .presetId = preset.id
             });
+        });
+
+        std::ranges::sort(m_Presets->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
+            Preset& f1 = dynamic_cast<Preset&>(*a);
+            Preset& f2 = dynamic_cast<Preset&>(*b);
+            return f1.displayName < f2.displayName;
         });
 
         m_Presets->updateDimensions();

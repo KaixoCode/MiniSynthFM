@@ -165,7 +165,8 @@ namespace Kaixo {
         } else {
             std::vector<std::filesystem::path> files;
             for (auto& file : std::filesystem::directory_iterator(folder)) {
-                if (file.is_regular_file()) files.push_back(file.path());
+                if (file.is_regular_file() && file.path().extension() == ".minifm") 
+                    files.push_back(file.path());
             }
             std::ranges::sort(files);
             for (auto& path : files) {
