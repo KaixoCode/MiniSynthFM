@@ -258,8 +258,35 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+    Rect<int> PatchBay::Connection::bounding(PatchBay& self, Point<> mouse) const {
+        if (this->begin == npos) return {};
+        auto begin = self.m_Jacks[this->begin]->holePosition();
+        auto end = this->end == npos ? mouse : self.m_Jacks[this->end]->holePosition();
+        auto minX = Math::min(begin.x(), end.x());
+        auto maxX = Math::max(begin.x(), end.x());
+        auto minY = Math::min(begin.y(), end.y());
+        auto maxY = Math::max(begin.y(), end.y());
+
+        for (auto& segment : m_Segments) {
+            if (segment.y < minY) minY = segment.y;
+            if (segment.y > maxY) maxY = segment.y;
+        }
+
+        return { minX, minY, maxX - minX, maxY - minY };
+    }
+
     void PatchBay::onIdle() {
-        if (changing()) repaint();
+        if (changing()) {
+            Rect<int> bounding;
+            for (auto& connection : m_Connections) {
+                if (connection.changing()) {
+                    bounding = bounding.getUnion(connection.bounding(*this, m_LastMousePosition));
+                }
+            }
+
+            bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
+            repaint(bounding);
+        }
     }
 
     // ------------------------------------------------

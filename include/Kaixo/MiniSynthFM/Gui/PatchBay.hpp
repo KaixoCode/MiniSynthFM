@@ -133,6 +133,10 @@ namespace Kaixo::Gui {
             ModDestination destination(PatchBay& self);
 
             // ------------------------------------------------
+            
+            Rect<int> bounding(PatchBay& self, Point<> mouse) const;
+
+            // ------------------------------------------------
 
         private:
             struct Segment {
