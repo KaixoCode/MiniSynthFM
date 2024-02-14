@@ -46,6 +46,7 @@ namespace Kaixo::Gui {
         TextView* presetName = nullptr;
         Button* cpuUsage = nullptr;
         Button* simdOptimizations = nullptr;
+        Button* sampleRate = nullptr;
 
         // ------------------------------------------------
         

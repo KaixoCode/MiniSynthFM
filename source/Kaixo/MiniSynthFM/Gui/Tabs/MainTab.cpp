@@ -41,6 +41,10 @@ namespace Kaixo::Gui {
         auto percent = interface->percent();
         cpuUsage->settings.text = std::format("{:.2f} %", percent);
         cpuUsage->repaint();
+
+        auto srate = context.interface<Processing::SampleRateInterface>()->sampleRate();
+        sampleRate->settings.text = Formatters::Frequency.format(srate);
+        sampleRate->repaint();
     }
 
     // ------------------------------------------------
@@ -118,13 +122,17 @@ namespace Kaixo::Gui {
         switch (simd_path::path) {
         case simd_path::P0: optimizations = "No SIMD registers available"; break;
         case simd_path::P1: optimizations = "SSE/SSE2"; break;
-        case simd_path::P2: optimizations = "SSE/SSE2/3/4.1"; break;
-        case simd_path::P3: optimizations = "SSE/SSE2/3/4.1 AVX/AVX2"; break;
+        case simd_path::P2: optimizations = "SSE/SSE2/3/4.1 FMA"; break;
+        case simd_path::P3: optimizations = "SSE/SSE2/3/4.1 FMA AVX/AVX2"; break;
         }
 
         simdOptimizations = &advanced.add<Button>({ 0, 22, 300, 20 }, {
             .graphics = T.display.main.advancedInfo.simdOptimizations,
             .text = optimizations,
+        });
+        
+        sampleRate = &advanced.add<Button>({ 0, 44, 300, 20 }, {
+            .graphics = T.display.main.advancedInfo.sampleRate,
         });
 
         advanced.add<ImageView>({ .image = T.display.main.advancedInfo.foreground, .enableMouse = false });

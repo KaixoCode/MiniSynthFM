@@ -156,6 +156,7 @@
         "foreground": "drawable",
         "button": "drawable",
         "cpu-usage": "drawable",
+        "sample-rate": "drawable",
         "simd-optimizations": "drawable"
       }
     },

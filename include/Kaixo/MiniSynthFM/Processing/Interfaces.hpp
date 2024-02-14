@@ -15,6 +15,19 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
     
+    class SampleRateInterface : public Interface {
+    public:
+
+        // ------------------------------------------------
+
+        float sampleRate();
+
+        // ------------------------------------------------
+
+    };
+    
+    // ------------------------------------------------
+    
     class TimerInterface : public Interface {
     public:
 

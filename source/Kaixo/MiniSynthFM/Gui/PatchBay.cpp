@@ -246,7 +246,7 @@ namespace Kaixo::Gui {
         Point<float> curPos1 = m_Segments.front().position;
         Point<float> nextPos1 = m_Segments[1].position;
 
-        auto acceleration1 = 0.1f * cableTension * (curPos1 - 2.f * curPos1 + nextPos1);
+        auto acceleration1 = (0.1f * cableTension) * (curPos1 - 2.f * curPos1 + nextPos1);
 
         // Endpoints just have gravity
         m_Segments.front().velocity += acceleration1 + Point<float>{ 0, cableGravity };
@@ -256,7 +256,7 @@ namespace Kaixo::Gui {
         Point<float> prevPos2 = m_Segments[Segments - 2].position;
         Point<float> curPos2 = m_Segments.back().position;
 
-        auto acceleration2 = 0.1f * cableTension * (prevPos2 - 2.f * curPos2 + curPos2);
+        auto acceleration2 = (0.1f * cableTension) * (prevPos2 - 2.f * curPos2 + curPos2);
 
         m_Segments.back().velocity += acceleration2 + Point<float>{ 0, cableGravity };
         m_Segments.back().velocity *= (1.0f - 0.5 * cableDamping); // Apply damping

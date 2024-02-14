@@ -568,6 +568,22 @@
           }
         }
 
+        sample-rate: {
+          extends: $basic-button
+          text: Sample Rate
+          text-position: [5, 1]
+
+          layers: {
+            path: {
+              extends: $display-text
+              text: $text
+              text-overflow: dots
+              text-align: center-left
+              text-position: [95, 1]
+            }
+          }
+        }
+
         cpu-usage: {
           extends: $basic-button
           text: CPU Usage
