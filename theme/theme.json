@@ -704,6 +704,21 @@
         text-position: [5, 1]
         text-align: center-left
       }
+
+      sort-button: {
+        extends: $basic-button
+
+        image: button-underline.png
+
+        layers: {
+          icon: {
+            image: sort.png
+            selected: {
+              image-offset: [0, 20]
+            }
+          }
+        }
+      }
     }
 
     // ------------------------------------------------
@@ -779,7 +794,7 @@
 
       theme-path: {
         extends: $basic-button
-        text: Theme Path
+        text: Theme
         text-position: [5, 1]
 
         layers: {

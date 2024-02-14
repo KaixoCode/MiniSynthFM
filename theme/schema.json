@@ -194,6 +194,7 @@
       "background": "drawable",
       "foreground": "drawable",
       "button": "drawable",
+      "sort-button": "drawable",
       "search": "text-area",
       "bank": "drawable",
       "preset": "drawable",

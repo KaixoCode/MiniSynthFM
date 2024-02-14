@@ -168,6 +168,7 @@ namespace Kaixo::Gui {
         ScrollView* m_Filters;
         ScrollView* m_Presets;
         TextView* m_Search;
+        Button* m_SortButton;
 
         // ------------------------------------------------
 
@@ -200,6 +201,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
         
         void applySearch();
+        void sortPresets(bool reverse);
 
         // ------------------------------------------------
 

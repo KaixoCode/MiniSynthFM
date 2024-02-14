@@ -167,7 +167,7 @@ namespace Kaixo::Gui {
             .alignChildren = Theme::Align::Left
         });
 
-        m_Search = &add<TextView>({ 113, 6, 193, 20 }, {
+        m_Search = &add<TextView>({ 113, 6, 159, 20 }, {
             .graphics = T.display.loadPreset.search,
             .padding = { 4, 3 },
             .multiline = false,
@@ -206,6 +206,14 @@ namespace Kaixo::Gui {
         m_FilterTabs.tab(0).addCallback([&](bool v) { if (v) reloadFilters(Filter::Type::Bank); });
         m_FilterTabs.tab(1).addCallback([&](bool v) { if (v) reloadFilters(Filter::Type::Type); });
         m_FilterTabs.tab(2).addCallback([&](bool v) { if (v) reloadFilters(Filter::Type::Author); });
+
+        m_SortButton = &add<Button>({ 274, 6, 32, 20 }, {
+            .callback = [&](bool v) {
+                sortPresets(v);
+            },
+            .graphics = T.display.loadPreset.sortButton,
+            .behaviour = Button::Behaviour::Toggle
+        });
 
         m_FilterTabs.select(0);
 
@@ -252,7 +260,10 @@ namespace Kaixo::Gui {
                 }
             }
 
-            for (auto& type : types) {
+            std::vector<std::string_view> sortedTypes{ types.begin(), types.end() };
+            std::ranges::sort(sortedTypes);
+
+            for (auto& type : sortedTypes) {
                 m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
                     .self = *this,
                     .type = Filter::Type::Type,
@@ -271,7 +282,10 @@ namespace Kaixo::Gui {
                 }
             }
 
-            for (auto& author : authors) {
+            std::vector<std::string_view> sortedAuthors{ authors.begin(), authors.end() };
+            std::ranges::sort(sortedAuthors);
+
+            for (auto& author : sortedAuthors) {
                 m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
                     .self = *this,
                     .type = Filter::Type::Author,
@@ -282,12 +296,6 @@ namespace Kaixo::Gui {
             break;
         }
         }
-
-        std::ranges::sort(m_Filters->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
-            Filter& f1 = dynamic_cast<Filter&>(*a);
-            Filter& f2 = dynamic_cast<Filter&>(*b);
-            return f1.settings.value < f2.settings.value;
-        });
 
         select((Filter&)*m_Filters->views().front());
         m_Filters->updateDimensions();
@@ -321,13 +329,7 @@ namespace Kaixo::Gui {
             });
         });
 
-        std::ranges::sort(m_Presets->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
-            Preset& f1 = dynamic_cast<Preset&>(*a);
-            Preset& f2 = dynamic_cast<Preset&>(*b);
-            return f1.displayName < f2.displayName;
-        });
-
-        m_Presets->updateDimensions();
+        sortPresets(m_SortButton->selected());
     }
 
     // ------------------------------------------------
@@ -374,6 +376,18 @@ namespace Kaixo::Gui {
                 entry->setVisible(entry->matchesSearch(m_Search->content()));
             }
         }
+        m_Presets->updateDimensions();
+    }
+
+    void LoadPresetTab::sortPresets(bool reverse) {
+        std::ranges::sort(m_Presets->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
+            Preset& f1 = dynamic_cast<Preset&>(*a);
+            Preset& f2 = dynamic_cast<Preset&>(*b);
+            return f1.displayName < f2.displayName;
+        });
+
+        if (reverse) std::ranges::reverse(m_Presets->views());
+
         m_Presets->updateDimensions();
     }
 
