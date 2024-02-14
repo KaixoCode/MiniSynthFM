@@ -8,9 +8,23 @@
 namespace Kaixo::Gui {
 
     // ------------------------------------------------
+    
+    std::string noteToName(Note fnote) {
+        constexpr std::string_view noteNames[12]{
+            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
+        };
+
+        int note = static_cast<int>(Math::floor(fnote));
+        int noteInOctave = note % 12;
+        int octave = note / 12;
+
+        return std::string(noteNames[noteInOctave]) + std::to_string(octave);
+    }
+
+    // ------------------------------------------------
 
     Piano::Key::Key(Context c, Settings s)
-        : View(c), settings(std::move(s))
+        : View(c), settings(std::move(s)), m_Name(noteToName(s.note))
     {
         animation(settings.graphics);
         wantsIdle(true);
@@ -22,8 +36,8 @@ namespace Kaixo::Gui {
         settings.graphics.draw({
             .graphics = g,
             .bounds = localDimensions(),
+            .text = m_Name,
             .state = state(),
-            //.text = ... TODO: note as text
         });
     }
 
