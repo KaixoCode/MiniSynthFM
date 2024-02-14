@@ -317,10 +317,12 @@ namespace Kaixo::Gui {
             }
 
             for (auto& connection : m_FallingConnections) {
-                bounding = bounding.getUnion(connection.bounding(*this, m_LastMousePosition));
+                bounding = bounding.getUnion(connection.bounding(*this, connection.m_Segments.back().position, connection.m_Segments.front().position));
             }
 
-            bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
+            if (m_CurrentConnection.begin != npos || m_CurrentConnection.end != npos) {
+                bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
+            }
             repaint(bounding.getUnion(m_LastBoundingBox)); // Union with previous bounding box to clear previous position
             m_LastBoundingBox = bounding;
         }
