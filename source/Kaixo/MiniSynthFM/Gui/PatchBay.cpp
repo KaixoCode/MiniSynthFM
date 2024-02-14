@@ -32,7 +32,7 @@ namespace Kaixo::Gui {
         settings.graphics.draw({
             .graphics = g,
             .bounds = localDimensions(),
-            .text = settings.name
+            .text = { { "$name", settings.name } }
         });
     }
 

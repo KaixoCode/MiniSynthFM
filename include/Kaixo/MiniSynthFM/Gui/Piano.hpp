@@ -118,7 +118,9 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
             
         private:
-            std::string m_Name{};
+            std::string m_NoteName{};
+            std::string m_FullName{};
+            std::string m_Octave{};
 
             // ------------------------------------------------
 

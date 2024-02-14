@@ -9,22 +9,38 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
     
-    std::string noteToName(Note fnote) {
-        constexpr std::string_view noteNames[12]{
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
-        };
-
+    int noteToOctave(Note fnote) {
         int note = static_cast<int>(Math::floor(fnote));
-        int noteInOctave = note % 12;
-        int octave = note / 12;
+        return (note - 24) / 12;
+    }
+    
+    int noteInOctave(Note fnote) {
+        int note = static_cast<int>(Math::floor(fnote));
+        return note % 12;
+    }
 
-        return std::string(noteNames[noteInOctave]) + std::to_string(octave);
+    constexpr std::string_view noteNames[12]{
+        "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
+    };
+
+    std::string fullNoteName(Note fnote) {
+        int note = noteInOctave(fnote);
+        int octave = noteToOctave(fnote);
+        return std::string(noteNames[note]) + std::to_string(octave);
+    }
+    
+    std::string noteName(Note fnote) {
+        int note = noteInOctave(fnote);
+        return std::string(noteNames[note]);
     }
 
     // ------------------------------------------------
 
     Piano::Key::Key(Context c, Settings s)
-        : View(c), settings(std::move(s)), m_Name(noteToName(s.note))
+        : View(c), settings(std::move(s)), 
+        m_FullName(fullNoteName(settings.note)),
+        m_NoteName(noteName(settings.note)),
+        m_Octave(std::to_string(noteToOctave(settings.note)))
     {
         animation(settings.graphics);
         wantsIdle(true);
@@ -36,7 +52,11 @@ namespace Kaixo::Gui {
         settings.graphics.draw({
             .graphics = g,
             .bounds = localDimensions(),
-            .text = m_Name,
+            .text = { 
+                { "$note", m_NoteName }, 
+                { "$octave", m_Octave },
+                { "$full-note", m_FullName },
+            },
             .state = state(),
         });
     }

@@ -48,7 +48,7 @@ namespace Kaixo::Gui {
         graphics.draw({
             .graphics = g,
             .bounds = localDimensions(),
-            .text = name,
+            .text = { { "$name", name } },
             .state = state()
         });
     }
@@ -113,7 +113,7 @@ namespace Kaixo::Gui {
         graphics.draw({
             .graphics = g,
             .bounds = localDimensions(),
-            .text = displayName,
+            .text = { { "$name", displayName } },
             .state = state()
         });
     }

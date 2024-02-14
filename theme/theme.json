@@ -260,7 +260,7 @@
 
         name: {
           text: {
-            content: $text
+            content: $name
             font: $main-font
             color: $text-color
             align: center
@@ -691,7 +691,7 @@
 
       preset: {
         extends: $basic-button
-        text: $text
+        text: $name
         text-overflow: dots
         text-position: [5, 1]
         text-align: center-left
@@ -699,7 +699,7 @@
 
       bank: {
         extends: $basic-button-select
-        text: $text
+        text: $name
         text-overflow: dots
         text-position: [5, 1]
         text-align: center-left

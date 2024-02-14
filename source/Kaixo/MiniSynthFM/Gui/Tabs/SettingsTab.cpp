@@ -160,7 +160,8 @@ namespace Kaixo::Gui {
             },
             .graphics = T.display.settings.showPiano,
             .behaviour = Button::Behaviour::Toggle,
-        }).value(Storage::flag(ShowPiano));
+        }).value(Storage::getOrDefault<bool>(ShowPiano, true));
+
 
         scrollView.updateDimensions();
 
