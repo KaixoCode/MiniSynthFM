@@ -150,16 +150,27 @@ namespace Kaixo::Gui {
     }
 
     void PatchBay::Connection::drawCable(juce::Graphics& g, Point<float> a, Point<float> b, PatchBay& self) {
-        m_Segments.front().position = a;
-        m_Segments.back().position = b;
 
         juce::Path path;
-        path.startNewSubPath(a);
 
-        for (std::size_t i = 1; i < Segments - 1; ++i) {
-            path.lineTo(m_Segments[i].position);
+        path.startNewSubPath(a);
+        if (!Storage::flag(CablePhysics)) {
+            Catenary catenary{ a.x(), self.height() - a.y(), b.x(), self.height() - b.y(), 45, 10 };
+            for (std::size_t i = 1; i < Segments - 1; ++i) {
+                auto r = (static_cast<float>(i) / (Segments - 1));
+                auto x = (b.x() - a.x()) * r + a.x();
+                auto y = catenary.calcY(x);
+                path.lineTo({ x, self.height() - y});
+            }
+        } else {
+            m_Segments.front().position = a;
+            m_Segments.back().position = b;
+
+            for (std::size_t i = 1; i < Segments - 1; ++i) {
+                path.lineTo(m_Segments[i].position);
+            }
+            simulationStep();
         }
-        simulationStep();
 
         path.lineTo(b);
 
@@ -308,23 +319,27 @@ namespace Kaixo::Gui {
 
     void PatchBay::onIdle() {
         if (changing()) {
-            // Find bounding box around all moving connections, so we only repaint the smallest necessary rectangle.
-            Rect<int> bounding;
-            for (auto& connection : m_Connections) {
-                if (connection.changing()) {
-                    bounding = bounding.getUnion(connection.bounding(*this, m_LastMousePosition));
+            if (Storage::flag(CablePhysics)) {
+                // Find bounding box around all moving connections, so we only repaint the smallest necessary rectangle.
+                Rect<int> bounding;
+                for (auto& connection : m_Connections) {
+                    if (connection.changing()) {
+                        bounding = bounding.getUnion(connection.bounding(*this, m_LastMousePosition));
+                    }
                 }
-            }
 
-            for (auto& connection : m_FallingConnections) {
-                bounding = bounding.getUnion(connection.bounding(*this, connection.m_Segments.back().position, connection.m_Segments.front().position));
-            }
+                for (auto& connection : m_FallingConnections) {
+                    bounding = bounding.getUnion(connection.bounding(*this, connection.m_Segments.back().position, connection.m_Segments.front().position));
+                }
 
-            if (m_CurrentConnection.begin != npos || m_CurrentConnection.end != npos) {
-                bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
+                if (m_CurrentConnection.begin != npos || m_CurrentConnection.end != npos) {
+                    bounding = bounding.getUnion(m_CurrentConnection.bounding(*this, m_LastMousePosition));
+                }
+                repaint(bounding.getUnion(m_LastBoundingBox)); // Union with previous bounding box to clear previous position
+                m_LastBoundingBox = bounding;
+            } else {
+                repaint();
             }
-            repaint(bounding.getUnion(m_LastBoundingBox)); // Union with previous bounding box to clear previous position
-            m_LastBoundingBox = bounding;
         }
     }
 
@@ -445,7 +460,9 @@ namespace Kaixo::Gui {
             m_CurrentConnection.m_Segments.back().velocity = velocity;
         }
 
-        m_FallingConnections.push_back(m_CurrentConnection);
+        if (Storage::flag(CablePhysics)) {
+            m_FallingConnections.push_back(m_CurrentConnection);
+        }
 
         m_CurrentConnection.reset();
     }
@@ -529,6 +546,12 @@ namespace Kaixo::Gui {
 
     bool PatchBay::changing() {
         if (!m_Changing) return false;
+
+        if (!Storage::flag(CablePhysics)) {
+            auto val = m_Changing;
+            m_Changing = false;
+            return val;
+        }
 
         if (!m_FallingConnections.empty()) {
             m_NotChangingButStillRedraw = false;

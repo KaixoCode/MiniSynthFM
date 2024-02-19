@@ -51,6 +51,7 @@ namespace Kaixo {
 	constexpr std::string_view PresetPath = "presetpath";
 	constexpr std::string_view ShowPiano = "showpiano";
 	constexpr std::string_view WindowScale = "windowscale";
+	constexpr std::string_view CablePhysics = "cablephysics";
 
 	// ------------------------------------------------
 	

@@ -870,6 +870,28 @@
         }
       }
 
+      cable-physics: {
+        extends: $basic-button
+        text: Cable Physics
+        text-position: [5, 1]
+
+        image: button-underline.png
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: Disable
+            text-overflow: dots
+            text-align: center-left
+            text-position: [90, 1]
+
+            selected: {
+              text: Enable
+            }
+          }
+        }
+      }
+
       global-title: {      
         extends: $display-text
 

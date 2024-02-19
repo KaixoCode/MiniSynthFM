@@ -30,7 +30,7 @@ namespace Kaixo::Gui {
             .description("Delay effect");
 
         // ------------------------------------------------
-            
+        
         add<Knob>({ 76, 97, 64, 64 }, {
             .graphics = T.delay.parameters.mix,
             .tooltipName = false,

@@ -161,6 +161,15 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.showPiano,
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::getOrDefault<bool>(ShowPiano, true));
+        
+        scrollView.add<Button>({ Width, 20 }, {
+            .callback = [&](bool state) {
+                Storage::set<bool>(CablePhysics, state);
+                context.repaint();
+            },
+            .graphics = T.display.settings.cablePhysics,
+            .behaviour = Button::Behaviour::Toggle,
+        }).value(Storage::getOrDefault<bool>(CablePhysics, true));
 
 
         scrollView.updateDimensions();

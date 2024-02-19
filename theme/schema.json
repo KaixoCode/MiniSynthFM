@@ -172,6 +172,7 @@
       "reload-theme": "drawable",
       "preset-path": "drawable",
       "touch-mode": "drawable",
+      "cable-physics": "drawable",
       "show-piano": "drawable",
       "parameters": {
         "pitch-bend-range": "drawable",
