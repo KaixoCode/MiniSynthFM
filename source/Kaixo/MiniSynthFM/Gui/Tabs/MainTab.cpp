@@ -5,6 +5,7 @@
 
 // ------------------------------------------------
 
+#include "Kaixo/MiniSynthFM/Gui/Tabs/SavePresetTab.hpp"
 #include "Kaixo/MiniSynthFM/Processing/Interfaces.hpp"
 
 // ------------------------------------------------
@@ -82,16 +83,23 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         add<Button>({ 286, 83, 20, 20 }, {
-            .callback = [&](bool val) {
-                advancedInfo.select(val);
+            .callback = [&](bool) {
+                context.tabControl(SavePresetTabControl).select(1);
             },
-            .graphics = T.display.main.advancedInfo.button,
-            .behaviour = Button::Behaviour::Toggle
+            .graphics = T.display.main.advancedInfo.button
         });
 
         // ------------------------------------------------
-
+        
         add<ImageView>({ .image = T.display.main.foreground, .enableMouse = false });
+
+        // ------------------------------------------------
+        
+        context.tabControl(SavePresetTabControl).add(1, add<PresetTab>({ 0, 0, 312, 165 }, {
+            .popup = settings.popup
+        }));
+
+        context.tabControl(SavePresetTabControl).select(0);
 
         // ------------------------------------------------
 

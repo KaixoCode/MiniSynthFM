@@ -693,6 +693,12 @@
         text-align: center
       }
 
+      cancel-button: {
+        extends: $basic-button
+        text: Cancel
+        text-align: center
+      }
+
       name: $display-text-area
       author: $display-text-area
       type: $display-text-area

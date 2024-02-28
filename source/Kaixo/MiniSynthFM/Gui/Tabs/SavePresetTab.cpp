@@ -74,12 +74,19 @@ namespace Kaixo::Gui {
             .placeholder = "Description"
         });
 
-        add<Button>({ 6, 139, 300, 20 }, {
+        add<Button>({ 160, 139, 146, 20 }, {
             .callback = [&](bool) {
                 if (name->empty()) settings.popup.open([](bool) {}, "You cannot leave the preset name blank.", false);
                 else savePreset(false);
             },
             .graphics = T.display.savePreset.saveButton,
+        });
+
+        add<Button>({ 6, 139, 148, 20 }, {
+            .callback = [&](bool) {
+                context.tabControl(SavePresetTabControl).select(0);
+            },
+            .graphics = T.display.savePreset.cancelButton,
         });
 
         // ------------------------------------------------
@@ -121,6 +128,7 @@ namespace Kaixo::Gui {
     void PresetTab::resultHandler(SaveResult result) {
         switch (result) {
         case SaveResult::Success:
+            context.tabControl(SavePresetTabControl).select(0);
             return settings.popup.open([](bool) {}, "Preset saved!", false);
         case SaveResult::AlreadyExists:
             return settings.popup.open([this](bool v) {

@@ -192,7 +192,8 @@
       "author": "text-area",
       "type": "text-area",
       "description": "text-area",
-      "save-button": "drawable"
+      "save-button": "drawable",
+      "cancel-button": "drawable"
     },
     "load-preset": {
       "background": "drawable",

@@ -46,10 +46,6 @@ namespace Kaixo::Gui {
         TextView* presetName = nullptr;
         
         // ------------------------------------------------
-        
-        TabControl advancedInfo{};
-
-        // ------------------------------------------------
 
         struct Settings {
 
