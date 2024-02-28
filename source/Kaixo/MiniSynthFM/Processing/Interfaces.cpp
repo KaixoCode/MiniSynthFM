@@ -13,17 +13,23 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
     
-    float SampleRateInterface::sampleRate() {
+    std::size_t GeneralInfoInterface::activeVoices() {
+        return self<MiniSynthFMProcessor>().bank.activeVoices();
+    }
+    
+    // ------------------------------------------------
+    
+    float GeneralInfoInterface::sampleRate() {
         return self<MiniSynthFMProcessor>().sampleRate();
     }
 
     // ------------------------------------------------
 
-    float TimerInterface::nanosPerSample() {
+    float GeneralInfoInterface::nanosPerSample() {
         return self<MiniSynthFMProcessor>().timerNanosPerSample;
     }
 
-    float TimerInterface::percent() {
+    float GeneralInfoInterface::percent() {
         return self<MiniSynthFMProcessor>().timerPercent;
     }
 

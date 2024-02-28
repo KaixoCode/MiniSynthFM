@@ -49,6 +49,7 @@ namespace Kaixo::Gui {
         Button* presetPath;
         Button* cpuUsage = nullptr;
         Button* sampleRate = nullptr;
+        Button* activeVoices = nullptr;
 
         // ------------------------------------------------
 

@@ -12,24 +12,19 @@
 // ------------------------------------------------
 
 namespace Kaixo::Processing {
-
+    
     // ------------------------------------------------
     
-    class SampleRateInterface : public Interface {
+    class GeneralInfoInterface : public Interface {
     public:
+
+        // ------------------------------------------------
+        
+        std::size_t activeVoices();
 
         // ------------------------------------------------
 
         float sampleRate();
-
-        // ------------------------------------------------
-
-    };
-    
-    // ------------------------------------------------
-    
-    class TimerInterface : public Interface {
-    public:
 
         // ------------------------------------------------
 

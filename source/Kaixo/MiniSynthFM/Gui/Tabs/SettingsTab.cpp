@@ -14,14 +14,18 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void SettingsTab::onIdle() {
-        auto interface = context.interface<Processing::TimerInterface>();
+        auto interface = context.interface<Processing::GeneralInfoInterface>();
         auto percent = interface->percent();
         cpuUsage->settings.text = std::format("{:.2f} %", percent);
         cpuUsage->repaint();
 
-        auto srate = context.interface<Processing::SampleRateInterface>()->sampleRate();
+        auto srate = interface->sampleRate();
         sampleRate->settings.text = Formatters::Frequency.format(srate);
         sampleRate->repaint();
+
+        auto voices = interface->activeVoices();
+        activeVoices->settings.text = std::format("{:d}/8", voices);
+        activeVoices->repaint();
     }
 
     // ------------------------------------------------
@@ -237,6 +241,10 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.cpuUsage,
         });
         
+        activeVoices = &scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.activeVoices,
+        });
+
         std::string optimizations = "No SIMD registers available";
         switch (simd_path::path) {
         case simd_path::P0: optimizations = "No SIMD registers available"; break;
@@ -249,7 +257,7 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.simdOptimizations,
             .text = optimizations,
         });
-        
+
         sampleRate = &scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.sampleRate,
         });

@@ -941,6 +941,22 @@
         }
       }
 
+      active-voices: {
+        extends: $basic-button
+        text: Active Voices
+        text-position: [5, 1]
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: $text
+            text-overflow: dots
+            text-align: center-left
+            text-position: [95, 1]
+          }
+        }
+      }
+
       parameters: {
         quality: {
           extends: $basic-button

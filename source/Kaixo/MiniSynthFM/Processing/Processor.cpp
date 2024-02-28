@@ -28,11 +28,10 @@ namespace Kaixo::Processing {
         registerInterface<LfoInterface>();
         registerInterface<ModInterface>();
         registerInterface<PianoInterface>();
-        registerInterface<TimerInterface>();
+        registerInterface<GeneralInfoInterface>();
         registerInterface<ModWheelInterface>();
         registerInterface<VelocityInterface>();
         registerInterface<RandomInterface>();
-        registerInterface<SampleRateInterface>();
     }
 
     // ------------------------------------------------
