@@ -154,10 +154,7 @@
       "advanced-info": {
         "background": "drawable",
         "foreground": "drawable",
-        "button": "drawable",
-        "cpu-usage": "drawable",
-        "sample-rate": "drawable",
-        "simd-optimizations": "drawable"
+        "button": "drawable"
       }
     },
     "settings": {
@@ -166,6 +163,7 @@
       "button": "drawable",
       "preset-title": "drawable",
       "global-title": "drawable",
+      "info-title": "drawable",
       "zoom-button": "drawable",
       "theme-path": "drawable",
       "default-theme": "drawable",
@@ -174,6 +172,11 @@
       "touch-mode": "drawable",
       "cable-physics": "drawable",
       "show-piano": "drawable",
+      "cpu-usage": "drawable",
+      "active-voices": "drawable",
+      "sample-rate": "drawable",
+      "simd-optimizations": "drawable",
+      "version": "drawable",
       "parameters": {
         "pitch-bend-range": "drawable",
         "phase-mode": "drawable",

@@ -44,10 +44,7 @@ namespace Kaixo::Gui {
 
         TextView* description = nullptr;
         TextView* presetName = nullptr;
-        Button* cpuUsage = nullptr;
-        Button* simdOptimizations = nullptr;
-        Button* sampleRate = nullptr;
-
+        
         // ------------------------------------------------
         
         TabControl advancedInfo{};
@@ -63,10 +60,6 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
         } settings;
-
-        // ------------------------------------------------
-
-        void onIdle() override;
 
         // ------------------------------------------------
 

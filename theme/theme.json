@@ -567,54 +567,6 @@
             }
           }
         }
-
-        sample-rate: {
-          extends: $basic-button
-          text: Sample Rate
-          text-position: [5, 1]
-
-          layers: {
-            path: {
-              extends: $display-text
-              text: $text
-              text-overflow: dots
-              text-align: center-left
-              text-position: [95, 1]
-            }
-          }
-        }
-
-        cpu-usage: {
-          extends: $basic-button
-          text: CPU Usage
-          text-position: [5, 1]
-
-          layers: {
-            path: {
-              extends: $display-text
-              text: $text
-              text-overflow: dots
-              text-align: center-left
-              text-position: [95, 1]
-            }
-          }
-        }
-
-        simd-optimizations: {
-          extends: $basic-button
-          text: Optimizations
-          text-position: [5, 1]
-
-          layers: {
-            path: {
-              extends: $display-text
-              text: $text
-              text-overflow: dots
-              text-align: center-left
-              text-position: [95, 1]
-            }
-          }
-        }
       }
       
       next-preset: {
@@ -908,6 +860,79 @@
 
         image-edges: [2, 2, 2, 2]
         image: button-underline.png
+      }
+
+      info-title: {      
+        extends: $display-text
+
+        text: General Info
+
+        image-edges: [2, 2, 2, 2]
+        image: button-underline.png
+      }
+
+      sample-rate: {
+        extends: $basic-button
+        text: Sample Rate
+        text-position: [5, 1]
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: $text
+            text-overflow: dots
+            text-align: center-left
+            text-position: [95, 1]
+          }
+        }
+      }
+
+      cpu-usage: {
+        extends: $basic-button
+        text: CPU Usage
+        text-position: [5, 1]
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: $text
+            text-overflow: dots
+            text-align: center-left
+            text-position: [95, 1]
+          }
+        }
+      }
+
+      simd-optimizations: {
+        extends: $basic-button
+        text: Optimizations
+        text-position: [5, 1]
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: $text
+            text-overflow: dots
+            text-align: center-left
+            text-position: [95, 1]
+          }
+        }
+      }
+
+      version: {
+        extends: $basic-button
+        text: Version
+        text-position: [5, 1]
+
+        layers: {
+          path: {
+            extends: $display-text
+            text: $text
+            text-overflow: dots
+            text-align: center-left
+            text-position: [95, 1]
+          }
+        }
       }
 
       parameters: {

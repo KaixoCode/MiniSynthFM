@@ -36,19 +36,6 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    void MainTab::onIdle() {
-        auto interface = context.interface<Processing::TimerInterface>();
-        auto percent = interface->percent();
-        cpuUsage->settings.text = std::format("{:.2f} %", percent);
-        cpuUsage->repaint();
-
-        auto srate = context.interface<Processing::SampleRateInterface>()->sampleRate();
-        sampleRate->settings.text = Formatters::Frequency.format(srate);
-        sampleRate->repaint();
-    }
-
-    // ------------------------------------------------
-
     MainTab::MainTab(Context c, Settings s)
         : View(c), settings(s)
     {
@@ -105,42 +92,6 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         add<ImageView>({ .image = T.display.main.foreground, .enableMouse = false });
-
-        // ------------------------------------------------
-        
-        auto& advanced = add<View>({ 6, 6, 300, 74 });
-
-        // ------------------------------------------------
-
-        advanced.add<ImageView>({ .image = T.display.main.advancedInfo.background });
-
-        cpuUsage = &advanced.add<Button>({ 0, 0, 300, 20 }, {
-            .graphics = T.display.main.advancedInfo.cpuUsage,
-        });
-        
-        std::string optimizations = "No SIMD registers available";
-        switch (simd_path::path) {
-        case simd_path::P0: optimizations = "No SIMD registers available"; break;
-        case simd_path::P1: optimizations = "SSE/SSE2"; break;
-        case simd_path::P2: optimizations = "SSE/SSE2/3/4.1 FMA"; break;
-        case simd_path::P3: optimizations = "SSE/SSE2/3/4.1 FMA AVX/AVX2"; break;
-        }
-
-        simdOptimizations = &advanced.add<Button>({ 0, 22, 300, 20 }, {
-            .graphics = T.display.main.advancedInfo.simdOptimizations,
-            .text = optimizations,
-        });
-        
-        sampleRate = &advanced.add<Button>({ 0, 44, 300, 20 }, {
-            .graphics = T.display.main.advancedInfo.sampleRate,
-        });
-
-        advanced.add<ImageView>({ .image = T.display.main.advancedInfo.foreground, .enableMouse = false });
-
-        // ------------------------------------------------
-
-        advancedInfo.add(1, advanced);
-        advancedInfo.select(0);
 
         // ------------------------------------------------
 
