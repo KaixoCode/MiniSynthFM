@@ -22,6 +22,16 @@ namespace Kaixo::Processing {
     public:
 
         // ------------------------------------------------
+        
+        enum class Mode {
+            Up, Down, UpDown, DownUp, UpAndDown, DownAndUp
+        };
+
+        enum class Tempo {
+            T1_64, T1_32, T1_16, T1_8, T1_6, T1_4, T1_2, T1_1, Amount
+        };
+
+        // ------------------------------------------------
 
         Arpeggiator(VoiceBank<VoiceBankVoice, Voices>& bank);
 
@@ -44,6 +54,13 @@ namespace Kaixo::Processing {
         std::size_t samplesBetweenNotes() const;
 
         // ------------------------------------------------
+        
+        void tempo(Tempo val);
+        void tempo(float val);
+        void time(float ms);
+        void synced(bool sync);
+
+        // ------------------------------------------------
 
     private:
         VoiceBank<VoiceBankVoice, Voices>& m_Bank;
@@ -51,6 +68,13 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
         
         float m_GatePercent = 0.5;
+
+        // ------------------------------------------------
+        
+        Mode m_Mode{};
+        Tempo m_Tempo{};
+        float m_Time = 100; // ms
+        bool m_Synced = true;
 
         // ------------------------------------------------
 
@@ -67,6 +91,13 @@ namespace Kaixo::Processing {
         };
 
         Vector<PressedNote, 32> m_NotesDown{};
+        Vector<std::size_t, 32> m_NoteOrder{};
+
+        PressedNote& inSequence(std::size_t index);
+
+        // ------------------------------------------------
+        
+        void createNoteOrder();
 
         // ------------------------------------------------
 

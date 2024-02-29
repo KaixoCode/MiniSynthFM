@@ -34,7 +34,7 @@ namespace Kaixo::Processing {
             m_NoteTrigger = (m_NoteTrigger + 1) % m_NotesDown.size();
         }
 
-        while (m_NotesDown[m_NoteRelease].lastTrigger + gate >= m_Timestamp) {
+        while (inSequence(m_NoteRelease).lastTrigger + gate >= m_Timestamp) {
             bool removed = releaseNote(m_NoteRelease);
             // If note removed, don't increment index, and also double-check trigger
             if (removed) {
@@ -78,7 +78,6 @@ namespace Kaixo::Processing {
                 return;
             }
         }
-
     }
 
     // ------------------------------------------------
@@ -104,9 +103,104 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     std::size_t Arpeggiator::samplesBetweenNotes() const {
-        return 100; // TODO:
+        auto bars = [&]() {
+            switch (m_Tempo) {
+            case Tempo::T1_1:   return 1.f;
+            case Tempo::T1_2:   return 0.5f;
+            case Tempo::T1_4:   return 0.25f;
+            case Tempo::T1_6:   return 0.1875f;
+            case Tempo::T1_8:   return 0.125f;
+            case Tempo::T1_16:  return 0.0625f;
+            case Tempo::T1_32:  return 0.03125f;
+            case Tempo::T1_64:  return 0.015625f;
+            }
+        };
+
+        float time = m_Time;
+        if (m_Synced) {
+            float nmrBarsForTempo = bars();
+            float beatsPerSecond = bpm() / 60;
+            float beatsPerBar = timeSignature().numerator;
+            float secondsPerBar = beatsPerBar / beatsPerSecond;
+            float seconds = nmrBarsForTempo * secondsPerBar;
+            time = seconds * 1000;
+        }
+
+        return sampleRate() * time / 1000.;
     }
 
+    // ------------------------------------------------
+    
+    void Arpeggiator::tempo(Tempo val) { m_Tempo = val; }
+    void Arpeggiator::tempo(float val) { tempo(normalToIndex(val, Tempo::Amount)); }
+
+    void Arpeggiator::time(float ms) { m_Time = ms; }
+
+    void Arpeggiator::synced(bool sync) { m_Synced = sync; }
+
+    // ------------------------------------------------
+    
+    Arpeggiator::PressedNote& Arpeggiator::inSequence(std::size_t index) {
+        return m_NotesDown[m_NoteOrder[index]];
+    }
+
+    // ------------------------------------------------
+    
+    void Arpeggiator::createNoteOrder() {
+        m_NoteOrder.clear();
+        auto sortUp = [](auto& values) {
+            std::ranges::sort(values, [&](auto a, auto b) -> bool {
+                return m_NotesDown[a].note < m_NotesDown[b].note;
+            });
+        };
+
+        auto sortDown = [](auto& values) {
+            std::ranges::sort(values, [&](auto a, auto b) -> bool {
+                return m_NotesDown[a].note > m_NotesDown[b].note;
+            });
+        };
+
+        switch (m_Mode) {
+        case Mode::Up: {
+            for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
+                m_NoteOrder.push_back(0);
+
+            sortUp(m_NoteOrder);
+            break;
+        }
+        case Mode::Down: {
+            for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
+                m_NoteOrder.push_back(0);
+
+            sortDown(m_NoteOrder);
+            break;
+        }
+        case Mode::UpDown: {
+            decltype(m_NoteOrder) temp{};
+            for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
+                temp.push_back(0);
+
+            sortUp(temp);
+            m_NoteOrder.push_back_all(temp);
+            temp.erase(temp.end() - 1); // Remove duplicate
+            sortDown(temp);
+            m_NoteOrder.push_back_all(temp);
+            break;
+        }
+        case Mode::DownUp: {
+            decltype(m_NoteOrder) temp{};
+            for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
+                temp.push_back(0);
+
+            sortDown(temp);
+            m_NoteOrder.push_back_all(temp);
+            temp.erase(temp.end() - 1); // Remove duplicate
+            sortUp(temp);
+            m_NoteOrder.push_back_all(temp);
+            break;
+        }
+        }
+    }
 
     // ------------------------------------------------
 
