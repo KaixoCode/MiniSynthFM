@@ -16,6 +16,99 @@
 namespace Kaixo::Processing {
 
     // ------------------------------------------------
+    
+    Arpeggiator::Arpeggiator(VoiceBank<VoiceBankVoice, Voices>& bank)
+        : m_Bank(bank)
+    {}
+
+    // ------------------------------------------------
+
+    void Arpeggiator::process() {
+        if (m_NotesDown.empty()) return;
+
+        std::size_t samples = samplesBetweenNotes();
+        std::size_t gate = m_GatePercent * samples;
+
+        if (m_Timestamp % samples == 0) {
+            triggerNote(m_NoteTrigger);
+            m_NoteTrigger = (m_NoteTrigger + 1) % m_NotesDown.size();
+        }
+
+        while (m_NotesDown[m_NoteRelease].lastTrigger + gate >= m_Timestamp) {
+            bool removed = releaseNote(m_NoteRelease);
+            // If note removed, don't increment index, and also double-check trigger
+            if (removed) {
+                m_NoteTrigger = m_NoteTrigger % m_NotesDown.size();
+                m_NoteRelease = m_NoteRelease % m_NotesDown.size();
+            } else m_NoteRelease = (m_NoteRelease + 1) % m_NotesDown.size();
+        }
+
+        m_Timestamp += 1;
+    }
+
+    // ------------------------------------------------
+    
+    void Arpeggiator::noteOn(Note note, double velocity, int channel) {
+        if (m_NotesDown.empty()) { // First note, reset timestamp
+            m_Timestamp = 0;
+        }
+        // Note was already pressed, but inactive, activate again
+        for (auto& pressed : m_NotesDown) {
+            if (pressed.note == note) {
+                pressed.active = true;
+                return;
+            }
+        }
+        // Note cache is full, remove oldest
+        if (m_NotesDown.full()) {
+            m_NotesDown.pop_front();
+        }
+        // Add pressed note to cache
+        m_NotesDown.push_back({
+            .velocity = velocity,
+            .note = note,
+            .channel = channel,
+        });
+    }
+
+    void Arpeggiator::noteOff(Note note, double velocity, int channel) {
+        for (auto& pressed : m_NotesDown) {
+            if (pressed.note == note) {
+                pressed.active = false;
+                return;
+            }
+        }
+
+    }
+
+    // ------------------------------------------------
+    
+    void Arpeggiator::triggerNote(std::size_t noteIndex) {
+        auto& note = m_NotesDown[noteIndex];
+        note.lastTrigger = m_Timestamp;
+        m_Bank.noteOn(note.note, note.velocity, note.channel);
+    }
+    
+    bool Arpeggiator::releaseNote(std::size_t noteIndex) {
+        auto& note = m_NotesDown[noteIndex];
+        m_Bank.noteOff(note.note, note.velocity, note.channel);
+    
+        if (!note.active) {
+            m_NotesDown.erase_index(noteIndex);
+            return true;
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------
+
+    std::size_t Arpeggiator::samplesBetweenNotes() const {
+        return 100; // TODO:
+    }
+
+
+    // ------------------------------------------------
 
     MiniSynthFMProcessor::MiniSynthFMProcessor() {
         registerModule(parameters);
