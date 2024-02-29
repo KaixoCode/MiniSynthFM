@@ -30,17 +30,15 @@ namespace Kaixo::Processing {
         std::size_t gate = m_GatePercent * samples;
 
         if (m_Timestamp % samples == 0) {
+            m_NoteTrigger %= m_NotesDown.size();
             triggerNote(m_NoteTrigger);
-            m_NoteTrigger = (m_NoteTrigger + 1) % m_NotesDown.size();
+            m_NoteTrigger++;
         }
 
-        while (inSequence(m_NoteRelease).lastTrigger + gate >= m_Timestamp) {
+        m_NoteRelease %= m_NotesDown.size();
+        if (inSequence(m_NoteRelease).lastTrigger + gate < m_Timestamp) {
             bool removed = releaseNote(m_NoteRelease);
-            // If note removed, don't increment index, and also double-check trigger
-            if (removed) {
-                m_NoteTrigger = m_NoteTrigger % m_NotesDown.size();
-                m_NoteRelease = m_NoteRelease % m_NotesDown.size();
-            } else m_NoteRelease = (m_NoteRelease + 1) % m_NotesDown.size();
+            if (!removed) m_NoteRelease++;
         }
 
         m_Timestamp += 1;
@@ -51,6 +49,8 @@ namespace Kaixo::Processing {
     void Arpeggiator::noteOn(Note note, double velocity, int channel) {
         if (m_NotesDown.empty()) { // First note, reset timestamp
             m_Timestamp = 0;
+            m_NoteTrigger = 0;
+            m_NoteRelease = 0;
         }
         // Note was already pressed, but inactive, activate again
         for (auto& pressed : m_NotesDown) {
@@ -69,6 +69,8 @@ namespace Kaixo::Processing {
             .note = note,
             .channel = channel,
         });
+
+        createNoteOrder();
     }
 
     void Arpeggiator::noteOff(Note note, double velocity, int channel) {
@@ -83,17 +85,18 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
     
     void Arpeggiator::triggerNote(std::size_t noteIndex) {
-        auto& note = m_NotesDown[noteIndex];
+        auto& note = inSequence(noteIndex);
         note.lastTrigger = m_Timestamp;
         m_Bank.noteOn(note.note, note.velocity, note.channel);
     }
     
     bool Arpeggiator::releaseNote(std::size_t noteIndex) {
-        auto& note = m_NotesDown[noteIndex];
+        auto& note = inSequence(noteIndex);
         m_Bank.noteOff(note.note, note.velocity, note.channel);
     
         if (!note.active) {
-            m_NotesDown.erase_index(noteIndex);
+            m_NotesDown.erase_index(m_NoteOrder[noteIndex]);
+            createNoteOrder();
             return true;
         }
 
@@ -131,6 +134,9 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
     
+    void Arpeggiator::mode(Mode val) { m_Mode = val; }
+    void Arpeggiator::mode(float val) { mode(normalToIndex(val, Mode::Amount)); }
+    
     void Arpeggiator::tempo(Tempo val) { m_Tempo = val; }
     void Arpeggiator::tempo(float val) { tempo(normalToIndex(val, Tempo::Amount)); }
 
@@ -148,14 +154,14 @@ namespace Kaixo::Processing {
     
     void Arpeggiator::createNoteOrder() {
         m_NoteOrder.clear();
-        auto sortUp = [](auto& values) {
-            std::ranges::sort(values, [&](auto a, auto b) -> bool {
+        auto sortUp = [this](auto& values) {
+            std::ranges::sort(values, [this](auto a, auto b) -> bool {
                 return m_NotesDown[a].note < m_NotesDown[b].note;
             });
         };
 
-        auto sortDown = [](auto& values) {
-            std::ranges::sort(values, [&](auto a, auto b) -> bool {
+        auto sortDown = [this](auto& values) {
+            std::ranges::sort(values, [this](auto a, auto b) -> bool {
                 return m_NotesDown[a].note > m_NotesDown[b].note;
             });
         };
@@ -163,14 +169,14 @@ namespace Kaixo::Processing {
         switch (m_Mode) {
         case Mode::Up: {
             for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
-                m_NoteOrder.push_back(0);
+                m_NoteOrder.push_back(i);
 
             sortUp(m_NoteOrder);
             break;
         }
         case Mode::Down: {
             for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
-                m_NoteOrder.push_back(0);
+                m_NoteOrder.push_back(i);
 
             sortDown(m_NoteOrder);
             break;
@@ -178,7 +184,7 @@ namespace Kaixo::Processing {
         case Mode::UpDown: {
             decltype(m_NoteOrder) temp{};
             for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
-                temp.push_back(0);
+                temp.push_back(i);
 
             sortUp(temp);
             m_NoteOrder.push_back_all(temp);
@@ -190,7 +196,7 @@ namespace Kaixo::Processing {
         case Mode::DownUp: {
             decltype(m_NoteOrder) temp{};
             for (std::size_t i = 0; i < m_NotesDown.size(); ++i)
-                temp.push_back(0);
+                temp.push_back(i);
 
             sortDown(temp);
             m_NoteOrder.push_back_all(temp);
@@ -210,6 +216,7 @@ namespace Kaixo::Processing {
         registerModule(bank);
         registerModule(voice);
         registerModule(delay);
+        registerModule(arp);
 
         registerInterface<EnvelopeInterface>();
         registerInterface<LfoInterface>();
@@ -230,6 +237,9 @@ namespace Kaixo::Processing {
 
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
+            arp.process();
+            arp.tempo(Arpeggiator::Tempo::T1_16);
+            arp.synced(true);
 
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();
@@ -270,11 +280,11 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::noteOn(Note note, double velocity, int channel) {
-        bank.noteOn(note, velocity, channel);
+        arp.noteOn(note, velocity, channel);
     }
 
     void MiniSynthFMProcessor::noteOff(Note note, double velocity, int channel) {
-        bank.noteOff(note, velocity, channel);
+        arp.noteOff(note, velocity, channel);
     }
 
     // ------------------------------------------------

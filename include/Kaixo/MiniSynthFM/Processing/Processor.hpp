@@ -24,7 +24,7 @@ namespace Kaixo::Processing {
         // ------------------------------------------------
         
         enum class Mode {
-            Up, Down, UpDown, DownUp, UpAndDown, DownAndUp
+            Up, Down, UpDown, DownUp, UpAndDown, DownAndUp, Amount
         };
 
         enum class Tempo {
@@ -55,6 +55,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
+        void mode(Mode val);
+        void mode(float val);
         void tempo(Tempo val);
         void tempo(float val);
         void time(float ms);
@@ -151,6 +153,10 @@ namespace Kaixo::Processing {
             VoiceBankVoice::Settings{ voice, 6ull }, 
             VoiceBankVoice::Settings{ voice, 7ull }, 
         };
+
+        // ------------------------------------------------
+
+        Arpeggiator arp{ bank };
 
         // ------------------------------------------------
         
