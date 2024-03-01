@@ -333,4 +333,49 @@
 
   <!-- ================================================ -->
 
+  <module name="Arpeggiator" short-name="Arp">
+    <param name="Enabled"
+           default="1"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.arp.enable($value > 0.5)"/>
+
+    <param name="Synced"
+           short-name="Sync"
+           default="1"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Off, On]"
+           interface="$self.arp.synced($value > 0.5)"/>
+
+    <param name="Time"
+           default="50"
+           transform="Power[1.f, 500.f, 4.f]"
+           format="Time"
+           interface="$self.arp.time($value * $value * $value * $value * 499 + 1)"/>
+
+    <param name="Tempo"
+           default="2"
+           steps="8"
+           transform="Group[8]"
+           format="Group[1/64, 1/32, 1/16, 1/8, 1/6, 1/4, 1/2, 1/1]"
+           interface="$self.arp.tempo($value)"/>
+
+    <param name="Mode"
+           default="0"
+           steps="6"
+           transform="Group[6]"
+           format="Group[Up, Down, UpDown, DownUp, UpAndDown, DownAndUp]"
+           interface="$self.arp.mode($value)"/>
+
+    <param name="Gate"
+           default="50"
+           transform="Range[1.f, 100.f]"
+           format="Percent"
+           interface="$self.arp.gate($value * 0.99 + 0.01)"/>
+  </module>
+  
+  <!-- ================================================ -->
+
 </module>
