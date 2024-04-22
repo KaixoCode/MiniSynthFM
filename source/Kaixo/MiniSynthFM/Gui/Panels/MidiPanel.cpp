@@ -41,7 +41,7 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .source = ModSource::ModWheel,
             .name = "Mod",
-        });
+        }).description("Route this output jack to any input jack to use the mod wheel as a modulation source.");
         
         add<Led>({ 115, 8, 13, 13 }, {
             .graphics = T.envelope.led,
@@ -61,7 +61,7 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .source = ModSource::Velocity,
             .name = "Vel",
-        });
+        }).description("Route this output jack to any input jack to use the velocity as a modulation source.");
         
         add<Led>({ 247, 8, 13, 13 }, {
             .graphics = T.envelope.led,
@@ -81,7 +81,7 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .source = ModSource::Random,
             .name = "Rand",
-        });
+        }).description("This output jack will generate a random output every key press to be used as a modulation source.");
         
         add<Led>({ 379, 8, 13, 13 }, {
             .graphics = T.envelope.led,

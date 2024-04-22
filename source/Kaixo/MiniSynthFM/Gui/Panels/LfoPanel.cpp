@@ -28,7 +28,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<ImageView>({ .image = T.lfo.background });
+        add<ImageView>({ .image = T.lfo.background })
+            .description("LFO with control over basic waveform, including (quantized) noise, tempo (can be synced to BPM), and depth.");
 
         // ------------------------------------------------
             
@@ -84,7 +85,7 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Output,
             .patchBay = settings.patchBay,
             .source = ModSource::LFO
-        });
+        }).description("Route this output jack to any input jack to use the LFO as a modulation source.");
             
         add<Jack>({ 207, 21, 64, 52 }, {
             .graphics = T.lfo.jacks.depth,
@@ -92,7 +93,7 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .destination = ModDestination::LfoDepth,
             .name = "Depth",
-        });
+        }).description("Routing to this input jack will modulate the depth of the LFO.");
 
         // ------------------------------------------------
             

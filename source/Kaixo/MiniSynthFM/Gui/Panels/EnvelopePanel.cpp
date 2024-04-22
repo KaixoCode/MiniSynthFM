@@ -28,7 +28,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<ImageView>({ .image = T.envelope.background });
+        add<ImageView>({ .image = T.envelope.background })
+            .description("ADSR envelopes can be used as a modulation source. Route the output jack to any input jack to modulate a parameter.");
 
         // ------------------------------------------------
             
@@ -78,7 +79,7 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Output,
             .patchBay = settings.patchBay,
             .source = i == 0 ? ModSource::Envelope1 : ModSource::Envelope2
-        });
+        }).description("Route this output jack to any input jack to use this envelope as a modulation source.");
             
         // ------------------------------------------------
             

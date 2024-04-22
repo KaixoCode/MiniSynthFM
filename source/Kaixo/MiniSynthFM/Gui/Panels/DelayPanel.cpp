@@ -27,7 +27,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
         
         add<ImageView>({ .image = T.delay.background })
-            .description("Delay effect");
+            .description("Delay effect with control over the mix, feedback, tempo (can be synced to BPM), and a toggle to turn on stereo ping-pong mode.");
 
         // ------------------------------------------------
         

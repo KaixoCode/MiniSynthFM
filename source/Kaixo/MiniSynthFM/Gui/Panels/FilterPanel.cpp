@@ -27,7 +27,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
         
         add<ImageView>({ .image = T.filter.background })
-            .description("Filter Effect");
+            .description("Lowpass filter with control over the cutoff and resonance. Adjust the drive knob to add some distortion.");
 
         // ------------------------------------------------
 
@@ -50,7 +50,7 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .destination = ModDestination::FilterFreq,
             .name = "Cutoff"
-        }).description("Modulate the cutoff frequency of the filter.");
+        }).description("Routing to this input jack will modulate the cutoff frequency of the lowpass filter.");
 
         add<Knob>({ 76, 32, 64, 64 }, {
             .graphics = T.filter.parameters.resonance,

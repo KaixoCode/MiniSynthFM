@@ -28,7 +28,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<ImageView>({ .image = T.gain.background });
+        add<ImageView>({ .image = T.gain.background })
+            .description("AD envelope that controls the main output level of MiniFM. Can also be used as a modulation source.");
 
         // ------------------------------------------------
 
@@ -60,7 +61,7 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Output,
             .patchBay = settings.patchBay,
             .source = ModSource::Envelope3
-        }).description("Route the gain envelope's signal to an input jack.");
+        }).description("Route this output jack to any input jack to use this envelope as a modulation source.");
             
         // ------------------------------------------------
             

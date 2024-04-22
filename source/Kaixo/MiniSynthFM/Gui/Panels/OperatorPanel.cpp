@@ -27,7 +27,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        add<ImageView>({ .image = T.oscillator.background });
+        add<ImageView>({ .image = T.oscillator.background })
+            .description("Operators are the source of the sound, route the output jack to the FM input of another operator to do frequency modulation.");
 
         // ------------------------------------------------
 
@@ -71,7 +72,7 @@ namespace Kaixo::Gui {
                             : i == 1 ? ModDestination::Op2FM
                             : ModDestination::Op3FM,
             .name = "FM"
-        });
+        }).description("Routing to this input jack will modulate the frequency of the operator.");
             
         add<Jack>({ 134, 110, 64, 52 }, {
             .graphics = T.oscillator.jacks.amount,
@@ -81,7 +82,7 @@ namespace Kaixo::Gui {
                             : i == 1 ? ModDestination::Op2Amount
                             :          ModDestination::Op3Amount,
             .name = "Amount"
-        });
+        }).description("Routing to this input jack will change how much the FM input jack influences the frequency of the operator.");
 
         add<Jack>({ 200, 46, 64, 52 }, {
             .graphics = T.oscillator.jacks.sync,
@@ -91,7 +92,7 @@ namespace Kaixo::Gui {
                             : i == 1 ? ModDestination::Op2Sync
                             : ModDestination::Op3Sync,
             .name = "Sync"
-        });
+        }).description("Route another operator to this input jack and play with this operator's pitch to get the classic hard-sync sound.");
             
         add<Jack>({ 200, 110, 64, 52 }, {
             .graphics = T.oscillator.jacks.output,
@@ -100,7 +101,7 @@ namespace Kaixo::Gui {
             .source = i == 0 ? ModSource::Op1
                     : i == 1 ? ModSource::Op2
                     :          ModSource::Op3
-        });
+        }).description("Route this output jack to any input jack to use this operator's sound as a modulation source.");
 
         // ------------------------------------------------
             
