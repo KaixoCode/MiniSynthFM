@@ -554,21 +554,15 @@
         }
       }
 
-      advanced-info: {
-        background: {
-          background-color: [27, 27, 27]
-        }
-
-        button: {
-          extends: $basic-button-select
-          layers: {
-            img: {
-              image: info-button.png
-            }
+      save-button: {
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: save-button.png
           }
         }
       }
-      
+
       next-preset: {
         extends: $basic-button
         layers: {
@@ -677,15 +671,6 @@
 
     save-preset: {
       background: display-background.png
-      button: {
-        extends: $basic-button-select
-        layers: {
-          img: {
-            image: tabs.png
-            image-offset: [0, 0]
-          }
-        }
-      }
 
       save-button: {
         extends: $basic-button
@@ -1026,6 +1011,21 @@
       }
     }
     
+    // ------------------------------------------------
+    
+    arp: {
+      background: display-background.png
+      button: {
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: tabs.png
+            image-offset: [0, 0]
+          }
+        }
+      }
+    }
+
     // ------------------------------------------------
 
   }

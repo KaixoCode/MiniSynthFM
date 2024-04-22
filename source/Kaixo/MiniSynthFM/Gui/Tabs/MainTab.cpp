@@ -86,7 +86,7 @@ namespace Kaixo::Gui {
             .callback = [&](bool) {
                 context.tabControl(SavePresetTabControl).select(1);
             },
-            .graphics = T.display.main.advancedInfo.button
+            .graphics = T.display.main.saveButton
         });
 
         // ------------------------------------------------

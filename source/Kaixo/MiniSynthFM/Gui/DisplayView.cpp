@@ -9,6 +9,7 @@
 #include "Kaixo/MiniSynthFM/Gui/Tabs/SavePresetTab.hpp"
 #include "Kaixo/MiniSynthFM/Gui/Tabs/SettingsTab.hpp"
 #include "Kaixo/MiniSynthFM/Gui/Tabs/PopupView.hpp"
+#include "Kaixo/MiniSynthFM/Gui/Tabs/ArpTab.hpp"
 
 // ------------------------------------------------
 
@@ -33,8 +34,8 @@ namespace Kaixo::Gui {
         auto& tabs = context.tabControl(0);
 
         tabs.add(0, add<MainTab>({ .popup = popup }));
-        tabs.add(1, *(load = &add<LoadPresetTab>({ .popup = popup })));
-        tabs.add(2, add<PresetTab>({ .popup = popup }));
+        tabs.add(1, add<ArpTab>({ .popup = popup }));
+        tabs.add(2, *(load = &add<LoadPresetTab>({ .popup = popup })));
         tabs.add(3, add<SettingsTab>({ .popup = popup }));
 
         // ------------------------------------------------
@@ -44,11 +45,11 @@ namespace Kaixo::Gui {
         }));
 
         tabs.addButton(1, add<Button>({ 313, 43, 35, 35 }, {
-            .graphics = T.display.loadPreset.button
+            .graphics = T.display.arp.button
         }));
 
         tabs.addButton(2, add<Button>({ 313, 80, 35, 35 }, {
-            .graphics = T.display.savePreset.button
+            .graphics = T.display.loadPreset.button
         }));
 
         tabs.addButton(3, add<Button>({ 313, 117, 35, 35 }, {
