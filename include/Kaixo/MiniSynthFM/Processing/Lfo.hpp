@@ -99,6 +99,7 @@ namespace Kaixo::Processing {
     private:
         alignas(sizeof(float) * Voices) float m_Phase[Voices]{};
         alignas(sizeof(float) * Voices) float m_Quantized[Voices]{};
+        alignas(sizeof(float) * Voices) float m_QuantizedNext[Voices]{};
         alignas(sizeof(float) * Voices) float m_Noise[Voices]{};
 
         // ------------------------------------------------
@@ -116,15 +117,19 @@ namespace Kaixo::Processing {
             auto phase = Kaixo::load<SimdType>(m_Phase, i);
             Kaixo::store<SimdType>(output + i, this->at<SimdType>(phase, i));
             Kaixo::store<SimdType>(m_Phase + i, Math::Fast::fmod1(phase + delta));
+
+            auto x1 = Kaixo::load<SimdType>(m_Quantized, i);
+            auto x2 = Kaixo::load<SimdType>(m_QuantizedNext, i);
+            auto f = 0.5f + 0.5f * Math::Fast::nsin(0.5f * (phase - 0.5f));
+            Kaixo::store<SimdType>(m_Noise + i, (1 - f) * x1 + f * x2);
         }
 
         // TODO: find way to parallelize this
         for (std::size_t i = 0; i < Voices; ++i) {
             if (m_Phase[i] < delta) {
-                m_Quantized[i] = Random::next() * 2 - 1;
+                m_Quantized[i] = m_QuantizedNext[i];
+                m_QuantizedNext[i] = Random::next() * 2 - 1;
             }
-
-            // TODO: m_Noise
         }
     }
 
@@ -137,7 +142,7 @@ namespace Kaixo::Processing {
         case LfoWaveform::Triangle: return 1.f - Math::Fast::abs(2.f - 4.f * x);
         case LfoWaveform::Saw: return 1.f - 2.f * x;
         case LfoWaveform::Square: return Kaixo::iff<SimdType>(x > 0.5f, [] { return 1.f; }, [] { return -1.f; });
-        case LfoWaveform::Quantized: return Kaixo::load<SimdType>(m_Quantized, i);
+        case LfoWaveform::Quantized: return Kaixo::load<SimdType>(m_QuantizedNext, i);
         case LfoWaveform::Noise: return Kaixo::load<SimdType>(m_Noise, i);
         }
     }
