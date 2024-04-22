@@ -50,7 +50,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        presetName = &add<TextView>({ 6, 83, 234, 20 }, {
+        presetName = &add<TextView>({ 6, 83, 256, 20 }, {
             .graphics = T.display.main.presetName,
             .padding = { 4, 3 },
             .multiline = false,
@@ -58,14 +58,14 @@ namespace Kaixo::Gui {
             .lineHeight = 14,
         });
 
-        add<Button>({ 242, 83, 20, 20 }, {
+        add<Button>({ 264, 83, 20, 20 }, {
             .callback = [&](bool) {
                 context.controller<MiniSynthFMController>().presetDatabase.loadPreviousPreset();
             },
             .graphics = T.display.main.previousPreset,
         });
 
-        add<Button>({ 264, 83, 20, 20 }, {
+        add<Button>({ 286, 83, 20, 20 }, {
             .callback = [&](bool) {
                 context.controller<MiniSynthFMController>().presetDatabase.loadNextPreset();
             },
@@ -81,25 +81,8 @@ namespace Kaixo::Gui {
         });
 
         // ------------------------------------------------
-
-        add<Button>({ 286, 83, 20, 20 }, {
-            .callback = [&](bool) {
-                context.tabControl(SavePresetTabControl).select(1);
-            },
-            .graphics = T.display.main.saveButton
-        });
-
-        // ------------------------------------------------
         
         add<ImageView>({ .image = T.display.main.foreground, .enableMouse = false });
-
-        // ------------------------------------------------
-        
-        context.tabControl(SavePresetTabControl).add(1, add<PresetTab>({ 0, 0, 312, 165 }, {
-            .popup = settings.popup
-        }));
-
-        context.tabControl(SavePresetTabControl).select(0);
 
         // ------------------------------------------------
 

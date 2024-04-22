@@ -84,7 +84,7 @@ namespace Kaixo::Gui {
 
         add<Button>({ 6, 139, 148, 20 }, {
             .callback = [&](bool) {
-                context.tabControl(SavePresetTabControl).select(0);
+                context.tabControl(0).select(0);
             },
             .graphics = T.display.savePreset.cancelButton,
         });
@@ -128,7 +128,7 @@ namespace Kaixo::Gui {
     void PresetTab::resultHandler(SaveResult result) {
         switch (result) {
         case SaveResult::Success:
-            context.tabControl(SavePresetTabControl).select(0);
+            context.tabControl(0).select(0);
             return settings.popup.open([](bool) {}, "Preset saved!", false);
         case SaveResult::AlreadyExists:
             return settings.popup.open([this](bool v) {

@@ -150,13 +150,7 @@
       "preset-name": "text-area",
       "next-preset": "drawable",
       "previous-preset": "drawable",
-      "description": "text-area",
-      "save-button": "drawable"
-    },
-    "arp": {
-      "background": "drawable",
-      "foreground": "drawable",
-      "button": "drawable"
+      "description": "text-area"
     },
     "settings": {
       "background": "drawable",
@@ -188,6 +182,7 @@
     "save-preset": {
       "background": "drawable",
       "foreground": "drawable",
+      "button": "drawable",
       "name": "text-area",
       "author": "text-area",
       "type": "text-area",

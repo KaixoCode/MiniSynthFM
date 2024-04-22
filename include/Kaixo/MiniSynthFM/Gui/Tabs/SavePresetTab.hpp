@@ -23,10 +23,6 @@
 namespace Kaixo::Gui {
 
     // ------------------------------------------------
-    
-    constexpr TabControl::Id SavePresetTabControl = 0x131FF0AB;
-
-    // ------------------------------------------------
 
     class PresetTab : public View, public PresetListener {
     public:

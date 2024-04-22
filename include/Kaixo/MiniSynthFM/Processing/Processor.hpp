@@ -11,7 +11,6 @@
 #include "Kaixo/MiniSynthFM/Controller.hpp"
 #include "Kaixo/MiniSynthFM/Processing/Voice.hpp"
 #include "Kaixo/MiniSynthFM/Processing/Delay.hpp"
-#include "Kaixo/MiniSynthFM/Processing/Arpeggiator.hpp"
 
 // ------------------------------------------------
 
@@ -65,10 +64,6 @@ namespace Kaixo::Processing {
             VoiceBankVoice::Settings{ voice, 6ull }, 
             VoiceBankVoice::Settings{ voice, 7ull }, 
         };
-
-        // ------------------------------------------------
-
-        Arpeggiator arp{ bank };
 
         // ------------------------------------------------
         

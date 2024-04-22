@@ -672,6 +672,16 @@
     save-preset: {
       background: display-background.png
 
+      button: {
+        extends: $basic-button-select
+        layers: {
+          img: {
+            image: tabs.png
+            image-offset: [0, 0]
+          }
+        }
+      }
+
       save-button: {
         extends: $basic-button
         text: Save Preset
@@ -1011,21 +1021,6 @@
       }
     }
     
-    // ------------------------------------------------
-    
-    arp: {
-      background: display-background.png
-      button: {
-        extends: $basic-button-select
-        layers: {
-          img: {
-            image: tabs.png
-            image-offset: [0, 0]
-          }
-        }
-      }
-    }
-
     // ------------------------------------------------
 
   }

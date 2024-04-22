@@ -23,7 +23,6 @@ namespace Kaixo::Processing {
         registerModule(bank);
         registerModule(voice);
         registerModule(delay);
-        registerModule(arp);
 
         registerInterface<EnvelopeInterface>();
         registerInterface<LfoInterface>();
@@ -44,9 +43,6 @@ namespace Kaixo::Processing {
 
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
-            arp.process();
-            arp.tempo(Arpeggiator::Tempo::T1_16);
-            arp.synced(true);
 
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();
@@ -87,11 +83,11 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void MiniSynthFMProcessor::noteOn(Note note, double velocity, int channel) {
-        arp.noteOn(note, velocity, channel);
+        bank.noteOn(note, velocity, channel);
     }
 
     void MiniSynthFMProcessor::noteOff(Note note, double velocity, int channel) {
-        arp.noteOff(note, velocity, channel);
+        bank.noteOff(note, velocity, channel);
     }
 
     // ------------------------------------------------
