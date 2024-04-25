@@ -76,6 +76,10 @@ namespace Kaixo::Gui {
 
         add<Button>({ 160, 139, 146, 20 }, {
             .callback = [&](bool) {
+                if constexpr (versionType == VersionType::Demo) {
+                    settings.popup.open([](bool) {}, "You cannot save presets in demo mode.", false);
+                    return;
+                }
                 if (name->empty()) settings.popup.open([](bool) {}, "You cannot leave the preset name blank.", false);
                 else savePreset(false);
             },

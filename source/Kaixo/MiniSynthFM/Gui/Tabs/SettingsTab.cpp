@@ -80,12 +80,31 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        scrollView.add<Knob>({ Width, 20 }, {
-            .graphics = T.display.settings.parameters.quality,
-            .tooltipName = false,
-            .tooltipValue = false,
-            .param = Synth.quality,
-        });
+        if constexpr (versionType == VersionType::Demo) {
+            context.beginEdit(Synth.quality);
+            context.performEdit(Synth.quality, 0);
+            context.endEdit(Synth.quality);
+
+            scrollView.add<Knob>({ Width, 20 }, {
+                .onchange = [&](ParamValue val) {
+                    context.beginEdit(Synth.quality);
+                    context.performEdit(Synth.quality, 0);
+                    context.endEdit(Synth.quality);
+                    settings.popup.open([](bool) {}, "Cannot change quality in demo mode.", false);
+                },
+                .graphics = T.display.settings.parameters.quality,
+                .tooltipName = false,
+                .tooltipValue = false,
+                .param = Synth.quality,
+            });
+        } else {
+            scrollView.add<Knob>({ Width, 20 }, {
+                .graphics = T.display.settings.parameters.quality,
+                .tooltipName = false,
+                .tooltipValue = false,
+                .param = Synth.quality,
+            });
+        }
         
         scrollView.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.exportQuality,
@@ -264,7 +283,7 @@ namespace Kaixo::Gui {
 
         &scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.version,
-            .text = JucePlugin_VersionString,
+            .text = SYNTH_FullVersion,
         });
 
         // ------------------------------------------------

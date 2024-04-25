@@ -195,6 +195,33 @@ namespace Kaixo::Gui {
         } else {
             foregroundNoPiano.draw({ .graphics = g, .bounds = getLocalBounds() });
         }
+
+        if constexpr (versionType == VersionType::Demo) {
+            int x = 250;
+            int y = 110;
+
+            g.setColour(Color{ 255, 255, 255, 50 });
+
+            g.fillRect(Rect{ x +   0, y +   0,  20, 250 });
+            g.fillRect(Rect{ x +  20, y +   0, 100,  20 });
+            g.fillRect(Rect{ x +  20, y + 230, 100,  20 });
+            g.fillRect(Rect{ x + 120, y +  20,  20, 210 });
+
+            g.fillRect(Rect{ x + 170, y +   0,  20, 250 });
+            g.fillRect(Rect{ x + 190, y +   0, 120,  20 });
+            g.fillRect(Rect{ x + 190, y + 110, 120,  20 });
+            g.fillRect(Rect{ x + 190, y + 230, 120,  20 });
+
+            g.fillRect(Rect{ x + 340, y +   0, 200,  20 });
+            g.fillRect(Rect{ x + 340, y +  20,  20, 230 });
+            g.fillRect(Rect{ x + 430, y +  20,  20, 230 });
+            g.fillRect(Rect{ x + 520, y +  20,  20, 230 });
+
+            g.fillRect(Rect{ x + 560, y +   0,  20, 250 });
+            g.fillRect(Rect{ x + 580, y +   0, 100,  20 });
+            g.fillRect(Rect{ x + 580, y + 230, 100,  20 });
+            g.fillRect(Rect{ x + 680, y +   0,  20, 250 });
+        }
     }
 
     // ------------------------------------------------

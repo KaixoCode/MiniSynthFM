@@ -57,7 +57,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        tabs.tab(1).addCallback([&](bool v) {
+        tabs.tab(2).addCallback([&](bool v) {
             if (v) {
                 load->reload();
             }
