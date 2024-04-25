@@ -14,7 +14,7 @@
 
   <param name="Mod Wheel Amount"
          short-name="Amount"
-         description="Attenuator for the mod wheel out jack. Changes the range of value that the jack outputs."
+         description="Adjust how much of the signal comes out of the mod wheel output jack."
          default="50"
          transform="Range[0.f, 100.f]"
          format="Percent"
@@ -22,7 +22,7 @@
 
   <param name="Velocity Amount"
          short-name="Amount"
-         description="Attenuator for the velocity out jack. Changes the range of value that the jack outputs."
+         description="Adjust how much of the signal comes out of the velocity output jack."
          default="50"
          transform="Range[0.f, 100.f]"
          format="Percent"
@@ -30,7 +30,7 @@
 
   <param name="Random Amount"
          short-name="Amount"
-         description="Attenuator for the random out jack. Changes the range of value that the jack outputs."
+         description="Adjust how much of the signal comes out of the random output jack."
          default="50"
          transform="Range[0.f, 100.f]"
          format="Percent"
@@ -55,7 +55,7 @@
            interface="$self.params.oscillator[$oscillator].tune($value * 24 - 12)"/>
 
     <param name="Octave"
-           description="Tune the operator up or down an octave."
+           description="Pitch the operator up or down an octave."
            default="1" 
            steps="3"
            transform="Group[3]"
@@ -63,7 +63,7 @@
            interface="$self.params.oscillator[$oscillator].octave(normalToIndex($value, 3) - 1)"/>
     
     <param name="Waveform"
-           description="Switch between the 4 basic waveforms: Sine, Triangle, Saw, and Square."
+           description="Switch between 4 basic waveforms: Sine, Triangle, Saw, and Square."
            short-name="Wave"
            default="0" 
            steps="4"
@@ -72,14 +72,14 @@
            interface="$self.params.oscillator[$oscillator].waveform($value)"/>
     
     <param name="FM" var-name="fm"
-           description="Adjust how much FM from the FM jack is applied. This parameter can also additionally be controlled with the Amount jack."
+           description="Adjust how much FM from the FM jack is applied to this operator. This parameter is modulated by the Amount jack."
            default="50"
            transform="Range[0.f, 100.f]"
            format="Percent"
            interface="$self.params.fm[$oscillator] = $value"/>
 
     <param name="Output"
-           description="This toggle enables or disables this operators main output. This does not affect the out jack, only whether the sound gets forwarded to the filter."
+           description="By default an operator does not output its sound. By toggling this output toggle the sound will be forwarded to the filter."
            default="1"
            steps="2"
            transform="Group[2]"
@@ -141,7 +141,7 @@
 
     <param name="Synced"
            short-name="Sync"
-           description="This toggle switches between Frequency and Tempo mode of the LFO. In Tempo mode the LFO is synced to the BPM, in Frequency mode it's not synced."
+           description="Toggle between frequency and sync mode, to either have fine control over the frequency, or have it synced to the BPM."
            default="1"
            steps="2"
            transform="Group[2]"
@@ -149,7 +149,7 @@
            interface="$self.params.lfo[$lfo].synced($value > 0.5)"/>
 
     <param name="Tempo"
-           description="Set the rate of the LFO to a multiple of a bar."
+           description="The LFO is synchronized to the BMP, set the rate of the LFO to a multiple of a bar."
            default="5"
            steps="12"
            transform="Group[12]"
