@@ -9,6 +9,16 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
     
+    std::vector<std::string_view> split_types(std::string_view type) {
+        auto res = split(type, ",");
+        for (auto& r : res) {
+            r = trim(r);
+        }
+        return res;
+    }
+
+    // ------------------------------------------------
+    
     bool matches_search(const auto& haystack, const auto& needle) {
         constexpr auto tolower = [](char c) -> char { return std::tolower(c); };
         constexpr auto equals = [](char a, char b) { return a == b; };
@@ -68,7 +78,7 @@ namespace Kaixo::Gui {
         case Type::Type:
             for (auto& bank : database.banks) {
                 for (auto& preset : bank.presets()) {
-                    if (preset.presetData.type == settings.value) {
+                    if (preset.presetData.type.contains(settings.value)) {
                         callback(preset);
                     }
                 }
@@ -256,7 +266,10 @@ namespace Kaixo::Gui {
             
             for (auto& bank : database.banks) {
                 for (auto& preset : bank.presets()) {
-                    types.insert(preset.presetData.type);
+                    auto presetTypes = split_types(preset.presetData.type);
+                    for (auto& type : presetTypes) {
+                        types.insert(type);
+                    }
                 }
             }
 
