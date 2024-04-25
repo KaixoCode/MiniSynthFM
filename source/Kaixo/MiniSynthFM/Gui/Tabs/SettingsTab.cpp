@@ -81,10 +81,6 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         if constexpr (versionType == VersionType::Demo) {
-            context.beginEdit(Synth.quality);
-            context.performEdit(Synth.quality, 0);
-            context.endEdit(Synth.quality);
-
             scrollView.add<Knob>({ Width, 20 }, {
                 .onchange = [&](ParamValue val) {
                     context.beginEdit(Synth.quality);
