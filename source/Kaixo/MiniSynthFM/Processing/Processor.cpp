@@ -46,23 +46,30 @@ namespace Kaixo::Processing {
 
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();
-            
+
             if (voice.ModuleContainer::active()) {
                 simd_path::execute([this]<class SimdType>() {
                     voice.process<SimdType>();
                 });
                 delay.input = voice.output;
-            } else {
+            }
+            else {
                 delay.input = 0;
             }
 
             if (delay.active()) {
                 delay.process();
                 outputBuffer()[i] = delay.output;
-            } else {
+            }
+            else {
                 outputBuffer()[i] = { 0, 0 };
             }
         }
+
+        //TODO: make sure 'reset()' fixes all NaN problems
+        //if (std::isnan(delay.output.l)) {
+        //    reset();
+        //}
 
         double nanos = timer.time<std::chrono::nanoseconds>();
         double nanosUsedPerSample = nanos / outputBuffer().size();

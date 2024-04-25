@@ -119,12 +119,25 @@ namespace Kaixo::Processing {
     }
 
     // ------------------------------------------------
+
+    void ParallelAntiAliasFilter::reset() {
+        for (auto& coefficient : coefficients) {
+            std::memset(coefficient.state, sizeof(coefficient.state), 0);
+        }
+    }
+
+    // ------------------------------------------------
     
     void ParallelFilter::finalize() {
         auto backup = m_M2;
         m_M2 = m_M1;
         m_M1 = m_M0;
         m_M0 = backup;
+    }
+
+    void ParallelFilter::reset() {
+        std::memset(m_X, sizeof(m_X), 0);
+        std::memset(m_Y, sizeof(m_Y), 0);
     }
 
     // ------------------------------------------------

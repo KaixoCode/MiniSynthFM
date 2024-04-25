@@ -91,6 +91,10 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
+        void reset() override;
+
+        // ------------------------------------------------
+        
     private:
         Settings m_Settings;
 
@@ -112,6 +116,8 @@ namespace Kaixo::Processing {
         KAIXO_INLINE SimdType processPeaking(SimdType input, SimdType frequency, SimdType q, SimdType gain, std::size_t i);
 
         void finalize();
+
+        void reset() override;
 
         // ------------------------------------------------
 
