@@ -200,7 +200,7 @@ namespace Kaixo::Gui {
             int x = 250;
             int y = 110;
 
-            g.setColour(Color{ 255, 255, 255, 50 });
+            g.setColour(Color{ 255, 255, 255, 20 });
 
             g.fillRect(Rect{ x +   0, y +   0,  20, 250 });
             g.fillRect(Rect{ x +  20, y +   0, 100,  20 });
