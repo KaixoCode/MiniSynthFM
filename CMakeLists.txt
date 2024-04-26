@@ -12,7 +12,7 @@ set(COMPANY_CODE "Kaix")
 set(WEBSITE "https://kaixo.me")
 set(BUNDLE_IDENTIFIER "me.kaixo.minisynthfm")
 set(VERSION "0.0.2")
-set(VERSION_TYPE "SNAPSHOT")
+set(VERSION_TYPE "DEMO")
 set(INITIAL_SIZE "1205, 681")
 set(IS_SYNTH true)
 
