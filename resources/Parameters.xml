@@ -38,6 +38,47 @@
 
   <!-- ================================================ -->
 
+  <param name="Quality"
+         default="1"
+         steps="5"
+         transform="Group[5]"
+         format="Group[Low, Normal, High, Ultra, Extreme]"
+         interface="$self.quality($value)"/>
+
+  <param name="Export Quality"
+         default="4"
+         steps="5"
+         transform="Group[5]"
+         format="Group[Low, Normal, High, Ultra, Extreme]"
+         interface="$self.exportQuality($value)"/>
+
+  <param name="Phase Mode"
+         default="1"
+         steps="3"
+         transform="Group[3]"
+         format="Group[Contiguous, Reset, Random]"
+         interface="$self.phaseMode($value)"/>
+
+  <param name="Pitch Bend Range"
+         short-name="Bend Range"
+         default="12"
+         steps="25"
+         transform="Integer[0, 25]"
+         format="Transpose"
+         interface="$self.params.pitchBendRange = normalToIndex($value, 25)"/>
+
+  <!-- ================================================ -->
+
+  <param name="Filter Algorithm"
+         short-name="Filter Alg"
+         default="0"
+         steps="3"
+         transform="Group[3]"
+         format="Group[Dirty Analog, Clean Analog, Digital]"
+         interface="$self.params.filter.setAlgorithm($value)"/>
+
+  <!-- ================================================ -->
+
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">
     <param name="Volume"
            description="Adjust the volume of the operator. This affects both the output jack, and the output toggle."
@@ -89,37 +130,6 @@
     </param>
 
   </module>
-
-  <!-- ================================================ -->
-
-  <param name="Quality"
-         default="1" 
-         steps="5" 
-         transform="Group[5]"
-         format="Group[Low, Normal, High, Ultra, Extreme]"
-         interface="$self.quality($value)"/>
-
-  <param name="Export Quality" 
-         default="4" 
-         steps="5" 
-         transform="Group[5]"
-         format="Group[Low, Normal, High, Ultra, Extreme]"
-         interface="$self.exportQuality($value)"/>
-
-  <param name="Phase Mode" 
-         default="1" 
-         steps="3" 
-         transform="Group[3]"
-         format="Group[Contiguous, Reset, Random]"
-         interface="$self.phaseMode($value)"/>
-
-  <param name="Pitch Bend Range"
-         short-name="Bend Range"
-         default="12"
-         steps="25"
-         transform="Integer[0, 25]"
-         format="Transpose"
-         interface="$self.params.pitchBendRange = normalToIndex($value, 25)"/>
 
   <!-- ================================================ -->
 

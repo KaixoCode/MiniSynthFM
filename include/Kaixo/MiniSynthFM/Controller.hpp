@@ -65,6 +65,12 @@ namespace Kaixo {
 
 	// ------------------------------------------------
 	
+	enum class FilterAlgorithm {
+		DirtyAnalog, CleanAnalog, Digital, Amount
+	};
+
+	// ------------------------------------------------
+	
 	enum class Quality {
 		Low, Normal, High, Ultra, Extreme, Amount
 	};
