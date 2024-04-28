@@ -69,13 +69,19 @@
 
   <!-- ================================================ -->
 
-  <param name="Filter Algorithm"
-         short-name="Filter Alg"
+  <param name="Noisy Filter"
          default="0"
-         steps="3"
-         transform="Group[3]"
-         format="Group[Dirty Analog, Clean Analog, Digital]"
-         interface="$self.params.filter.setAlgorithm($value)"/>
+         steps="2"
+         transform="Group[2]"
+         format="Group[Enabled, Disabled]"
+         interface="$self.params.filter.noisy = $value > 0.5"/>
+
+  <param name="Delay Algorithm"
+         default="0"
+         steps="4"
+         transform="Group[4]"
+         format="Group[Dirty, Dark, Open, Clean]"
+         interface="$self.delay.algorithm($value)"/>
 
   <!-- ================================================ -->
 

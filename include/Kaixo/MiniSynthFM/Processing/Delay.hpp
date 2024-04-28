@@ -26,6 +26,12 @@ namespace Kaixo::Processing {
         };
 
         // ------------------------------------------------
+        
+        enum class Algorithm {
+            Dirty, Dark, Open, Clean, Amount
+        };
+
+        // ------------------------------------------------
 
         constexpr static std::size_t MaxDelaySeconds = 10;
 
@@ -47,6 +53,8 @@ namespace Kaixo::Processing {
         void synced(bool v);
         void tempo(float v);
         void tempo(Tempo v);
+        void algorithm(float v);
+        void algorithm(Algorithm v);
 
         // ------------------------------------------------
         
@@ -79,8 +87,10 @@ namespace Kaixo::Processing {
         std::size_t m_Counter = 0;
         std::size_t m_SamplesSilence = 0;
         Tempo m_Tempo = Tempo::T1_6;
+        Algorithm m_Algorithm = Algorithm::Dirty;
         float m_Delay = 0;
         float m_ActualDelay = 0;
+        float m_SmoothedDelay = 0;
         float m_Feedback = 0.5;
         float m_Mix = true;
         float m_RandomFrequency = 0;

@@ -29,19 +29,12 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
-        FilterAlgorithm algorithm = FilterAlgorithm::DirtyAnalog;
-
-        // ------------------------------------------------
-
         float frequency = 0;
         float resonance = 0;
         float drive = 0;
         bool keytrack = false;
+        bool noisy = true;
         
-        // ------------------------------------------------
-        
-        void setAlgorithm(float val) { algorithm = normalToIndex(val, FilterAlgorithm::Amount); }
-
         // ------------------------------------------------
 
     };
@@ -305,100 +298,62 @@ namespace Kaixo::Processing {
         m_AAF.settings.stopbandAmplitudedB = -80;
         m_AAF.settings.normalisedTransitionWidth = 0.001;
         m_AAF.recalculate();
-        
-        // every 2 ms
-        float timer = 2 * sampleRate() / 1000.;
-        if (m_Counter++ > timer) {
-            m_RandomFrequency = Random::next();
-            m_Counter = 0;
+
+        if (params.noisy) {
+            // every 2 ms
+            float timer = 2 * sampleRate() / 1000.;
+            if (m_Counter++ > timer) {
+                m_RandomFrequency = Random::next();
+                m_Counter = 0;
+            }
+        } else {
+            m_RandomFrequency = 0.5; // No random frequency
         }
 
-        switch (params.algorithm) {
-        case FilterAlgorithm::CleanAnalog:
-            m_RandomFrequency = 0.5; // No random frequency
-            [[fallthrough]];
-        case FilterAlgorithm::DirtyAnalog:
-            for (std::size_t i = 0; i < Voices; i += Count) {
-                auto noteValue = Kaixo::load<SimdType>(note, i);
-                auto freqMod = Kaixo::load<SimdType>(m_FrequencyModulation, i) * m_Ratio + 
-                               Kaixo::load<SimdType>(frequencyModulation, i) * (1 - m_Ratio);
-                Kaixo::store(m_FrequencyModulation + i, freqMod);
+        for (std::size_t i = 0; i < Voices; i += Count) {
+            auto noteValue = Kaixo::load<SimdType>(note, i);
+            auto freqMod = Kaixo::load<SimdType>(m_FrequencyModulation, i) * m_Ratio + 
+                           Kaixo::load<SimdType>(frequencyModulation, i) * (1 - m_Ratio);
+            Kaixo::store(m_FrequencyModulation + i, freqMod);
 
-                auto freqValue = Math::Fast::magnitude_to_log(params.frequency + freqMod, SimdType(16.f), SimdType(16000.f));
+            auto freqValue = Math::Fast::magnitude_to_log(params.frequency + freqMod, SimdType(16.f), SimdType(16000.f));
 
-                if (params.keytrack) {
-                    freqValue = Math::Fast::clamp(freqValue * Math::Fast::exp2((noteValue - 60.f) / 12.f), SimdType(16.f), SimdType(16000.f));
-                } else {
-                    freqValue = Math::Fast::clamp(freqValue, SimdType(16.f), SimdType(16000.f));
-                }
-
-                auto nfreq = (freqValue / 16000.f);
-                auto randRange = 24.f * (1 - (1 - params.drive) * (1 - params.drive)) + 6.f * (1.f - nfreq * nfreq);
-                auto frequency = Math::Fast::clamp(freqValue + (m_RandomFrequency * 2 - 1) * randRange, SimdType(16.f), SimdType(16000.f));
-                auto resonance = params.resonance * (1.f - nfreq * nfreq * nfreq * nfreq);
-
-                // Less resonance when low frequency
-                resonance = Kaixo::iff<SimdType>(nfreq < SimdType(0.01f),
-                    [&] { return resonance * (0.2f + 0.8f * (nfreq / 0.01f)); },
-                    [&] { return resonance; });
-
-                auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
-
-                SimdType res{};
-                if (oversampleAmount == 1) {
-                    auto inputValue = Kaixo::load<SimdType>(input[0], i);
-                    res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
-                } else {
-                    for (std::size_t j = 0; j < oversampleAmount; ++j) {
-                        auto inputValue = Kaixo::load<SimdType>(input[j], i);
-                        inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
-                        res = m_AAF.process<SimdType>(inputValue, i);
-                    }
-                }
-
-                auto filterOutput = m_Filter[0].processLowpass<SimdType>(res, frequency, resonance, i);
-                filterOutput = m_Filter[1].processPeaking<SimdType>(filterOutput, frequency * 0.9f, resonance * 0.2f + 0.2f, params.drive * 12.f - resonance * 15.f, i);
-                filterOutput = m_Filter[2].processPeaking<SimdType>(filterOutput, frequency * 1.1f, 0.2f - resonance * 0.2f, resonance * 15.f - params.drive * 12.f, i);
-                filterOutput = params.drive * Math::Fast::tanh_like(1.115f * filterOutput) + filterOutput * (1.f - 0.9f * params.drive);
-            
-                Kaixo::store<SimdType>(output + i, filterOutput);
+            if (params.keytrack) {
+                freqValue = Math::Fast::clamp(freqValue * Math::Fast::exp2((noteValue - 60.f) / 12.f), SimdType(16.f), SimdType(16000.f));
+            } else {
+                freqValue = Math::Fast::clamp(freqValue, SimdType(16.f), SimdType(16000.f));
             }
-            break;
-        case FilterAlgorithm::Digital:
-            for (std::size_t i = 0; i < Voices; i += Count) {
-                auto noteValue = Kaixo::load<SimdType>(note, i);
-                auto freqMod = Kaixo::load<SimdType>(m_FrequencyModulation, i) * m_Ratio + 
-                               Kaixo::load<SimdType>(frequencyModulation, i) * (1 - m_Ratio);
-                Kaixo::store(m_FrequencyModulation + i, freqMod);
 
-                auto frequency = Math::Fast::magnitude_to_log(params.frequency + freqMod, SimdType(16.f), SimdType(16000.f));
-                auto resonance = params.resonance;
-                auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
+            auto nfreq = (freqValue / 16000.f);
+            auto randRange = 24.f * (1 - (1 - params.drive) * (1 - params.drive)) + 6.f * (1.f - nfreq * nfreq);
+            auto frequency = Math::Fast::clamp(freqValue + (m_RandomFrequency * 2 - 1) * randRange, SimdType(16.f), SimdType(16000.f));
+            auto resonance = params.resonance * (1.f - nfreq * nfreq * nfreq * nfreq);
 
-                if (params.keytrack) {
-                    frequency = Math::Fast::clamp(frequency * Math::Fast::exp2((noteValue - 60.f) / 12.f), SimdType(16.f), SimdType(16000.f));
-                } else {
-                    frequency = Math::Fast::clamp(frequency, SimdType(16.f), SimdType(16000.f));
+            // Less resonance when low frequency
+            resonance = Kaixo::iff<SimdType>(nfreq < SimdType(0.01f),
+                [&] { return resonance * (0.2f + 0.8f * (nfreq / 0.01f)); },
+                [&] { return resonance; });
+
+            auto drive = Math::Fast::db_to_magnitude(params.drive * 12);
+
+            SimdType res{};
+            if (oversampleAmount == 1) {
+                auto inputValue = Kaixo::load<SimdType>(input[0], i);
+                res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
+            } else {
+                for (std::size_t j = 0; j < oversampleAmount; ++j) {
+                    auto inputValue = Kaixo::load<SimdType>(input[j], i);
+                    inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
+                    res = m_AAF.process<SimdType>(inputValue, i);
                 }
-
-                SimdType res{};
-                if (oversampleAmount == 1) {
-                    auto inputValue = Kaixo::load<SimdType>(input[0], i);
-                    res = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
-                } else {
-                    for (std::size_t j = 0; j < oversampleAmount; ++j) {
-                        auto inputValue = Kaixo::load<SimdType>(input[j], i);
-                        inputValue = params.drive * Math::Fast::tanh_like(inputValue * drive) + inputValue * (1 - params.drive);
-                        res = m_AAF.process<SimdType>(inputValue, i);
-                    }
-                }
-
-                auto filterOutput = m_Filter[0].processLowpass<SimdType>(res, frequency, resonance, i);
-                filterOutput = params.drive * Math::Fast::tanh_like(1.115f * filterOutput) + filterOutput * (1.f - 0.9f * params.drive);
-            
-                Kaixo::store<SimdType>(output + i, filterOutput);
             }
-            break;
+
+            auto filterOutput = m_Filter[0].processLowpass<SimdType>(res, frequency, resonance, i);
+            filterOutput = m_Filter[1].processPeaking<SimdType>(filterOutput, frequency * 0.9f, resonance * 0.2f + 0.2f, params.drive * 12.f - resonance * 15.f, i);
+            filterOutput = m_Filter[2].processPeaking<SimdType>(filterOutput, frequency * 1.1f, 0.2f - resonance * 0.2f, resonance * 15.f - params.drive * 12.f, i);
+            filterOutput = params.drive * Math::Fast::tanh_like(1.115f * filterOutput) + filterOutput * (1.f - 0.9f * params.drive);
+            
+            Kaixo::store<SimdType>(output + i, filterOutput);
         }
 
         m_Filter[0].finalize();

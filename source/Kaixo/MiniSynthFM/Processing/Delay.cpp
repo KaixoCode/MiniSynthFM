@@ -22,6 +22,8 @@ namespace Kaixo::Processing {
     void Delay::synced(bool v) { m_Synced = v; }
     void Delay::tempo(float v) { tempo(normalToIndex(v, Tempo::Amount)); }
     void Delay::tempo(Tempo v) { m_Tempo = v; }
+    void Delay::algorithm(float v) { algorithm(normalToIndex(v, Algorithm::Amount)); }
+    void Delay::algorithm(Algorithm v) { m_Algorithm = v; }
 
     // ------------------------------------------------
 
@@ -54,7 +56,7 @@ namespace Kaixo::Processing {
             }
         };
 
-        float delay = m_Delay;
+        float delay = m_SmoothedDelay;
         if (m_Synced) {
             float nmrBarsForTempo = bars();
             float beatsPerSecond = bpm() / 60;
@@ -62,6 +64,12 @@ namespace Kaixo::Processing {
             float secondsPerBar = beatsPerBar / beatsPerSecond;
             float seconds = nmrBarsForTempo * secondsPerBar;
             delay = seconds * 1000;
+        } else {
+            float ratio = sampleRate() / 48000;
+            float r = Math::pow(0.9999, ratio);
+            float maxDiff = ratio * 0.1;
+            float diff = Math::Fast::clamp((1 - r) * (m_Delay - m_SmoothedDelay), -maxDiff, maxDiff);
+            m_SmoothedDelay += diff;
         }
 
         if (m_PingPong) delay *= 2;
@@ -69,27 +77,94 @@ namespace Kaixo::Processing {
 
         float out1 = read(delay);
 
-        m_Filter[0].frequency(200);
-        m_Filter[0].resonance(0.2);
-        m_Filter[0].type(FilterType::HighPass);
-        m_Filter[1].frequency(4000 + (m_RandomFrequency * 2 - 1) * 100);
-        m_Filter[1].resonance(0.4);
-        m_Filter[1].type(FilterType::LowPass);
-        m_Filter[1].type(FilterType::PeakingEQ);
-        m_Filter[2].frequency(3600);
-        m_Filter[2].resonance(0.25);
-        m_Filter[2].gain(-2.4);
-        m_Filter[3].type(FilterType::PeakingEQ);
-        m_Filter[3].frequency(4400);
-        m_Filter[3].resonance(0);
-        m_Filter[3].gain(2.4);
+        bool doDrive = false;
+        switch (m_Algorithm) {
+        case Algorithm::Dirty: {
+            doDrive = true;
+            m_Filter[0].type(FilterType::HighPass);
+            m_Filter[0].frequency(200);
+            m_Filter[0].resonance(0.2);
+            m_Filter[1].type(FilterType::PeakingEQ);
+            m_Filter[1].frequency(4000);
+            m_Filter[1].resonance(0.4);
+            m_Filter[2].type(FilterType::LowPass);
+            m_Filter[2].frequency(3600 + (m_RandomFrequency * 2 - 1) * 100);
+            m_Filter[2].resonance(0.25);
+            m_Filter[2].gain(-2.4);
+            m_Filter[3].type(FilterType::PeakingEQ);
+            m_Filter[3].frequency(4400);
+            m_Filter[3].resonance(0);
+            m_Filter[3].gain(2.4);
+            break;
+        }
+        case Algorithm::Dark: {
+            m_Filter[0].type(FilterType::HighPass);
+            m_Filter[0].frequency(70);
+            m_Filter[0].resonance(0.4);
+            m_Filter[1].type(FilterType::PeakingEQ);
+            m_Filter[1].frequency(9000);
+            m_Filter[1].resonance(0.1);
+            m_Filter[2].type(FilterType::LowPass);
+            m_Filter[2].frequency(1400);
+            m_Filter[2].resonance(0.1);
+            m_Filter[2].gain(-2.4);
+            m_Filter[3].type(FilterType::PeakingEQ);
+            m_Filter[3].frequency(250);
+            m_Filter[3].resonance(0);
+            m_Filter[3].gain(-1.2);
+            break;
+        }
+        case Algorithm::Open: {
+            m_Filter[0].type(FilterType::HighPass);
+            m_Filter[0].frequency(200);
+            m_Filter[0].resonance(0.2);
+            m_Filter[1].type(FilterType::PeakingEQ);
+            m_Filter[1].frequency(7000);
+            m_Filter[1].resonance(0.4);
+            m_Filter[2].type(FilterType::LowPass);
+            m_Filter[2].frequency(3600 + (m_RandomFrequency * 2 - 1) * 100);
+            m_Filter[2].resonance(0.25);
+            m_Filter[2].gain(-1.8);
+            m_Filter[3].type(FilterType::PeakingEQ);
+            m_Filter[3].frequency(4400);
+            m_Filter[3].resonance(0);
+            m_Filter[3].gain(2.4);
+            break;
+        }
+        case Algorithm::Clean: {
+            m_Filter[0].type(FilterType::HighPass);
+            m_Filter[0].frequency(200);
+            m_Filter[0].resonance(0.2);
+            m_Filter[1].type(FilterType::LowPass);
+            m_Filter[1].frequency(16000);
+            m_Filter[1].resonance(0.1);
+            m_Filter[2].type(FilterType::HighShelf);
+            m_Filter[2].frequency(1500);
+            m_Filter[2].resonance(0.0);
+            m_Filter[2].gain(-0.5);
+            m_Filter[3].type(FilterType::LowShelf);
+            m_Filter[3].frequency(2000);
+            m_Filter[3].resonance(0);
+            m_Filter[3].gain(-0.8);
+            break;
+        }
+        }
 
-        float drive = 0.4;
-        float fedBack = 2 * m_Feedback * out1;
-        m_Filter.input = input + fedBack + drive * (Math::Fast::tanh_like(1.2 * fedBack * out1) - fedBack);
-        m_Filter.process();
-        float back = m_Filter.output.average();
-        m_Samples[m_Write] = 0.4 * Math::Fast::tanh_like(1.115 * back) + 0.64 * back;
+        if (doDrive) {
+            float drive = 0.4;
+            float fedBack = 2 * m_Feedback * out1;
+            m_Filter.input = input + fedBack + drive * (Math::Fast::tanh_like(1.2 * fedBack * out1) - fedBack);
+            m_Filter.process();
+            float back = m_Filter.output.average();
+            m_Samples[m_Write] = 0.4 * Math::Fast::tanh_like(1.115 * back) + 0.64 * back;
+        } else {
+            float drive = 0.2;
+            float fedBack = 1.7 * m_Feedback * out1;
+            m_Filter.input = input + fedBack + drive * (Math::Fast::tanh_like(fedBack * out1) - 0.8 * fedBack);
+            m_Filter.process();
+            float back = m_Filter.output.average();
+            m_Samples[m_Write] = 0.82 * back;
+        }
 
         float myOutput = 0;
         if (m_PingPong) {
