@@ -61,6 +61,23 @@ namespace Kaixo::Gui {
         });
         
         // ------------------------------------------------
+        
+        scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.noisyFilter,
+            .behaviour = Button::Behaviour::Toggle,
+            .param = Synth.noisyFilter
+        });
+
+        // ------------------------------------------------
+
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.delayAlgorithm,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.delayAlgorithm,
+        });
+        
+        // ------------------------------------------------
 
         scrollView.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.pitchBendRange,

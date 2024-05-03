@@ -70,10 +70,10 @@
   <!-- ================================================ -->
 
   <param name="Noisy Filter"
-         default="0"
+         default="1"
          steps="2"
          transform="Group[2]"
-         format="Group[Enabled, Disabled]"
+         format="Group[Disabled, Enabled]"
          interface="$self.params.filter.noisy = $value > 0.5"/>
 
   <param name="Delay Algorithm"
@@ -289,7 +289,7 @@
            interface="$self.params.filter.resonance = $value"/>
 
     <param name="Drive"
-           description="The drive control drives the signal both before and after the lowpass filter. This also introduces additional noise to make the filter sound more unstable and dirty."
+           description="The drive control drives the signal both before and after the lowpass filter."
            default="0"
            transform="Range[0.f, 100.f]"
            format="Percent"

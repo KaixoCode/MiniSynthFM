@@ -716,9 +716,9 @@
 
       zoom-button: {
         extends: $basic-button
-        
-        image: button-underline.png
 
+        image: button-underline.png
+        
         text: Zoom
         text-position: [5, 1]
         layers: {
@@ -740,8 +740,8 @@
       reload-theme: {
         extends: $basic-button
         text: Reload Theme
-        text-position: [90, 1]
-
+        text-position: [ 90, 1 ]
+        
         image: button-underline.png
       }
 
@@ -765,9 +765,9 @@
         extends: $basic-button
         text: Preset Path
         text-position: [5, 2]
-
+        
         image: button-underline.png
-
+        
         layers: {
           path: {
             extends: $display-text
@@ -783,9 +783,9 @@
         extends: $basic-button
         text: Touch Mode
         text-position: [5, 1]
-
+        
         image: button-underline.png
-
+        
         layers: {
           path: {
             extends: $display-text
@@ -805,9 +805,9 @@
         extends: $basic-button
         text: Show Piano
         text-position: [5, 1]
-
+        
         image: button-underline.png
-
+        
         layers: {
           path: {
             extends: $display-text
@@ -827,9 +827,9 @@
         extends: $basic-button
         text: Cable Physics
         text-position: [5, 1]
-
+        
         image: button-underline.png
-
+        
         layers: {
           path: {
             extends: $display-text
@@ -956,8 +956,23 @@
         quality: {
           extends: $basic-button
           text: Quality
-          text-position: [5, 1]
+          text-position: [ 5, 1 ]
 
+          layers: {
+            value: {
+              extends: $display-text
+              text: $value
+              text-align: center-left
+              text-position: [ 90, 1 ]
+            }
+          }
+        }
+
+        noisy-filter: {
+          extends: $basic-button
+          text: Noisy Filter
+          text-position: [5, 1]
+          
           layers: {
             value: {
               extends: $display-text
@@ -968,13 +983,30 @@
           }
         }
 
+        delay-algorithm: {
+          extends: $basic-button
+          text: Delay Alg
+          text-position: [5, 1]
+          
+          image: button-underline.png
+        
+          layers: {
+            value: {
+              extends: $display-text
+              text: $value
+              text-align: center-left
+              text-position: [90, 1]
+            }
+          }
+        }
+        
         export-quality: {
           extends: $basic-button
           text: Export
           text-position: [5, 1]
-
+          
           image: button-underline.png
-
+        
           layers: {
             value: {
               extends: $display-text
@@ -989,9 +1021,9 @@
           extends: $basic-button
           text: Phase
           text-position: [5, 1]
-
+          
           image: button-underline.png
-
+        
           layers: {
             value: {
               extends: $display-text
@@ -1006,9 +1038,9 @@
           extends: $basic-button
           text: $short-name
           text-position: [5, 1]
-
+          
           image: button-underline.png
-
+        
           layers: {
             value: {
               extends: $display-text
