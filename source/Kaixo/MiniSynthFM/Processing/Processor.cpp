@@ -32,7 +32,6 @@ namespace Kaixo::Processing {
         registerInterface<ModWheelInterface>();
         registerInterface<VelocityInterface>();
         registerInterface<RandomInterface>();
-        registerInterface<InvalidStateInterface>();
     }
 
     // ------------------------------------------------

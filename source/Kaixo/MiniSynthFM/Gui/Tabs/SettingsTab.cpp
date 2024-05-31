@@ -13,24 +13,6 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    void SettingsTab::onIdle() {
-        View::onIdle();
-        auto interface = context.interface<Processing::GeneralInfoInterface>();
-        auto percent = interface->percent();
-        cpuUsage->settings.text = std::format("{:.2f} %", percent);
-        cpuUsage->repaint();
-
-        auto srate = interface->sampleRate();
-        sampleRate->settings.text = Formatters::Frequency.format(srate);
-        sampleRate->repaint();
-
-        auto voices = interface->activeVoices();
-        activeVoices->settings.text = std::format("{:d}/8", voices);
-        activeVoices->repaint();
-    }
-
-    // ------------------------------------------------
-
     SettingsTab::SettingsTab(Context c, Settings s)
         : View(c), settings(s)
     {
@@ -136,19 +118,19 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        themePath = &scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this](bool) {
+        Button& themePath = scrollView.add<Button>({ Width, 20 }, {
+            .callback = [this, &themePath](bool) {
                 themeChooser.launchAsync(
-                        juce::FileBrowserComponent::openMode
+                      juce::FileBrowserComponent::openMode
                     | juce::FileBrowserComponent::canSelectFiles,
-                [this](const juce::FileChooser& choose)
+                [this, &themePath](const juce::FileChooser& choose)
                 {
                     auto file = choose.getResult();
                     auto filepath = file.getFullPathName().toStdString();
 
                     if (!T.open(filepath)) return; // Try open theme
 
-                    themePath->settings.text = T.name();
+                    themePath.settings.text = T.name();
                     context.repaint();
                     Storage::set<std::string>(Setting::LoadedTheme, filepath);
                 });
@@ -158,19 +140,19 @@ namespace Kaixo::Gui {
         });
 
         scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this](bool) {
+            .callback = [this, &themePath](bool) {
                 Storage::set<std::string>(Setting::LoadedTheme, Theme::Default);
                 T.openDefault();
-                themePath->settings.text = Theme::Default;
+                themePath.settings.text = Theme::Default;
                 context.repaint();
             },
             .graphics = T.display.settings.defaultTheme
         });
 
         scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this](bool) {
+            .callback = [this, &themePath](bool) {
                 T.reopen();
-                themePath->settings.text = T.name();
+                themePath.settings.text = T.name();
                 context.repaint();
             },
             .graphics = T.display.settings.reloadTheme
@@ -178,19 +160,19 @@ namespace Kaixo::Gui {
 
         std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-        presetPath = &scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this](bool) {
+        Button& presetPath = scrollView.add<Button>({ Width, 20 }, {
+            .callback = [this, &presetPath](bool) {
                 themeChooser.launchAsync(
                         juce::FileBrowserComponent::openMode
                     | juce::FileBrowserComponent::canSelectDirectories,
-                [this](const juce::FileChooser& choose)
+                [this, &presetPath](const juce::FileChooser& choose)
                 {
                     auto file = choose.getResult();
                     if (!file.exists()) return;
                     auto filepath = file.getFullPathName().toStdString();
 
-                    presetPath->settings.text = filepath;
-                    presetPath->repaint();
+                    presetPath.settings.text = filepath;
+                    presetPath.repaint();
                     Storage::set<std::string>(PresetPath, filepath);
                 });
             },
@@ -270,12 +252,26 @@ namespace Kaixo::Gui {
             .text = "Info",
         });
 
-        cpuUsage = &scrollView.add<Button>({ Width, 20 }, {
+        auto& cpuUsage = scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.cpuUsage,
         });
         
-        activeVoices = &scrollView.add<Button>({ Width, 20 }, {
+        watch<float>([interface = context.interface<Processing::GeneralInfoInterface>()] {
+            return interface->percent();
+        }, [&cpuUsage](float percent) {
+            cpuUsage.settings.text = std::format("{:.2f} %", percent);
+            cpuUsage.repaint();
+        });
+
+        auto& activeVoices = scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.activeVoices,
+        });
+
+        watch<std::size_t>([interface = context.interface<Processing::GeneralInfoInterface>()] {
+            return interface->activeVoices();
+        }, [&activeVoices](std::size_t voices) {
+            activeVoices.settings.text = std::format("{:d}/8", voices);
+            activeVoices.repaint();
         });
 
         std::string optimizations = "No SIMD registers available";
@@ -286,16 +282,23 @@ namespace Kaixo::Gui {
         case simd_path::P3: optimizations = "SSE/SSE2/3/4.1 FMA AVX/AVX2"; break;
         }
 
-        &scrollView.add<Button>({ Width, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.simdOptimizations,
             .text = optimizations,
         });
 
-        sampleRate = &scrollView.add<Button>({ Width, 20 }, {
+        auto& sampleRate = scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.sampleRate,
         });
 
-        &scrollView.add<Button>({ Width, 20 }, {
+        watch<float>([interface = context.interface<Processing::GeneralInfoInterface>()] {
+            return interface->sampleRate();
+        }, [&sampleRate](float srate) {
+            sampleRate.settings.text = Formatters::Frequency.format(srate);
+            sampleRate.repaint();
+        });
+
+        scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.version,
             .text = SYNTH_FullVersion,
         });

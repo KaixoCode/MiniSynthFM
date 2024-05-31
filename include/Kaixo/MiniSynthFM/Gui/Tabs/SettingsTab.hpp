@@ -45,20 +45,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        Button* themePath;
-        Button* presetPath;
-        Button* cpuUsage = nullptr;
-        Button* sampleRate = nullptr;
-        Button* activeVoices = nullptr;
-
-        // ------------------------------------------------
-
         juce::FileChooser themeChooser{ "Choose a MiniFM theme.", {}, "*.minifmtheme" };
         juce::FileChooser presetPathChooser{ "Choose a MiniFM preset folder." };
-
-        // ------------------------------------------------
-
-        void onIdle() override;
 
         // ------------------------------------------------
 
