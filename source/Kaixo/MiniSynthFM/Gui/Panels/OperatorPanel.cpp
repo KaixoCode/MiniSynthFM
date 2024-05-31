@@ -69,8 +69,8 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Input,
             .patchBay = settings.patchBay,
             .destination = i == 0 ? ModDestination::Op1FM
-                            : i == 1 ? ModDestination::Op2FM
-                            : ModDestination::Op3FM,
+                         : i == 1 ? ModDestination::Op2FM
+                                  : ModDestination::Op3FM,
             .name = "FM"
         }).description("Routing to this input jack will modulate the frequency of the operator.");
             
@@ -79,8 +79,8 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Input,
             .patchBay = settings.patchBay,
             .destination = i == 0 ? ModDestination::Op1Amount
-                            : i == 1 ? ModDestination::Op2Amount
-                            :          ModDestination::Op3Amount,
+                         : i == 1 ? ModDestination::Op2Amount
+                                  : ModDestination::Op3Amount,
             .name = "Amount"
         }).description("Routing to this input jack will change how much the FM input jack influences the frequency of the operator.");
 
@@ -89,8 +89,8 @@ namespace Kaixo::Gui {
             .type = Jack::Type::Input,
             .patchBay = settings.patchBay,
             .destination = i == 0 ? ModDestination::Op1Sync
-                            : i == 1 ? ModDestination::Op2Sync
-                            : ModDestination::Op3Sync,
+                         : i == 1 ? ModDestination::Op2Sync
+                                  : ModDestination::Op3Sync,
             .name = "Sync"
         }).description("Route another operator to this input jack and play with this operator's pitch to get the classic hard-sync sound.");
             
@@ -100,11 +100,11 @@ namespace Kaixo::Gui {
             .patchBay = settings.patchBay,
             .source = i == 0 ? ModSource::Op1
                     : i == 1 ? ModSource::Op2
-                    :          ModSource::Op3
+                             : ModSource::Op3
         }).description("Route this output jack to any input jack to use this operator's sound as a modulation source.");
 
         // ------------------------------------------------
-            
+        
         add<Button>({ 180, 3, 80, 23 }, {
             .graphics = T.oscillator.parameters.output,
             .behaviour = Button::Behaviour::Toggle,
