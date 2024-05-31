@@ -136,8 +136,8 @@ namespace Kaixo::Processing {
     }
 
     void ParallelFilter::reset() {
-        std::memset(m_X, sizeof(m_X), 0);
-        std::memset(m_Y, sizeof(m_Y), 0);
+        std::memset(m_X, 0, sizeof(m_X));
+        std::memset(m_Y, 0, sizeof(m_Y));
     }
 
     // ------------------------------------------------
@@ -147,6 +147,7 @@ namespace Kaixo::Processing {
     {
         for (auto& f : m_Filter)
             registerModule(f);
+        registerModule(m_AAF);
     }
 
     // ------------------------------------------------
@@ -157,7 +158,6 @@ namespace Kaixo::Processing {
 
     void CustomFilter::reset() {
         ModuleContainer::reset();
-        //m_AAF.reset();
     }
 
     // ------------------------------------------------

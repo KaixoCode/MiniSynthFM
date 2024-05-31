@@ -191,7 +191,10 @@ namespace Kaixo::Processing {
     }
 
     void Delay::reset() {
+        ModuleContainer::reset();
         std::ranges::fill(m_Samples, 0);
+        input = 0;
+        output = { 0, 0 };
     }
 
     // ------------------------------------------------

@@ -14,6 +14,7 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void SettingsTab::onIdle() {
+        View::onIdle();
         auto interface = context.interface<Processing::GeneralInfoInterface>();
         auto percent = interface->percent();
         cpuUsage->settings.text = std::format("{:.2f} %", percent);
@@ -298,7 +299,7 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.version,
             .text = SYNTH_FullVersion,
         });
-
+        
         // ------------------------------------------------
 
         add<ImageView>({ .image = T.display.settings.foreground, .enableMouse = false });

@@ -32,6 +32,7 @@ namespace Kaixo::Processing {
         registerInterface<ModWheelInterface>();
         registerInterface<VelocityInterface>();
         registerInterface<RandomInterface>();
+        registerInterface<InvalidStateInterface>();
     }
 
     // ------------------------------------------------
@@ -57,24 +58,31 @@ namespace Kaixo::Processing {
                     voice.process<SimdType>();
                 });
                 delay.input = voice.output;
-            }
-            else {
+            } else {
                 delay.input = 0;
             }
 
             if (delay.active()) {
                 delay.process();
                 outputBuffer()[i] = delay.output;
-            }
-            else {
+            } else {
                 outputBuffer()[i] = { 0, 0 };
             }
         }
 
-        //TODO: make sure 'reset()' fixes all NaN problems
-        //if (std::isnan(delay.output.l)) {
-        //    reset();
-        //}
+        // Since the filter can become unstable when modulated at high speeds
+        // this makes sure when an invalid state occurs, it gets reset back to a valid state.
+        if (voice.ModuleContainer::active()) {
+            constexpr float maxPossibleLevel = 20; // Level probably can't get above ~3, but some room for error
+            bool hasInvalidState = std::isnan(delay.output.l) 
+                || delay.output.l >  maxPossibleLevel
+                || delay.output.l < -maxPossibleLevel;
+
+            if (hasInvalidState) {
+                reset();
+                for (auto& frame : outputBuffer()) frame = { 0, 0 };
+            }
+        }
 
         double nanos = timer.time<std::chrono::nanoseconds>();
         double nanosUsedPerSample = nanos / outputBuffer().size();
