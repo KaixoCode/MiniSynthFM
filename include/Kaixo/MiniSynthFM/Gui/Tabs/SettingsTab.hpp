@@ -44,6 +44,11 @@ namespace Kaixo::Gui {
         TabControl zoom;
 
         // ------------------------------------------------
+        
+        Button* themePath;
+        Button* presetPath;
+
+        // ------------------------------------------------
 
         juce::FileChooser themeChooser{ "Choose a MiniFM theme.", {}, "*.minifmtheme" };
         juce::FileChooser presetPathChooser{ "Choose a MiniFM preset folder." };

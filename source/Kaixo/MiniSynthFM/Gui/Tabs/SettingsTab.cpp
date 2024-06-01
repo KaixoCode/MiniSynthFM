@@ -60,10 +60,9 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        scrollView.add<Knob>({ Width, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.monophonic,
-            .tooltipName = false,
-            .tooltipValue = false,
+            .behaviour = Button::Behaviour::Toggle,
             .param = Synth.monophonic,
         });
         
@@ -74,10 +73,9 @@ namespace Kaixo::Gui {
             .param = Synth.glide,
         });
         
-        scrollView.add<Knob>({ Width, 20 }, {
+        scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.alwaysGlide,
-            .tooltipName = false,
-            .tooltipValue = false,
+            .behaviour = Button::Behaviour::Toggle,
             .param = Synth.alwaysGlide,
         });
         
@@ -139,19 +137,19 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        Button& themePath = scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this, &themePath](bool) {
+        themePath = &scrollView.add<Button>({ Width, 20 }, {
+            .callback = [this](bool) {
                 themeChooser.launchAsync(
                       juce::FileBrowserComponent::openMode
                     | juce::FileBrowserComponent::canSelectFiles,
-                [this, &themePath](const juce::FileChooser& choose)
+                [this](const juce::FileChooser& choose)
                 {
                     auto file = choose.getResult();
                     auto filepath = file.getFullPathName().toStdString();
 
                     if (!T.open(filepath)) return; // Try open theme
 
-                    themePath.settings.text = T.name();
+                    themePath->settings.text = T.name();
                     context.repaint();
                     Storage::set<std::string>(Setting::LoadedTheme, filepath);
                 });
@@ -161,19 +159,19 @@ namespace Kaixo::Gui {
         });
 
         scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this, &themePath](bool) {
+            .callback = [this](bool) {
                 Storage::set<std::string>(Setting::LoadedTheme, Theme::Default);
                 T.openDefault();
-                themePath.settings.text = Theme::Default;
+                themePath->settings.text = Theme::Default;
                 context.repaint();
             },
             .graphics = T.display.settings.defaultTheme
         });
 
         scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this, &themePath](bool) {
+            .callback = [this](bool) {
                 T.reopen();
-                themePath.settings.text = T.name();
+                themePath->settings.text = T.name();
                 context.repaint();
             },
             .graphics = T.display.settings.reloadTheme
@@ -181,19 +179,19 @@ namespace Kaixo::Gui {
 
         std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-        Button& presetPath = scrollView.add<Button>({ Width, 20 }, {
-            .callback = [this, &presetPath](bool) {
+        presetPath = &scrollView.add<Button>({ Width, 20 }, {
+            .callback = [this](bool) {
                 themeChooser.launchAsync(
                         juce::FileBrowserComponent::openMode
                     | juce::FileBrowserComponent::canSelectDirectories,
-                [this, &presetPath](const juce::FileChooser& choose)
+                [this](const juce::FileChooser& choose)
                 {
                     auto file = choose.getResult();
                     if (!file.exists()) return;
                     auto filepath = file.getFullPathName().toStdString();
 
-                    presetPath.settings.text = filepath;
-                    presetPath.repaint();
+                    presetPath->settings.text = filepath;
+                    presetPath->repaint();
                     Storage::set<std::string>(PresetPath, filepath);
                 });
             },
