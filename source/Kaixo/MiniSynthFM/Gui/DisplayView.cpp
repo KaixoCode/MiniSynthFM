@@ -43,15 +43,15 @@ namespace Kaixo::Gui {
             .graphics = T.display.main.button
         }));
 
-        tabs.addButton(1, add<Button>({ 313, 43, 35, 35 }, {
+        tabs.addButton(1, add<Button>({ 313, 45, 35, 35 }, {
             .graphics = T.display.savePreset.button
         }));
 
-        tabs.addButton(2, add<Button>({ 313, 80, 35, 35 }, {
+        tabs.addButton(2, add<Button>({ 313, 85, 35, 35 }, {
             .graphics = T.display.loadPreset.button
         }));
 
-        tabs.addButton(3, add<Button>({ 313, 117, 35, 35 }, {
+        tabs.addButton(3, add<Button>({ 313, 124, 35, 35 }, {
             .graphics = T.display.settings.button
         }));
 
