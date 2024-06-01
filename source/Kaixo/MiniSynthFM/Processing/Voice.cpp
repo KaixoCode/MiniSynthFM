@@ -44,13 +44,27 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
-    void MiniSynthFMVoice::trigger(std::size_t i, Note n, float vel) {
+    void MiniSynthFMVoice::trigger(std::size_t i, Note n, float vel, Note fromNote, bool stolen) {
         velocity[i] = vel;
         note[i] = n;
         randomValue[i] = Random::next();
-        for (auto& osc : oscillator) osc.trigger(i);
+
+        if (params.glide != 0) {
+            float glideSamples = (params.glide / 1000.) * sampleRate();
+            currentNote[i] = fromNote;
+            deltaNote[i] = (note[i] - currentNote[i]) / glideSamples;
+            isGliding[i] = true;
+        } else {
+            currentNote[i] = note[i];
+            isGliding[i] = false;
+        }
+
+        if (!stolen) {
+            for (auto& osc : oscillator) osc.trigger(i);
+            for (auto& lfo : lfo) lfo.trigger(i);
+        }
+
         for (auto& env : envelope) env.trigger(i);
-        for (auto& lfo : lfo) lfo.trigger(i);
     }
 
     // ------------------------------------------------
@@ -74,12 +88,19 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     void VoiceBankVoice::trigger() {
-        settings.voice.trigger(settings.index, note, velocity);
+        settings.voice.trigger(settings.index, note, velocity, fromNote, stolen);
     }
 
     void VoiceBankVoice::release() {
         settings.voice.release(settings.index);
     }
+
+    // ------------------------------------------------
+
+    Note VoiceBankVoice::currentNote() const {
+        return settings.voice.currentNote[settings.index];
+    }
+
     // ------------------------------------------------
 
 }

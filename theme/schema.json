@@ -177,6 +177,9 @@
         "noisy-filter": "drawable",
         "delay-algorithm": "drawable",
         "phase-mode": "drawable",
+        "glide": "drawable",
+        "always-glide": "drawable",
+        "monophonic": "drawable",
         "quality": "drawable",
         "export-quality": "drawable"
       }

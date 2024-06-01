@@ -45,6 +45,7 @@ namespace Kaixo::Processing {
         float lfoLevel[Lfos]{};
         bool outputOscillator[Oscillators]{};
 
+        float glide = 0;
         float pitchBendRange = 0;
         float pitchBend = 0;
         float modWheel = 0;
@@ -85,7 +86,7 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        void trigger(std::size_t i, Note n, float vel);
+        void trigger(std::size_t i, Note n, float vel, Note fromNote, bool stolen);
         void release(std::size_t i);
 
         // ------------------------------------------------
@@ -106,6 +107,10 @@ namespace Kaixo::Processing {
         alignas(sizeof(float) * Voices) float velocity[Voices]{};
         alignas(sizeof(float) * Voices) float note[Voices]{};
         alignas(sizeof(float) * Voices) float randomValue[Voices]{};
+        alignas(sizeof(float) * Voices) float currentNote[Voices]{};
+
+        bool isGliding[Voices]{};
+        float deltaNote[Voices]{};
 
         // ------------------------------------------------
 
@@ -140,6 +145,10 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
+        Note currentNote() const override;
+
+        // ------------------------------------------------
+
     };
 
     // ------------------------------------------------
@@ -154,7 +163,7 @@ namespace Kaixo::Processing {
         for (std::size_t i = 0; i < Voices; i += Count) {
             auto _velocity = Kaixo::load<SimdType>(velocity, i);
             auto _random = Kaixo::load<SimdType>(randomValue, i);
-            auto _note = Kaixo::load<SimdType>(note, i);
+            auto _note = Kaixo::load<SimdType>(currentNote, i);
 
             auto velocitylevel = _velocity * params.velocityAmount;
             auto modwheellevel = params.modWheel * params.modWheelAmount;
@@ -263,6 +272,18 @@ namespace Kaixo::Processing {
     template<class SimdType>
     KAIXO_INLINE void MiniSynthFMVoice::process() {
         constexpr std::size_t Count = sizeof(SimdType) / sizeof(float);
+
+        for (std::size_t i = 0; i < Voices; ++i) {
+            if (isGliding[i]) {
+                currentNote[i] += deltaNote[i];
+                if (deltaNote[i] >= 0 && currentNote[i] >= note[i] ||
+                    deltaNote[i] <= 0 && currentNote[i] <= note[i])
+                {
+                    currentNote[i] = note[i];
+                    isGliding[i] = false;
+                }
+            }
+        }
 
         for (auto& lfo : lfo) lfo.process<SimdType>();
         for (auto& env : envelope) env.process<SimdType>();

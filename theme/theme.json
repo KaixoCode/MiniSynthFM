@@ -312,6 +312,22 @@
 
     // ------------------------------------------------
 
+    $settings-entry: {
+      extends: $basic-button
+      text-position: [5, 1]
+      
+      layers: {
+        value: {
+          extends: $display-text
+          text: $value
+          text-align: center-left
+          text-position: [90, 1]
+        }
+      }
+    }
+
+    // ------------------------------------------------
+
   }
 
   // ------------------------------------------------
@@ -954,101 +970,53 @@
 
       parameters: {
         quality: {
-          extends: $basic-button
+          extends: $settings-entry
           text: Quality
-          text-position: [ 5, 1 ]
-
-          layers: {
-            value: {
-              extends: $display-text
-              text: $value
-              text-align: center-left
-              text-position: [ 90, 1 ]
-            }
-          }
         }
 
         noisy-filter: {
-          extends: $basic-button
+          extends: $settings-entry
           text: Noisy Filter
-          text-position: [5, 1]
-          
-          layers: {
-            value: {
-              extends: $display-text
-              text: $value
-              text-align: center-left
-              text-position: [90, 1]
-            }
-          }
+        }
+
+        glide: {
+          extends: $settings-entry
+          text: Glide
+        }
+
+        always-glide: {
+          extends: $settings-entry
+          text: Always Glide
+          image: button-underline.png
+        }
+
+        monophonic: {
+          extends: $settings-entry
+          text: Monophonic
         }
 
         delay-algorithm: {
-          extends: $basic-button
+          extends: $settings-entry
           text: Delay Alg
-          text-position: [5, 1]
-          
           image: button-underline.png
-        
-          layers: {
-            value: {
-              extends: $display-text
-              text: $value
-              text-align: center-left
-              text-position: [90, 1]
-            }
-          }
         }
         
         export-quality: {
-          extends: $basic-button
+          extends: $settings-entry
           text: Export
-          text-position: [5, 1]
-          
           image: button-underline.png
-        
-          layers: {
-            value: {
-              extends: $display-text
-              text: $value
-              text-align: center-left
-              text-position: [90, 1]
-            }
-          }
         }
         
         phase-mode: {
-          extends: $basic-button
+          extends: $settings-entry
           text: Phase
-          text-position: [5, 1]
-          
           image: button-underline.png
-        
-          layers: {
-            value: {
-              extends: $display-text
-              text: $value
-              text-align: center-left
-              text-position: [90, 1]
-            }
-          }
         }
         
         pitch-bend-range: {
-          extends: $basic-button
+          extends: $settings-entry
           text: $short-name
-          text-position: [5, 1]
-          
           image: button-underline.png
-        
-          layers: {
-            value: {
-              extends: $display-text
-              text: $value
-              text-align: center-left
-              text-position: [90, 1]
-            }
-          }
         }
       }
     }

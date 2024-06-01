@@ -48,6 +48,7 @@ namespace Kaixo::Processing {
 
         for (std::size_t i = 0; i < outputBuffer().size(); ++i) {
             parameters.process();
+            bank.updateLastNote();
 
             for (auto& osc : params.oscillator)
                 osc.updateFrequency();

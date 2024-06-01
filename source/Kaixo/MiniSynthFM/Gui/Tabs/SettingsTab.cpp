@@ -51,13 +51,34 @@ namespace Kaixo::Gui {
             .param = Synth.noisyFilter
         });
 
-        // ------------------------------------------------
-
         scrollView.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.delayAlgorithm,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delayAlgorithm,
+        });
+
+        // ------------------------------------------------
+
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.monophonic,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.monophonic,
+        });
+        
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.glide,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.glide,
+        });
+        
+        scrollView.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.alwaysGlide,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.alwaysGlide,
         });
         
         // ------------------------------------------------

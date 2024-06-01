@@ -83,6 +83,26 @@
          format="Group[Dirty, Dark, Open, Clean]"
          interface="$self.delay.algorithm($value)"/>
 
+  <param name="Monophonic"
+         default="0"
+         steps="2"
+         transform="Group[2]"
+         format="Group[Disabled, Enabled]"
+         interface="$self.bank.maxVoices($value > 0.5 ? 1 : 8)"/>
+
+  <param name="Glide"
+         default="100"
+         transform="Power[0.f, 5000.f, 4.f]"
+         format="Time"
+         interface="$self.params.glide = $value * $value * $value * $value * 5000"/>
+
+  <param name="Always Glide"
+         default="0"
+         steps="2"
+         transform="Group[2]"
+         format="Group[Disabled, Enabled]"
+         interface="$self.bank.alwaysLegato($value > 0.5)"/>
+
   <!-- ================================================ -->
 
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">
