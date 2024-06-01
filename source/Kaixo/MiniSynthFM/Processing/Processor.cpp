@@ -102,12 +102,16 @@ namespace Kaixo::Processing {
 
     // ------------------------------------------------
 
-    void MiniSynthFMProcessor::noteOn(Note note, double velocity, int channel) {
-        bank.noteOn(note, velocity, channel);
+    void MiniSynthFMProcessor::noteOnMPE(NoteID id, Note note, double velocity, int channel) {
+        bank.noteOnMPE(id, note, velocity, channel);
     }
 
-    void MiniSynthFMProcessor::noteOff(Note note, double velocity, int channel) {
-        bank.noteOff(note, velocity, channel);
+    void MiniSynthFMProcessor::notePitchBendMPE(NoteID id, double value) {
+        bank.notePitchBendMPE(id, value);
+    }
+
+    void MiniSynthFMProcessor::noteOffMPE(NoteID id, Note note, double velocity, int channel) {
+        bank.noteOffMPE(id, note, velocity, channel);
     }
 
     // ------------------------------------------------

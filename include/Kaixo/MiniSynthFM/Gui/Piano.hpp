@@ -18,8 +18,9 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        virtual void noteOn(Note note) = 0;
+        virtual NoteID noteOn(Note note) = 0;
         virtual void noteOff(Note note) = 0;
+        virtual void pitchBend(NoteID id, float amt) = 0;
 
         // ------------------------------------------------
 
@@ -121,6 +122,7 @@ namespace Kaixo::Gui {
             std::string m_NoteName{};
             std::string m_FullName{};
             std::string m_Octave{};
+            NoteID m_NoteID = NoNoteID;
 
             // ------------------------------------------------
 

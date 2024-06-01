@@ -108,6 +108,7 @@ namespace Kaixo::Processing {
         alignas(sizeof(float) * Voices) float note[Voices]{};
         alignas(sizeof(float) * Voices) float randomValue[Voices]{};
         alignas(sizeof(float) * Voices) float currentNote[Voices]{};
+        alignas(sizeof(float) * Voices) float pitchBend[Voices]{};
 
         bool isGliding[Voices]{};
         float deltaNote[Voices]{};
@@ -148,6 +149,10 @@ namespace Kaixo::Processing {
         Note currentNote() const override;
 
         // ------------------------------------------------
+        
+        void notePitchBendMPE(double value) override;
+
+        // ------------------------------------------------
 
     };
 
@@ -164,6 +169,7 @@ namespace Kaixo::Processing {
             auto _velocity = Kaixo::load<SimdType>(velocity, i);
             auto _random = Kaixo::load<SimdType>(randomValue, i);
             auto _note = Kaixo::load<SimdType>(currentNote, i);
+            auto _mpePitchBend = Kaixo::load<SimdType>(pitchBend, i) * 96.f - 48.f;
 
             auto velocitylevel = _velocity * params.velocityAmount;
             auto modwheellevel = params.modWheel * params.modWheelAmount;
@@ -239,9 +245,9 @@ namespace Kaixo::Processing {
 
             Kaixo::store<SimdType>(filter.note + i, _note + _pitchBend);
 
-            oscillator[0].note<SimdType>(i, _note + _pitchBend + fm1 * 24.f * getAllANoOp(ModDestination::Op1FM));
-            oscillator[1].note<SimdType>(i, _note + _pitchBend + fm2 * 24.f * getAllANoOp(ModDestination::Op2FM));
-            oscillator[2].note<SimdType>(i, _note + _pitchBend + fm3 * 24.f * getAllANoOp(ModDestination::Op3FM));
+            oscillator[0].note<SimdType>(i, _note + _pitchBend + _mpePitchBend + fm1 * 24.f * getAllANoOp(ModDestination::Op1FM));
+            oscillator[1].note<SimdType>(i, _note + _pitchBend + _mpePitchBend + fm2 * 24.f * getAllANoOp(ModDestination::Op2FM));
+            oscillator[2].note<SimdType>(i, _note + _pitchBend + _mpePitchBend + fm3 * 24.f * getAllANoOp(ModDestination::Op3FM));
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
                 op1fm = Kaixo::load<SimdType>(oscillator[0].fmOutput[j], i) * params.volume[0];

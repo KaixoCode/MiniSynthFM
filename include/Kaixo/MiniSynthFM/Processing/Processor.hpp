@@ -31,8 +31,9 @@ namespace Kaixo::Processing {
         
         // ------------------------------------------------
 
-        void noteOn(Note note, double velocity, int channel) override;
-        void noteOff(Note note, double velocity, int channel) override;
+        void noteOnMPE(NoteID id, Note note, double velocity, int channel) override;
+        void notePitchBendMPE(NoteID id, double value) override;
+        void noteOffMPE(NoteID id, Note note, double velocity, int channel) override;
 
         // ------------------------------------------------
         

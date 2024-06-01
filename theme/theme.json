@@ -740,7 +740,7 @@
         layers: {
           level: {
             extends: $display-text
-            text: ["0.5x", "0.7x", "1.0x", "1.5x", "2.0x"]
+            text: ["50%", "70%", "100%", "150%", "200%"]
             text-align: center-left
             text-position: [90, 1]
           }
@@ -816,7 +816,7 @@
           }
         }
       }
-
+      
       show-piano: {
         extends: $basic-button
         text: Show Piano

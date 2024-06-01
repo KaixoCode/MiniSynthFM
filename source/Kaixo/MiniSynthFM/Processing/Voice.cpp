@@ -31,6 +31,8 @@ namespace Kaixo::Processing {
         for (auto& osc : oscillator) registerModule(osc);
         for (auto& env : envelope) registerModule(env);
         registerModule(filter);
+
+        std::fill_n(pitchBend, Voices, 0.5f);
     }
 
     // ------------------------------------------------
@@ -99,6 +101,12 @@ namespace Kaixo::Processing {
 
     Note VoiceBankVoice::currentNote() const {
         return settings.voice.currentNote[settings.index];
+    }
+
+    // ------------------------------------------------
+
+    void VoiceBankVoice::notePitchBendMPE(double value) {
+        settings.voice.pitchBend[settings.index] = value;
     }
 
     // ------------------------------------------------

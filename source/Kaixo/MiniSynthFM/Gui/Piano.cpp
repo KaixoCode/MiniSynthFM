@@ -64,18 +64,18 @@ namespace Kaixo::Gui {
     // ------------------------------------------------
 
     void Piano::Key::mouseDown(const juce::MouseEvent& event) {
-        settings.piano.settings.interface->noteOn(settings.note);
+        m_NoteID = settings.piano.settings.interface->noteOn(settings.note);
     }
     
     void Piano::Key::mouseDrag(const juce::MouseEvent& event) {
         float delta = localDimensions().centerX() - event.x;
-        float offset = Math::sign(delta) * Math::max(Math::abs(delta) / (width() + settings.piano.settings.spacing) - 0.5, 0.f) / 12.;
+        float offset = Math::sign(delta) * Math::max(Math::abs(delta) / (width() + settings.piano.settings.spacing) - 0.5, 0.f) / 48.;
         float note = 0.5 - offset;
-        context.performEdit(Synth.pitchBendParameter, note);
+        settings.piano.settings.interface->pitchBend(m_NoteID, note);
     }
 
     void Piano::Key::mouseUp(const juce::MouseEvent& event) {
-        context.performEdit(Synth.pitchBendParameter, 0.5);
+        settings.piano.settings.interface->pitchBend(m_NoteID, 0.5);
         settings.piano.settings.interface->noteOff(settings.note);
     }
 

@@ -208,7 +208,7 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.touchMode,
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::flag(Setting::TouchMode));
-
+        
         scrollView.add<Button>({ Width, 20 }, {
             .callback = [&](bool state) {
                 Storage::set<bool>(ShowPiano, state);
