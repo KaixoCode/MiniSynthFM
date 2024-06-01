@@ -68,6 +68,7 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void mouseDown(const juce::MouseEvent& e) override;
+            bool keyPressed(const juce::KeyPress& e) override;
 
             // ------------------------------------------------
 
@@ -115,6 +116,7 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void mouseDown(const juce::MouseEvent& e) override;
+            bool keyPressed(const juce::KeyPress& e) override;
 
             // ------------------------------------------------
 

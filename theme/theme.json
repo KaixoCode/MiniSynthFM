@@ -310,6 +310,14 @@
       }
     }
 
+    $basic-button-focus: {
+      extends: $basic-button
+
+      focused: {
+        image: button-hover.png
+      }
+    }
+
     // ------------------------------------------------
 
     $settings-entry: {
@@ -652,7 +660,7 @@
       }
 
       preset: {
-        extends: $basic-button
+        extends: $basic-button-focus
         text: $name
         text-overflow: dots
         text-position: [5, 1]

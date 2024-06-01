@@ -38,6 +38,7 @@ namespace Kaixo::Gui {
     LoadPresetTab::Filter::Filter(Context c, Settings s)
         : View(c), settings(std::move(s))
     {
+        setWantsKeyboardFocus(true);
         graphics = T.display.loadPreset.bank;
         animation(graphics);
     }
@@ -47,7 +48,47 @@ namespace Kaixo::Gui {
     void LoadPresetTab::Filter::mouseDown(const juce::MouseEvent& e) {
         settings.self.select(*this);
     }
+    
+    bool LoadPresetTab::Filter::keyPressed(const juce::KeyPress& e) {
+        if (e.isKeyCode(e.upKey)) {
+            auto& filters = settings.self.m_Filters->views();
+            auto it = std::find_if(filters.begin(), filters.end(),
+                [this](std::unique_ptr<View>& o) { return o.get() == dynamic_cast<View*>(this); });
+            if (it != filters.begin()) {
+                (*--it)->focused(true);
+                settings.self.select(*dynamic_cast<Filter*>(it->get()));
+                settings.self.m_Filters->scrollToKeepVisible(it->get());
+                settings.self.repaint();
+            }
 
+            return true;
+        }        
+
+        if (e.isKeyCode(e.downKey)) {
+            auto& filters = settings.self.m_Filters->views();
+            auto it = std::find_if(filters.begin(), filters.end(),
+                [this](std::unique_ptr<View>& o) { return o.get() == dynamic_cast<View*>(this); });
+            if (it != filters.end() && ++it != filters.end()) {
+                (*it)->focused(true);
+                settings.self.select(*dynamic_cast<Filter*>(it->get()));
+                settings.self.m_Filters->scrollToKeepVisible(it->get());
+                settings.self.repaint();
+            }
+
+            return true;
+        }
+
+        if (e.isKeyCode(e.rightKey)) {
+            auto& presets = settings.self.m_Presets->views();
+            if (!presets.empty()) {
+                presets.front()->focused(true);
+                settings.self.m_Presets->scrollToKeepVisible(presets.front().get());
+                settings.self.repaint();
+            }
+
+            return true;
+        }
+    }
     // ------------------------------------------------
 
     void LoadPresetTab::Filter::paint(juce::Graphics& g) {
@@ -105,6 +146,7 @@ namespace Kaixo::Gui {
     LoadPresetTab::Preset::Preset(Context c, Settings s)
         : View(c), settings(std::move(s))
     {
+        setWantsKeyboardFocus(true);
         graphics = T.display.loadPreset.preset;
         reloadDisplayName();
         animation(graphics);
@@ -114,6 +156,58 @@ namespace Kaixo::Gui {
 
     void LoadPresetTab::Preset::mouseDown(const juce::MouseEvent& e) {
         load();
+    }
+
+    bool LoadPresetTab::Preset::keyPressed(const juce::KeyPress& e) {
+        if (e.isKeyCode(e.returnKey)) {
+            load();
+            return true;
+        }
+
+        if (e.isKeyCode(e.upKey)) {
+            auto& presets = settings.self.m_Presets->views();
+            auto it = std::find_if(presets.begin(), presets.end(),
+                [this](std::unique_ptr<View>& o) { return o.get() == dynamic_cast<View*>(this); });
+            if (it != presets.begin()) {
+                (*--it)->focused(true);
+                settings.self.m_Presets->scrollToKeepVisible(it->get());
+                settings.self.repaint();
+            }
+
+            return true;
+        }        
+
+        if (e.isKeyCode(e.downKey)) {
+            auto& presets = settings.self.m_Presets->views();
+            auto it = std::find_if(presets.begin(), presets.end(),
+                [this](std::unique_ptr<View>& o) { return o.get() == dynamic_cast<View*>(this); });
+            if (it != presets.end() && ++it != presets.end()) {
+                (*it)->focused(true);
+                settings.self.m_Presets->scrollToKeepVisible(it->get());
+                settings.self.repaint();
+            }
+
+            return true;
+        }
+
+        if (e.isKeyCode(e.leftKey)) {
+            auto& filters = settings.self.m_Filters->views();
+            auto it = std::find_if(filters.begin(), filters.end(),
+                [this](std::unique_ptr<View>& o) { return o->selected(); });
+            if (it != filters.end()) {
+                (*it)->focused(true);
+                settings.self.select(*dynamic_cast<Filter*>(it->get()));
+                settings.self.m_Filters->scrollToKeepVisible(it->get());
+                settings.self.repaint();
+            } else if (!filters.empty()) {
+                filters.front()->focused(true);
+                settings.self.select(*dynamic_cast<Filter*>(filters.front().get()));
+                settings.self.m_Filters->scrollToKeepVisible(filters.front().get());
+                settings.self.repaint();
+            }
+
+            return true;
+        }
     }
 
     // ------------------------------------------------
