@@ -37,6 +37,10 @@ namespace Kaixo::Gui {
         Theme::Drawable foregroundNoPiano;
 
         // ------------------------------------------------
+        
+        Button* hideInfoButton;
+
+        // ------------------------------------------------
 
     };
     

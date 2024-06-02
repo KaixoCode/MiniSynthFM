@@ -169,6 +169,34 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
+        ImageView& infoBg = add<ImageView>({ .image = T.infoBackground });
+        ImageView& infoBgNoPiano = add<ImageView>({ .image = T.infoBackgroundNoPiano });
+
+        hideInfoButton = &add<Button>({
+            .callback = [&](bool) {
+                infoBg.setVisible(false);
+                infoBgNoPiano.setVisible(false);
+                hideInfoButton->setVisible(false);
+            }
+        });
+
+        infoBg.setVisible(false);
+        infoBgNoPiano.setVisible(false);
+        hideInfoButton->setVisible(false);
+
+        add<Button>({ 35, 30, 150, 165 }, {
+            .callback = [&](bool) {
+                hideInfoButton->setVisible(true);
+                if (Storage::flag(ShowPiano)) {
+                    infoBg.setVisible(true);
+                } else {
+                    infoBgNoPiano.setVisible(true);
+                }
+            }
+        });
+
+        // ------------------------------------------------
+        
         // Move patch bay to end of views, so it draws on top
         removeChildComponent(&patchBay);
         addChildComponent(&patchBay);

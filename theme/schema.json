@@ -212,5 +212,7 @@
   "background": "drawable",
   "foreground": "drawable",
   "background-no-piano": "drawable",
-  "foreground-no-piano": "drawable"
+  "foreground-no-piano": "drawable",
+  "info-background": "drawable",
+  "info-background-no-piano": "drawable"
 }

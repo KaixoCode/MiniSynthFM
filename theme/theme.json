@@ -343,6 +343,9 @@
   background: background.png
   background-no-piano: background-no-piano.png
 
+  info-background: info-background.png
+  info-background-no-piano: info-background-no-piano.png
+
   // ------------------------------------------------
 
   cables: {
