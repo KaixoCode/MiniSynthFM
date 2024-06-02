@@ -39,6 +39,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
         
         Button* hideInfoButton;
+        Button* openWebsiteButton;
 
         // ------------------------------------------------
 

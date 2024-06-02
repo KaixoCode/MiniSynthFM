@@ -177,16 +177,27 @@ namespace Kaixo::Gui {
                 infoBg.setVisible(false);
                 infoBgNoPiano.setVisible(false);
                 hideInfoButton->setVisible(false);
+                openWebsiteButton->setVisible(false);
             }
         });
+
+        openWebsiteButton = &add<Button>({ 275, 265, 300, 150 }, {
+            .callback = [&](bool) {
+                URL url{ "https://minisynthfm.com" };
+                url.launchInDefaultBrowser();
+            }
+        });
+        openWebsiteButton->setMouseCursor(MouseCursor::PointingHandCursor);
 
         infoBg.setVisible(false);
         infoBgNoPiano.setVisible(false);
         hideInfoButton->setVisible(false);
+        openWebsiteButton->setVisible(false);
 
         add<Button>({ 35, 30, 150, 165 }, {
             .callback = [&](bool) {
                 hideInfoButton->setVisible(true);
+                openWebsiteButton->setVisible(true);
                 if (Storage::flag(ShowPiano)) {
                     infoBg.setVisible(true);
                 } else {
