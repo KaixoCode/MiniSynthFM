@@ -168,6 +168,12 @@ namespace Kaixo::Gui {
         });
 
         // ------------------------------------------------
+
+        // Move patch bay to end of views, so it draws on top
+        removeChildComponent(&patchBay);
+        addChildComponent(&patchBay);
+
+        // ------------------------------------------------
         
         ImageView& infoBg = add<ImageView>({ .image = T.infoBackground });
         ImageView& infoBgNoPiano = add<ImageView>({ .image = T.infoBackgroundNoPiano });
@@ -205,12 +211,6 @@ namespace Kaixo::Gui {
                 }
             }
         });
-
-        // ------------------------------------------------
-        
-        // Move patch bay to end of views, so it draws on top
-        removeChildComponent(&patchBay);
-        addChildComponent(&patchBay);
 
         // ------------------------------------------------
         
