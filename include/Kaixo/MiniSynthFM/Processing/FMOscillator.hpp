@@ -173,9 +173,9 @@ namespace Kaixo::Processing {
             auto delta = _frequency / static_cast<float>(sampleRate());
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
-                SimdType _phaseMod = Kaixo::load<SimdType>(m_PhaseModulation[j], i);
+                SimdType _phaseMod = Math::Fast::fmod1(Kaixo::load<SimdType>(m_PhaseModulation[j], i));
 
-                SimdType phase = Math::Fast::fmod1((static_cast<float>(j) * delta / static_cast<float>(oversampleAmount)) + (_phaseMod + (_phase + 10.f)));
+                SimdType phase = Math::Fast::fmod1((static_cast<float>(j) * delta / static_cast<float>(oversampleAmount)) + (_phaseMod + _phase + 10.f));
                 auto [_output, _fmOutput] = this->at<SimdType>(phase, _frequency);
 
                 Kaixo::store<SimdType>(output[j] + i, _output);
