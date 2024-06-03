@@ -1,0 +1,1084 @@
+{
+  "theme-name": "Red Theme",
+  "variables": {
+    "$selection-color": [
+      255,
+      255,
+      255,
+      50
+    ],
+    "$text-color": [
+      206,
+      206,
+      204
+    ],
+    "$display-color": [
+      150,
+      150,
+      148
+    ],
+    "$display-text-area": {
+      "font": "$main-font",
+      "text-color": "$display-color",
+      "caret-color": "$display-color",
+      "selection-color": "$selection-color",
+      "placeholder-color": {
+        "value": "$display-color",
+        "focused": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "background": {
+        "image-edges": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "image": "button-underline.png",
+        "focused": {
+          "image": "button-hover.png"
+        }
+      }
+    },
+    "$display-text": {
+      "font": "$main-font",
+      "text-position": [
+        0,
+        1
+      ],
+      "text-color": "$display-color"
+    },
+    "$knob": {},
+    "$main-knob": {
+      "extends": "$knob",
+      "layers": {
+        "background": {
+          "image": {
+            "source": "knob-bg.png",
+            "position": [
+              8,
+              1
+            ],
+            "frames": 22,
+            "size": [
+              47,
+              38
+            ]
+          }
+        },
+        "main": {
+          "image": {
+            "source": "knob.png",
+            "frames": 46,
+            "frames-per-row": 7,
+            "size": [
+              27,
+              27
+            ],
+            "position": [
+              18,
+              11
+            ]
+          }
+        },
+        "name": {
+          "text": {
+            "font": "$main-font",
+            "color": "$text-color",
+            "content": "$short-name",
+            "position": [
+              0,
+              22
+            ],
+            "align": "center"
+          },
+          "hovering": {
+            "text": "$value"
+          }
+        }
+      }
+    },
+    "$main-knob-bi": {
+      "extends": "$main-knob",
+      "layers": {
+        "background": {
+          "image": {
+            "source": "knob-bg-bi.png",
+            "frames": 21
+          }
+        }
+      }
+    },
+    "$basic-waveform-knob": {
+      "extends": "$main-knob",
+      "layers": {
+        "background": {
+          "image": {
+            "source": "basic-waveforms.png",
+            "frames": 4,
+            "size": [
+              64,
+              64
+            ],
+            "position": [
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "$lfo-waveform-knob": {
+      "extends": "$main-knob",
+      "layers": {
+        "background": {
+          "image": {
+            "source": "lfo-waveforms.png",
+            "frames": 6,
+            "size": [
+              64,
+              64
+            ],
+            "position": [
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "$slider": {
+      "extends": "$knob",
+      "layers": {
+        "background": {
+          "image": {
+            "source": "slider-bg.png",
+            "position": [
+              17,
+              9
+            ]
+          }
+        },
+        "main": {
+          "image": {
+            "source": "slider.png",
+            "frames": 90,
+            "frames-per-row": 90,
+            "size": [
+              43,
+              107
+            ],
+            "position": [
+              9,
+              5
+            ]
+          }
+        },
+        "name": {
+          "text": {
+            "font": "$main-font",
+            "color": "$text-color",
+            "content": "$short-name",
+            "position": [
+              0,
+              60
+            ],
+            "align": "center"
+          },
+          "hovering": {
+            "text": "$value"
+          }
+        }
+      }
+    },
+    "$toggle": {
+      "extends": "$knob",
+      "layers": {
+        "toggle": {
+          "image": {
+            "source": "toggle.png",
+            "size": [
+              29,
+              19
+            ],
+            "position": [
+              0,
+              2
+            ]
+          },
+          "selected": {
+            "image-offset": [
+              0,
+              19
+            ]
+          }
+        },
+        "name": {
+          "text": {
+            "font": "$main-font",
+            "color": "$text-color",
+            "content": "$short-name",
+            "position": [
+              34,
+              6
+            ],
+            "align": "top-left"
+          }
+        }
+      }
+    },
+    "$vertical-toggle": {
+      "extends": "$toggle",
+      "layers": {
+        "toggle": {
+          "image": {
+            "position": [
+              17,
+              3
+            ]
+          }
+        },
+        "name": {
+          "text": {
+            "position": [
+              0,
+              13
+            ],
+            "align": "center"
+          }
+        }
+      }
+    },
+    "$threeway-toggle": {
+      "extends": "$toggle",
+      "layers": {
+        "toggle": {
+          "image": {
+            "source": "threeway-toggle.png",
+            "frames": 3
+          }
+        }
+      }
+    },
+    "$main-font": {
+      "map": "map.png",
+      "description": "map.json"
+    },
+    "$led": {
+      "image": {
+        "source": "led.png",
+        "frames": 100,
+        "frames-per-row": 10,
+        "size": [
+          13,
+          13
+        ]
+      }
+    },
+    "$jack": {
+      "layers": {
+        "jack": {
+          "image": {
+            "source": "jack.png",
+            "position": [
+              21,
+              4
+            ]
+          }
+        },
+        "name": {
+          "text": {
+            "content": "$name",
+            "font": "$main-font",
+            "color": "$text-color",
+            "align": "center",
+            "position": [
+              0,
+              16
+            ]
+          }
+        }
+      }
+    },
+    "$output-jack": {
+      "extends": "$jack",
+      "layers": {
+        "name": {
+          "text": {
+            "color": [
+              37,
+              37,
+              37
+            ]
+          },
+          "image": {
+            "source": "out-jack-text-background.png",
+            "position": [
+              12,
+              32
+            ],
+            "size": [
+              40,
+              15
+            ]
+          }
+        }
+      }
+    },
+    "$basic-button": {
+      "extends": "$display-text",
+      "image-edges": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "hovering": {
+        "image": "button-hover.png"
+      },
+      "text-align": "center-left"
+    },
+    "$basic-button-select": {
+      "extends": "$basic-button",
+      "selected": {
+        "image": "button-hover.png"
+      }
+    },
+    "$basic-button-focus": {
+      "extends": "$basic-button",
+      "focused": {
+        "image": "button-hover.png"
+      }
+    },
+    "$settings-entry": {
+      "extends": "$basic-button",
+      "text-position": [
+        5,
+        1
+      ],
+      "layers": {
+        "value": {
+          "extends": "$display-text",
+          "text": "$value",
+          "text-align": "center-left",
+          "text-position": [
+            90,
+            1
+          ]
+        }
+      }
+    }
+  },
+  "background": "background.png",
+  "background-no-piano": "background-no-piano.png",
+  "info-background": "info-background.png",
+  "info-background-no-piano": "info-background-no-piano.png",
+  "cables": {
+    "cable1": {
+      "end": "cable1.png",
+      "color": [40, 40, 40]
+    },
+    "cable2": {
+      "end": "cable1.png",
+      "color": [40, 40, 40]
+    },
+    "cable3": {
+      "end": "cable1.png",
+      "color": [40, 40, 40]
+    },
+    "cable4": {
+      "end": "cable1.png",
+      "color": [40, 40, 40]
+    },
+    "cable5": {
+      "end": "cable1.png",
+      "color": [40, 40, 40]
+    }
+  },
+  "piano": {
+    "white-key": {
+      "background-color": {
+        "value": [
+          211,
+          211,
+          211
+        ],
+        "transition": 50,
+        "hovering": [
+          180,
+          180,
+          180
+        ],
+        "pressed": [
+          150,
+          150,
+          150
+        ]
+      }
+    },
+    "black-key": {
+      "background-color": {
+        "value": [
+          22,
+          22,
+          22
+        ],
+        "transition": 50,
+        "hovering": [
+          40,
+          40,
+          40
+        ],
+        "pressed": [
+          60,
+          60,
+          60
+        ]
+      }
+    },
+    "mod-wheel": {
+      "image": {
+        "source": "wheel.png",
+        "frames": 100,
+        "frames-per-row": 100,
+        "size": [
+          35,
+          145
+        ]
+      }
+    },
+    "pitch-wheel": {
+      "image": {
+        "source": "wheel.png",
+        "frames": 100,
+        "frames-per-row": 100,
+        "size": [
+          35,
+          145
+        ]
+      }
+    }
+  },
+  "envelope": {
+    "led": "$led",
+    "parameters": {
+      "loop": "$toggle",
+      "level": "$main-knob",
+      "attack": "$slider",
+      "decay": "$slider",
+      "sustain": "$slider",
+      "release": "$slider"
+    },
+    "jacks": {
+      "output": "$output-jack"
+    }
+  },
+  "delay": {
+    "parameters": {
+      "time": "$main-knob",
+      "tempo": "$main-knob",
+      "feedback": "$main-knob",
+      "mix": "$main-knob",
+      "synced": "$vertical-toggle",
+      "pingpong": "$toggle"
+    }
+  },
+  "gain": {
+    "led": "$led",
+    "parameters": {
+      "gate": "$vertical-toggle",
+      "level": "$main-knob",
+      "attack": "$main-knob",
+      "decay": "$main-knob"
+    },
+    "jacks": {
+      "output": "$output-jack"
+    }
+  },
+  "lfo": {
+    "led": "$led",
+    "parameters": {
+      "frequency": "$main-knob",
+      "depth": "$main-knob",
+      "synced": "$vertical-toggle",
+      "tempo": "$main-knob",
+      "waveform": "$lfo-waveform-knob"
+    },
+    "jacks": {
+      "depth": "$jack",
+      "output": "$output-jack"
+    }
+  },
+  "filter": {
+    "parameters": {
+      "keytrack": "$toggle",
+      "cutoff": "$main-knob",
+      "resonance": "$main-knob",
+      "drive": "$main-knob"
+    },
+    "jacks": {
+      "cutoff": "$jack"
+    }
+  },
+  "oscillator": {
+    "parameters": {
+      "volume": "$main-knob-bi",
+      "tune": "$main-knob-bi",
+      "octave": "$threeway-toggle",
+      "waveform": "$basic-waveform-knob",
+      "fm": "$main-knob",
+      "output": "$toggle"
+    },
+    "jacks": {
+      "output": "$output-jack",
+      "fm": "$jack",
+      "amount": "$jack",
+      "sync": "$jack"
+    }
+  },
+  "midi": {
+    "mod-wheel-led": "$led",
+    "velocity-led": "$led",
+    "random-led": "$led",
+    "parameters": {
+      "mod-wheel-amount": "$main-knob",
+      "velocity-amount": "$main-knob",
+      "random-amount": "$main-knob"
+    },
+    "jacks": {
+      "mod-wheel": "$output-jack",
+      "velocity": "$output-jack",
+      "random": "$output-jack"
+    }
+  },
+  "display": {
+    "popup": {
+      "background": {
+        "image": "popup-background.png"
+      },
+      "back-button": {
+        "extends": "$basic-button",
+        "text": "Cancel",
+        "text-align": "center"
+      },
+      "confirm-button": {
+        "extends": "$basic-button",
+        "text": "Confirm",
+        "text-align": "center"
+      },
+      "message": "$display-text-area"
+    },
+    "main": {
+      "foreground": "main-tab-foreground.png",
+      "background": "display-background.png",
+      "button": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "img": {
+            "image": "tabs.png",
+            "image-offset": [
+              80,
+              0
+            ]
+          }
+        }
+      },
+      "save-button": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "img": {
+            "image": "save-button.png"
+          }
+        }
+      },
+      "next-preset": {
+        "extends": "$basic-button",
+        "layers": {
+          "img": {
+            "image": "next-preset.png"
+          }
+        }
+      },
+      "previous-preset": {
+        "extends": "$basic-button",
+        "layers": {
+          "img": {
+            "image": "previous-preset.png"
+          }
+        }
+      },
+      "preset-name": "$display-text-area",
+      "description": "$display-text-area"
+    },
+    "load-preset": {
+      "background": "load-preset-background.png",
+      "button": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "img": {
+            "image": "tabs.png",
+            "image-offset": [
+              40,
+              0
+            ]
+          }
+        }
+      },
+      "search": "$display-text-area",
+      "scrollbar": {
+        "background-color": "$display-color"
+      },
+      "bank-tab": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "icon": {
+            "image": "filters.png",
+            "image-offset": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "type-tab": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "icon": {
+            "image": "filters.png",
+            "image-offset": [
+              0,
+              20
+            ]
+          }
+        }
+      },
+      "author-tab": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "icon": {
+            "image": "filters.png",
+            "image-offset": [
+              0,
+              40
+            ]
+          }
+        }
+      },
+      "preset": {
+        "extends": "$basic-button-focus",
+        "text": "$name",
+        "text-overflow": "dots",
+        "text-position": [
+          5,
+          1
+        ],
+        "text-align": "center-left"
+      },
+      "bank": {
+        "extends": "$basic-button-select",
+        "text": "$name",
+        "text-overflow": "dots",
+        "text-position": [
+          5,
+          1
+        ],
+        "text-align": "center-left"
+      },
+      "sort-button": {
+        "extends": "$basic-button",
+        "image": "button-underline.png",
+        "layers": {
+          "icon": {
+            "image": "sort.png",
+            "selected": {
+              "image-offset": [
+                0,
+                20
+              ]
+            }
+          }
+        }
+      }
+    },
+    "save-preset": {
+      "background": "display-background.png",
+      "button": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "img": {
+            "image": "tabs.png",
+            "image-offset": [
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "save-button": {
+        "extends": "$basic-button",
+        "text": "Save Preset",
+        "text-align": "center"
+      },
+      "cancel-button": {
+        "extends": "$basic-button",
+        "text": "Cancel",
+        "text-align": "center"
+      },
+      "name": "$display-text-area",
+      "author": "$display-text-area",
+      "type": "$display-text-area",
+      "description": "$display-text-area"
+    },
+    "settings": {
+      "background": "display-background.png",
+      "button": {
+        "extends": "$basic-button-select",
+        "layers": {
+          "img": {
+            "image": "tabs.png",
+            "image-offset": [
+              120,
+              0
+            ]
+          }
+        }
+      },
+      "zoom-button": {
+        "extends": "$basic-button",
+        "image": "button-underline.png",
+        "text": "Zoom",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "level": {
+            "extends": "$display-text",
+            "text": [
+              "50%",
+              "70%",
+              "100%",
+              "150%",
+              "200%"
+            ],
+            "text-align": "center-left",
+            "text-position": [
+              90,
+              1
+            ]
+          }
+        }
+      },
+      "default-theme": {
+        "extends": "$basic-button",
+        "text": "Default Theme",
+        "text-position": [
+          90,
+          1
+        ]
+      },
+      "reload-theme": {
+        "extends": "$basic-button",
+        "text": "Reload Theme",
+        "text-position": [
+          90,
+          1
+        ],
+        "image": "button-underline.png"
+      },
+      "theme-path": {
+        "extends": "$basic-button",
+        "text": "Theme",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              90,
+              1
+            ]
+          }
+        }
+      },
+      "preset-path": {
+        "extends": "$basic-button",
+        "text": "Preset Path",
+        "text-position": [
+          5,
+          2
+        ],
+        "image": "button-underline.png",
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              90,
+              1
+            ]
+          }
+        }
+      },
+      "touch-mode": {
+        "extends": "$basic-button",
+        "text": "Touch Mode",
+        "text-position": [
+          5,
+          1
+        ],
+        "image": "button-underline.png",
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "Disabled",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              90,
+              1
+            ],
+            "selected": {
+              "text": "Enabled"
+            }
+          }
+        }
+      },
+      "show-piano": {
+        "extends": "$basic-button",
+        "text": "Show Piano",
+        "text-position": [
+          5,
+          1
+        ],
+        "image": "button-underline.png",
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "Hide",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              90,
+              1
+            ],
+            "selected": {
+              "text": "Show"
+            }
+          }
+        }
+      },
+      "cable-physics": {
+        "extends": "$basic-button",
+        "text": "Cable Physics",
+        "text-position": [
+          5,
+          1
+        ],
+        "image": "button-underline.png",
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "Disable",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              90,
+              1
+            ],
+            "selected": {
+              "text": "Enable"
+            }
+          }
+        }
+      },
+      "global-title": {
+        "extends": "$display-text",
+        "text": "Global Settings",
+        "image-edges": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "image": "button-underline.png"
+      },
+      "preset-title": {
+        "extends": "$display-text",
+        "text": "Preset Settings",
+        "image-edges": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "image": "button-underline.png"
+      },
+      "info-title": {
+        "extends": "$display-text",
+        "text": "General Info",
+        "image-edges": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "image": "button-underline.png"
+      },
+      "sample-rate": {
+        "extends": "$basic-button",
+        "text": "Sample Rate",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              95,
+              1
+            ]
+          }
+        }
+      },
+      "cpu-usage": {
+        "extends": "$basic-button",
+        "text": "CPU Usage",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              95,
+              1
+            ]
+          }
+        }
+      },
+      "simd-optimizations": {
+        "extends": "$basic-button",
+        "text": "Optimizations",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              95,
+              1
+            ]
+          }
+        }
+      },
+      "version": {
+        "extends": "$basic-button",
+        "text": "Version",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              95,
+              1
+            ]
+          }
+        }
+      },
+      "active-voices": {
+        "extends": "$basic-button",
+        "text": "Active Voices",
+        "text-position": [
+          5,
+          1
+        ],
+        "layers": {
+          "path": {
+            "extends": "$display-text",
+            "text": "$text",
+            "text-overflow": "dots",
+            "text-align": "center-left",
+            "text-position": [
+              95,
+              1
+            ]
+          }
+        }
+      },
+      "parameters": {
+        "quality": {
+          "extends": "$settings-entry",
+          "text": "Quality"
+        },
+        "noisy-filter": {
+          "extends": "$settings-entry",
+          "text": "Noisy Filter"
+        },
+        "glide": {
+          "extends": "$settings-entry",
+          "text": "Glide"
+        },
+        "always-glide": {
+          "extends": "$settings-entry",
+          "text": "Always Glide",
+          "image": "button-underline.png"
+        },
+        "monophonic": {
+          "extends": "$settings-entry",
+          "text": "Monophonic"
+        },
+        "delay-algorithm": {
+          "extends": "$settings-entry",
+          "text": "Delay Alg",
+          "image": "button-underline.png"
+        },
+        "export-quality": {
+          "extends": "$settings-entry",
+          "text": "Export",
+          "image": "button-underline.png"
+        },
+        "phase-mode": {
+          "extends": "$settings-entry",
+          "text": "Phase",
+          "image": "button-underline.png"
+        },
+        "pitch-bend-range": {
+          "extends": "$settings-entry",
+          "text": "$short-name",
+          "image": "button-underline.png"
+        }
+      }
+    }
+  }
+}
