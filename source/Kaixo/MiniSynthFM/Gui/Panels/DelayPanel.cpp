@@ -54,6 +54,12 @@ namespace Kaixo::Gui {
 
         timeTempo.select(1);
 
+        watch<bool>([&] { 
+            return context.param(Synth.delay.synced) > 0.5; 
+        }, [&](bool val) {
+            timeTempo.select(val);
+        });
+
         add<Knob>({ 76, 32, 64, 64 }, {
             .graphics = T.delay.parameters.feedback,
             .tooltipName = false,

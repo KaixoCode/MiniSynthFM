@@ -59,6 +59,12 @@ namespace Kaixo::Gui {
         }));
 
         frequencyTempo.select(1);
+        
+        watch<bool>([&, i] { 
+            return context.param(Synth.lfo[i].synced) > 0.5;
+        }, [&](bool val) {
+            frequencyTempo.select(val);
+        });
 
         add<Knob>({ 137, 9, 64, 64 }, {
             .graphics = T.lfo.parameters.waveform,
