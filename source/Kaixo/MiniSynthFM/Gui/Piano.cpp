@@ -77,7 +77,6 @@ namespace Kaixo::Gui {
 
     void Piano::Key::mouseUp(const juce::MouseEvent& event) {
         float velocity = Math::clamp1(0.1 + 0.9 * static_cast<float>(event.y - y()) / height());
-        settings.piano.settings.interface->pitchBend(m_NoteID, 0.5);
         settings.piano.settings.interface->noteOff(settings.note, velocity);
     }
 

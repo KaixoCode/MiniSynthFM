@@ -104,6 +104,7 @@ namespace Kaixo::Processing {
 
     void MiniSynthFMProcessor::noteOnMPE(NoteID id, Note note, double velocity, int channel) {
         bank.noteOnMPE(id, note, velocity, channel);
+        bank.notePitchBendMPE(id, 0.5);
     }
 
     void MiniSynthFMProcessor::notePitchBendMPE(NoteID id, double value) {
