@@ -104,7 +104,6 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
         
-        alignas(sizeof(float) * Voices) float previousLfoLevel[Voices]{};
         alignas(sizeof(float) * Voices) float velocity[Voices]{};
         alignas(sizeof(float) * Voices) float note[Voices]{};
         alignas(sizeof(float) * Voices) float randomValue[Voices]{};
@@ -188,7 +187,30 @@ namespace Kaixo::Processing {
             auto op2fm = Kaixo::load<SimdType>(oscillator[1].fmOutput[0], i) * params.volume[1];
             auto op3fm = Kaixo::load<SimdType>(oscillator[2].fmOutput[0], i) * params.volume[2];
 
-            auto lfolevel = Kaixo::load<SimdType>(previousLfoLevel, i);
+            auto getMW     = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::ModWheel]) * modwheellevel; };
+            auto getRand   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Random]) * randomlevel; };
+            auto getVel    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Velocity]) * velocitylevel; };
+            auto getEnv1   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope1]) * env1level; };
+            auto getEnv2   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope2]) * env2level; };
+            auto getEnv3   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope3]) * env3level; };
+            auto getOp1    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1level; };
+            auto getOp2    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2level; };
+            auto getOp3    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3level; };
+            auto getOp1FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1fm; };
+            auto getOp2FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2fm; };
+            auto getOp3FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3fm; };
+
+            auto getAllANoLFO = [&](ModDestination dest) {
+                return getVel(dest) + getMW(dest) + getRand(dest) +
+                    getOp1(dest) + getOp2(dest) + getOp3(dest) +
+                    getEnv1(dest) + getEnv2(dest) + getEnv3(dest);
+            };
+            
+            // Assign new value
+            auto lfoMult = (params.lfoLevel[0] + getAllANoLFO(ModDestination::LfoDepth));
+            auto lfoOutput = Kaixo::load<SimdType>(lfo[0].output, i);
+            auto lfolevel = lfoOutput * lfoMult;
+            auto lfolevelS = (lfoOutput * 0.5 + 0.5) * lfoMult;
 
             auto getAllM = [&](ModDestination dest) {
                 SimdType amount = 1.f;
@@ -198,38 +220,21 @@ namespace Kaixo::Processing {
                 if (params.routing[(int)dest][(int)ModSource::Envelope1]) amount = amount * env1level;
                 if (params.routing[(int)dest][(int)ModSource::Envelope2]) amount = amount * env2level;
                 if (params.routing[(int)dest][(int)ModSource::Envelope3]) amount = amount * env3level;
-                if (params.routing[(int)dest][(int)ModSource::LFO])       amount = amount * (lfolevel * 0.5 + 0.5);
+                if (params.routing[(int)dest][(int)ModSource::LFO])       amount = amount * lfolevelS;
                 if (params.routing[(int)dest][(int)ModSource::Op1])       amount = amount * op1level;
                 if (params.routing[(int)dest][(int)ModSource::Op2])       amount = amount * op2level;
                 if (params.routing[(int)dest][(int)ModSource::Op3])       amount = amount * op3level;
                 return amount;
             };
 
-            // Assign new value
-            lfolevel = Kaixo::load<SimdType>(lfo[0].output, i) * params.lfoLevel[0] * getAllM(ModDestination::LfoDepth);
-            Kaixo::store<SimdType>(previousLfoLevel + i, lfolevel); // Store for recursive
-
-            auto getMW     = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::ModWheel]) * modwheellevel; };
-            auto getRand   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Random]) * randomlevel; };
-            auto getVel    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Velocity]) * velocitylevel; };
-            auto getEnv1   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope1]) * env1level; };
-            auto getEnv2   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope2]) * env2level; };
-            auto getEnv3   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope3]) * env3level; };
             auto getLfo    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::LFO]) * lfolevel; };
-            auto getOp1    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1level; };
-            auto getOp2    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2level; };
-            auto getOp3    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3level; };
-            auto getOp1FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1fm; };
-            auto getOp2FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2fm; };
-            auto getOp3FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3fm; };
-
             auto getAllA = [&](ModDestination dest) {
                 return getVel(dest)  + getMW(dest)   + getRand(dest) +
                        getOp1(dest)  + getOp2(dest)  + getOp3(dest)  + 
                        getEnv1(dest) + getEnv2(dest) + getEnv3(dest) + 
                        getLfo(dest);
             };
-
+            
             auto getAllANoOp = [&](ModDestination dest) {
                 return getVel(dest)  + getMW(dest)   + getRand(dest) + 
                        getEnv1(dest) + getEnv2(dest) + getEnv3(dest) + 

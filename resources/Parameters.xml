@@ -211,7 +211,7 @@
 
     <param name="Waveform"
            short-name="Wave"
-           description="Set the waveform of the LFO, either basic waveforms: Sine, Triangle, Saw, or Square. Or noise: Quantized is discrete values, and Noise is smoothed random values."
+           description="Set the waveform of the LFO. Quantized is discrete random values, and Noise is smoothed random values."
            default="0"
            steps="6"
            transform="Group[6]"
