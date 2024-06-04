@@ -163,6 +163,7 @@
       "back-button": "drawable",
       "preset-title": "drawable",
       "global-title": "drawable",
+      "midi-title": "drawable",
       "info-title": "drawable",
       "zoom-button": "drawable",
       "theme-path": "drawable",

@@ -889,6 +889,15 @@
         image-edges: [2, 2, 2, 2]
         image: button-underline.png
       }
+      
+      midi-title: {      
+        extends: $display-text
+
+        text: MIDI Settings
+
+        image-edges: [2, 2, 2, 2]
+        image: button-underline.png
+      }
 
       info-title: {      
         extends: $display-text

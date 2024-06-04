@@ -149,7 +149,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         midiSettings.add<ImageView>({ Width, 20 }, {
-            .image = T.display.settings.presetTitle,
+            .image = T.display.settings.midiTitle,
             .text = "MIDI Settings",
         });
         
