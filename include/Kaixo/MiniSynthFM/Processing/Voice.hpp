@@ -198,7 +198,7 @@ namespace Kaixo::Processing {
                 if (params.routing[(int)dest][(int)ModSource::Envelope1]) amount = amount * env1level;
                 if (params.routing[(int)dest][(int)ModSource::Envelope2]) amount = amount * env2level;
                 if (params.routing[(int)dest][(int)ModSource::Envelope3]) amount = amount * env3level;
-                if (params.routing[(int)dest][(int)ModSource::LFO])       amount = amount * lfolevel;
+                if (params.routing[(int)dest][(int)ModSource::LFO])       amount = amount * (lfolevel * 0.5 + 0.5);
                 if (params.routing[(int)dest][(int)ModSource::Op1])       amount = amount * op1level;
                 if (params.routing[(int)dest][(int)ModSource::Op2])       amount = amount * op2level;
                 if (params.routing[(int)dest][(int)ModSource::Op3])       amount = amount * op3level;
