@@ -17,12 +17,60 @@ namespace Kaixo::Gui {
         : View(c), settings(s)
     {
         // ------------------------------------------------
-        
+
         wantsIdle(true);
 
         // ------------------------------------------------
 
         add<ImageView>({ .image = T.display.settings.background });
+
+        // ------------------------------------------------
+
+        auto& presetSettings = add<ScrollView>({ 6, 6, 300, 153 }, {
+            .scrollbar = T.display.loadPreset.scrollbar,
+            .margin = { 0, 0, 0, 0 },
+            .gap = 2,
+            .barThickness = 5,
+            .barPadding = { 2, 0, 0, 0 },
+            .keepBarSpace = false,
+            .alignChildren = Theme::Align::Left
+        });
+        
+        // ------------------------------------------------
+
+        auto& midiSettings = add<ScrollView>({ 6, 6, 300, 153 }, {
+            .scrollbar = T.display.loadPreset.scrollbar,
+            .margin = { 0, 0, 0, 0 },
+            .gap = 2,
+            .barThickness = 5,
+            .barPadding = { 2, 0, 0, 0 },
+            .keepBarSpace = false,
+            .alignChildren = Theme::Align::Left
+        });
+        
+        // ------------------------------------------------
+
+        auto& generalSettings = add<ScrollView>({ 6, 6, 300, 153 }, {
+            .scrollbar = T.display.loadPreset.scrollbar,
+            .margin = { 0, 0, 0, 0 },
+            .gap = 2,
+            .barThickness = 5,
+            .barPadding = { 2, 0, 0, 0 },
+            .keepBarSpace = false,
+            .alignChildren = Theme::Align::Left
+        });
+        
+        // ------------------------------------------------
+
+        auto& generalInfo = add<ScrollView>({ 6, 6, 300, 153 }, {
+            .scrollbar = T.display.loadPreset.scrollbar,
+            .margin = { 0, 0, 0, 0 },
+            .gap = 2,
+            .barThickness = 5,
+            .barPadding = { 2, 0, 0, 0 },
+            .keepBarSpace = false,
+            .alignChildren = Theme::Align::Left
+        });
 
         // ------------------------------------------------
         
@@ -36,44 +84,100 @@ namespace Kaixo::Gui {
             .alignChildren = Theme::Align::Left
         });
 
-        // ------------------------------------------------
+        pages.addButton(1, scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.presetSettings,
+        }));
+        
+        pages.addButton(2, scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.midiSettings,
+        }));
+        
+        pages.addButton(3, scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.globalSettings,
+        }));
+        
+        pages.addButton(4, scrollView.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.generalInfo,
+        }));
+        
+        pages.addButton(0, presetSettings.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.backButton,
+        }));
+        
+        pages.addButton(0, midiSettings.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.backButton,
+        }));
+        
+        pages.addButton(0, generalSettings.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.backButton,
+        }));
+        
+        pages.addButton(0, generalInfo.add<Button>({ Width, 20 }, {
+            .graphics = T.display.settings.backButton,
+        }));
+        
+        pages.add(0, scrollView);
+        pages.add(1, presetSettings);
+        pages.add(2, midiSettings);
+        pages.add(3, generalSettings);
+        pages.add(4, generalInfo);
 
-        scrollView.add<ImageView>({ Width, 20 }, {
+        pages.select(0);
+
+        // ------------------------------------------------
+        
+        presetSettings.add<ImageView>({ Width, 20 }, {
             .image = T.display.settings.presetTitle,
             .text = "Preset Settings",
         });
         
         // ------------------------------------------------
         
-        scrollView.add<Button>({ Width, 20 }, {
+        presetSettings.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.noisyFilter,
             .behaviour = Button::Behaviour::Toggle,
             .param = Synth.noisyFilter
         });
 
-        scrollView.add<Knob>({ Width, 20 }, {
+        presetSettings.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.delayAlgorithm,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.delayAlgorithm,
         });
+        
+        // ------------------------------------------------
+
+        midiSettings.add<ImageView>({ Width, 20 }, {
+            .image = T.display.settings.presetTitle,
+            .text = "MIDI Settings",
+        });
+        
+        // ------------------------------------------------
+        
+        midiSettings.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.velocityToGain,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.velocityToGain,
+        });
 
         // ------------------------------------------------
 
-        scrollView.add<Button>({ Width, 20 }, {
+        midiSettings.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.monophonic,
             .behaviour = Button::Behaviour::Toggle,
             .param = Synth.monophonic,
         });
         
-        scrollView.add<Knob>({ Width, 20 }, {
+        midiSettings.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.glide,
             .tooltipName = false,
             .tooltipValue = false,
             .param = Synth.glide,
         });
         
-        scrollView.add<Button>({ Width, 20 }, {
+        midiSettings.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.alwaysGlide,
             .behaviour = Button::Behaviour::Toggle,
             .param = Synth.alwaysGlide,
@@ -81,7 +185,7 @@ namespace Kaixo::Gui {
         
         // ------------------------------------------------
 
-        scrollView.add<Knob>({ Width, 20 }, {
+        midiSettings.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.pitchBendRange,
             .tooltipName = false,
             .tooltipValue = false,
@@ -90,7 +194,7 @@ namespace Kaixo::Gui {
         
         // ------------------------------------------------
 
-        scrollView.add<Knob>({ Width, 20 }, {
+        presetSettings.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.phaseMode,
             .tooltipName = false,
             .tooltipValue = false,
@@ -100,7 +204,7 @@ namespace Kaixo::Gui {
         // ------------------------------------------------
 
         if constexpr (versionType == VersionType::Demo) {
-            scrollView.add<Knob>({ Width, 20 }, {
+            presetSettings.add<Knob>({ Width, 20 }, {
                 .onchange = [&](ParamValue val) {
                     context.beginEdit(Synth.quality);
                     context.performEdit(Synth.quality, 0);
@@ -113,7 +217,7 @@ namespace Kaixo::Gui {
                 .param = Synth.quality,
             });
         } else {
-            scrollView.add<Knob>({ Width, 20 }, {
+            presetSettings.add<Knob>({ Width, 20 }, {
                 .graphics = T.display.settings.parameters.quality,
                 .tooltipName = false,
                 .tooltipValue = false,
@@ -121,7 +225,7 @@ namespace Kaixo::Gui {
             });
         }
         
-        scrollView.add<Knob>({ Width, 20 }, {
+        presetSettings.add<Knob>({ Width, 20 }, {
             .graphics = T.display.settings.parameters.exportQuality,
             .tooltipName = false,
             .tooltipValue = false,
@@ -130,14 +234,14 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        scrollView.add<ImageView>({ Width, 20 }, {
+        generalSettings.add<ImageView>({ Width, 20 }, {
             .image = T.display.settings.globalTitle,
             .text = "Global Settings",
         });
 
         // ------------------------------------------------
 
-        themePath = &scrollView.add<Button>({ Width, 20 }, {
+        themePath = &generalSettings.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 themeChooser.launchAsync(
                       juce::FileBrowserComponent::openMode
@@ -158,7 +262,7 @@ namespace Kaixo::Gui {
             .text = std::string{ T.name() },
         });
 
-        scrollView.add<Button>({ Width, 20 }, {
+        generalSettings.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 Storage::set<std::string>(Setting::LoadedTheme, Theme::Default);
                 T.openDefault();
@@ -168,7 +272,7 @@ namespace Kaixo::Gui {
             .graphics = T.display.settings.defaultTheme
         });
 
-        scrollView.add<Button>({ Width, 20 }, {
+        generalSettings.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 T.reopen();
                 themePath->settings.text = T.name();
@@ -179,7 +283,7 @@ namespace Kaixo::Gui {
 
         std::string storedPresetPath = Storage::getOrDefault<std::string>(PresetPath, "No Path Selected");
 
-        presetPath = &scrollView.add<Button>({ Width, 20 }, {
+        presetPath = &generalSettings.add<Button>({ Width, 20 }, {
             .callback = [this](bool) {
                 themeChooser.launchAsync(
                         juce::FileBrowserComponent::openMode
@@ -199,7 +303,7 @@ namespace Kaixo::Gui {
             .text = storedPresetPath
         });
 
-        scrollView.add<Button>({ Width, 20 }, {
+        generalSettings.add<Button>({ Width, 20 }, {
             .callback = [&](bool state) {
                 Storage::set<bool>(Setting::TouchMode, state);
             },
@@ -207,7 +311,7 @@ namespace Kaixo::Gui {
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::flag(Setting::TouchMode));
         
-        scrollView.add<Button>({ Width, 20 }, {
+        generalSettings.add<Button>({ Width, 20 }, {
             .callback = [&](bool state) {
                 Storage::set<bool>(ShowPiano, state);
                 if (state) {
@@ -221,7 +325,7 @@ namespace Kaixo::Gui {
             .behaviour = Button::Behaviour::Toggle,
         }).value(Storage::getOrDefault<bool>(ShowPiano, true));
         
-        scrollView.add<Button>({ Width, 20 }, {
+        generalSettings.add<Button>({ Width, 20 }, {
             .callback = [&](bool state) {
                 Storage::set<bool>(CablePhysics, state);
                 context.repaint();
@@ -231,13 +335,13 @@ namespace Kaixo::Gui {
         }).value(Storage::getOrDefault<bool>(CablePhysics, true));
 
 
-        scrollView.updateDimensions();
+        generalSettings.updateDimensions();
 
         // ------------------------------------------------
 
         constexpr float zoomLevels[5]{ 0.5, 0.7, 1.0, 1.5, 2.0 };
 
-        auto& zoom = scrollView.add<Knob>({ Width, 20 }, {
+        auto& zoom = generalSettings.add<Knob>({ Width, 20 }, {
             .onchange = [&, zoomLevels](ParamValue v) {
                 auto value = zoomLevels[normalToIndex(v, 5)];
                 auto current = context.scale();
@@ -266,12 +370,12 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        scrollView.add<ImageView>({ Width, 20 }, {
+        generalInfo.add<ImageView>({ Width, 20 }, {
             .image = T.display.settings.infoTitle,
             .text = "Info",
         });
 
-        auto& cpuUsage = scrollView.add<Button>({ Width, 20 }, {
+        auto& cpuUsage = generalInfo.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.cpuUsage,
         });
         
@@ -282,7 +386,7 @@ namespace Kaixo::Gui {
             cpuUsage.repaint();
         });
 
-        auto& activeVoices = scrollView.add<Button>({ Width, 20 }, {
+        auto& activeVoices = generalInfo.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.activeVoices,
         });
 
@@ -301,12 +405,12 @@ namespace Kaixo::Gui {
         case simd_path::P3: optimizations = "SSE/SSE2/3/4.1 FMA AVX/AVX2"; break;
         }
 
-        scrollView.add<Button>({ Width, 20 }, {
+        generalInfo.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.simdOptimizations,
             .text = optimizations,
         });
 
-        auto& sampleRate = scrollView.add<Button>({ Width, 20 }, {
+        auto& sampleRate = generalInfo.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.sampleRate,
         });
 
@@ -317,7 +421,7 @@ namespace Kaixo::Gui {
             sampleRate.repaint();
         });
 
-        scrollView.add<Button>({ Width, 20 }, {
+        generalInfo.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.version,
             .text = SYNTH_FullVersion,
         });

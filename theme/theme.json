@@ -898,7 +898,43 @@
         image-edges: [2, 2, 2, 2]
         image: button-underline.png
       }
-
+      
+      back-button: {
+        extends: $basic-button
+        text: Back
+        text-position: [22, 2]
+        layers: {
+          back: {
+            image: previous-preset.png
+            image-position: [1, 0]
+          }
+        }
+      }
+      
+      preset-settings: {
+        extends: $basic-button
+        text: Preset Settings
+        text-position: [5, 1]
+      }
+      
+      midi-settings: {
+        extends: $basic-button
+        text: MIDI Settings
+        text-position: [5, 1]
+      }
+      
+      global-settings: {
+        extends: $basic-button
+        text: Global Settings
+        text-position: [5, 1]
+      }
+      
+      general-info: {
+        extends: $basic-button
+        text: General Information
+        text-position: [5, 1]
+      }
+      
       sample-rate: {
         extends: $basic-button
         text: Sample Rate
@@ -1009,6 +1045,12 @@
         delay-algorithm: {
           extends: $settings-entry
           text: Delay Alg
+          image: button-underline.png
+        }
+        
+        velocity-to-gain: {
+          extends: $settings-entry
+          text: Vel to Gain
           image: button-underline.png
         }
         

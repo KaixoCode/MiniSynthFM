@@ -45,6 +45,7 @@ namespace Kaixo::Processing {
         float lfoLevel[Lfos]{};
         bool outputOscillator[Oscillators]{};
 
+        float velToGain = 0.5;
         float glide = 0;
         float pitchBendRange = 0;
         float pitchBend = 0;
@@ -312,10 +313,12 @@ namespace Kaixo::Processing {
 
         output = 0;
         for (std::size_t i = 0; i < Voices; i += Count) {
+            SimdType velocityGain = Kaixo::load<SimdType>(velocity, i) * params.velToGain + (1 - params.velToGain);
             output += Kaixo::sum<SimdType>(
                 Kaixo::load<SimdType>(filter.output, i) *
                 Kaixo::load<SimdType>(envelope[2].output, i) *
-                params.envelopeLevel[2]);
+                params.envelopeLevel[2] * 
+                velocityGain);
         }
     }
 

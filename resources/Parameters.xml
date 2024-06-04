@@ -103,6 +103,13 @@
          format="Group[Disabled, Enabled]"
          interface="$self.bank.alwaysLegato($value > 0.5)"/>
 
+  <param name="Velocity To Gain"
+         short-name="Vel To Gain"
+         default="50"
+         transform="Range[0.f, 100.f]"
+         format="Percent"
+         interface="$self.params.velToGain = $value"/>
+
   <!-- ================================================ -->
 
   <module name="Operator" short-name="Op" var-name="oscillator" count="3">

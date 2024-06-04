@@ -155,7 +155,12 @@
     "settings": {
       "background": "drawable",
       "foreground": "drawable",
+      "preset-settings": "drawable",
+      "midi-settings": "drawable",
+      "global-settings": "drawable",
+      "general-info": "drawable",
       "button": "drawable",
+      "back-button": "drawable",
       "preset-title": "drawable",
       "global-title": "drawable",
       "info-title": "drawable",
@@ -179,6 +184,7 @@
         "phase-mode": "drawable",
         "glide": "drawable",
         "always-glide": "drawable",
+        "velocity-to-gain": "drawable",
         "monophonic": "drawable",
         "quality": "drawable",
         "export-quality": "drawable"
