@@ -144,6 +144,16 @@
            transform="Group[4]"
            format="Group[Sine, Triangle, Saw, Square]"
            interface="$self.params.oscillator[$oscillator].waveform($value)"/>
+
+    <param name="Mod Type"
+           short-name="Mod"
+           default="0"
+           steps="2"
+           transform="Group[2]"
+           format="Group[Sync, Volume]"
+           interface="$self.params.oscillator[$oscillator].modType($value)">
+      <index if="oscillator=1 or oscillator=2" default="1"/>
+    </param>
     
     <param name="FM" var-name="fm"
            description="Adjust how much FM from the FM jack is applied to this operator. This parameter is modulated by the Amount jack."

@@ -516,7 +516,7 @@
       output: $output-jack
       fm: $jack
       amount: $jack
-      sync: $jack
+      mod: $jack
     }
   }
 
@@ -1078,6 +1078,22 @@
         pitch-bend-range: {
           extends: $settings-entry
           text: $short-name
+          image: button-underline.png
+        }
+        
+        operator1-mod-type: {
+          extends: $settings-entry
+          text: $short-identifier
+        }
+        
+        operator2-mod-type: {
+          extends: $settings-entry
+          text: $short-identifier
+        }
+
+        operator3-mod-type: {
+          extends: $settings-entry
+          text: $short-identifier
           image: button-underline.png
         }
       }

@@ -20,6 +20,9 @@ namespace Kaixo::Processing {
 
     void FMOscillatorParameters::waveform(Waveform wf) { m_Waveform = wf; }
     void FMOscillatorParameters::waveform(float val) { waveform(normalToIndex(val, Waveform::Amount)); }
+    
+    void FMOscillatorParameters::modType(ModType wf) { m_ModType = wf; }
+    void FMOscillatorParameters::modType(float val) { modType(normalToIndex(val, ModType::Amount)); }
 
     // ------------------------------------------------
 

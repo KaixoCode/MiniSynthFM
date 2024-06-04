@@ -147,6 +147,29 @@ namespace Kaixo::Gui {
         });
         
         // ------------------------------------------------
+        
+        presetSettings.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.operator1ModType,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.oscillator[0].modType,
+        });
+        
+        presetSettings.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.operator2ModType,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.oscillator[1].modType,
+        });
+        
+        presetSettings.add<Knob>({ Width, 20 }, {
+            .graphics = T.display.settings.parameters.operator3ModType,
+            .tooltipName = false,
+            .tooltipValue = false,
+            .param = Synth.oscillator[2].modType,
+        });
+        
+        // ------------------------------------------------
 
         midiSettings.add<ImageView>({ Width, 20 }, {
             .image = T.display.settings.midiTitle,

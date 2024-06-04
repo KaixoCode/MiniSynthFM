@@ -85,14 +85,14 @@ namespace Kaixo::Gui {
         }).description("Routing to this input jack will change how much the FM input jack influences the frequency of the operator.");
 
         add<Jack>({ 200, 46, 64, 52 }, {
-            .graphics = T.oscillator.jacks.sync,
+            .graphics = T.oscillator.jacks.mod,
             .type = Jack::Type::Input,
             .patchBay = settings.patchBay,
-            .destination = i == 0 ? ModDestination::Op1Sync
-                         : i == 1 ? ModDestination::Op2Sync
-                                  : ModDestination::Op3Sync,
-            .name = "Sync"
-        }).description("Route another operator to this input jack and play with this operator's pitch to get the classic hard-sync sound.");
+            .destination = i == 0 ? ModDestination::Op1Mod
+                         : i == 1 ? ModDestination::Op2Mod
+                                  : ModDestination::Op3Mod,
+            .name = "Mod"
+        }).description("Route another operator to this input jack. Either applies a classic hard-sync or ring modulation, configure in settings.");
             
         add<Jack>({ 200, 110, 64, 52 }, {
             .graphics = T.oscillator.jacks.output,

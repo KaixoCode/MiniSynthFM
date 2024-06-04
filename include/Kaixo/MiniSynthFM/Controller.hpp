@@ -108,7 +108,7 @@ namespace Kaixo {
 		FilterFreq, LfoDepth,
 		Op1FM, Op2FM, Op3FM,
 		Op1Amount, Op2Amount, Op3Amount,
-		Op1Sync, Op2Sync, Op3Sync,
+		Op1Mod, Op2Mod, Op3Mod,
 		Amount, None
 	};
 
@@ -137,9 +137,9 @@ namespace Kaixo {
 		case ModDestination::Op1Amount: return "op1-amount";
 		case ModDestination::Op2Amount: return "op2-amount";
 		case ModDestination::Op3Amount: return "op3-amount";
-		case ModDestination::Op1Sync: return "op1-sync";
-		case ModDestination::Op2Sync: return "op2-sync";
-		case ModDestination::Op3Sync: return "op3-sync";
+		case ModDestination::Op1Mod: return "op1-sync";
+		case ModDestination::Op2Mod: return "op2-sync";
+		case ModDestination::Op3Mod: return "op3-sync";
 		}
 	}
 
@@ -166,9 +166,9 @@ namespace Kaixo {
 		if (dest == "op1-amount") return ModDestination::Op1Amount;
 		if (dest == "op2-amount") return ModDestination::Op2Amount;
 		if (dest == "op3-amount") return ModDestination::Op3Amount;
-		if (dest == "op1-sync") return ModDestination::Op1Sync;
-		if (dest == "op2-sync") return ModDestination::Op2Sync;
-		if (dest == "op3-sync") return ModDestination::Op3Sync;
+		if (dest == "op1-sync") return ModDestination::Op1Mod;
+		if (dest == "op2-sync") return ModDestination::Op2Mod;
+		if (dest == "op3-sync") return ModDestination::Op3Mod;
 	}
 
 	// ------------------------------------------------

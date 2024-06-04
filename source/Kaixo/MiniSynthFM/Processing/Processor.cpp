@@ -171,9 +171,9 @@ namespace Kaixo::Processing {
         doAllS(ModDestination::Op1FM);
         doAllS(ModDestination::Op2FM);
         doAllS(ModDestination::Op3FM);
-        doAllS(ModDestination::Op1Sync);
-        doAllS(ModDestination::Op2Sync);
-        doAllS(ModDestination::Op3Sync);
+        doAllS(ModDestination::Op1Mod);
+        doAllS(ModDestination::Op2Mod);
+        doAllS(ModDestination::Op3Mod);
     }
 
     basic_json MiniSynthFMProcessor::serialize() {

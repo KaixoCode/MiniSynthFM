@@ -209,19 +209,19 @@ namespace Kaixo::Processing {
             lfolevel = Kaixo::load<SimdType>(lfo[0].output, i) * params.lfoLevel[0] * getAllM(ModDestination::LfoDepth);
             Kaixo::store<SimdType>(previousLfoLevel + i, lfolevel); // Store for recursive
 
-            auto getMW    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::ModWheel]) * modwheellevel; };
-            auto getRand  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Random]) * randomlevel; };
-            auto getVel   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Velocity]) * velocitylevel; };
-            auto getEnv1  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope1]) * env1level; };
-            auto getEnv2  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope2]) * env2level; };
-            auto getEnv3  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope3]) * env3level; };
-            auto getLfo   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::LFO]) * lfolevel; };
-            auto getOp1   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1level; };
-            auto getOp2   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2level; };
-            auto getOp3   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3level; };
-            auto getOp1FM = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1fm; };
-            auto getOp2FM = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2fm; };
-            auto getOp3FM = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3fm; };
+            auto getMW     = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::ModWheel]) * modwheellevel; };
+            auto getRand   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Random]) * randomlevel; };
+            auto getVel    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Velocity]) * velocitylevel; };
+            auto getEnv1   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope1]) * env1level; };
+            auto getEnv2   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope2]) * env2level; };
+            auto getEnv3   = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Envelope3]) * env3level; };
+            auto getLfo    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::LFO]) * lfolevel; };
+            auto getOp1    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1level; };
+            auto getOp2    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2level; };
+            auto getOp3    = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3level; };
+            auto getOp1FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op1]) * op1fm; };
+            auto getOp2FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op2]) * op2fm; };
+            auto getOp3FM  = [&](ModDestination dest) { return static_cast<float>(params.routing[(int)dest][(int)ModSource::Op3]) * op3fm; };
 
             auto getAllA = [&](ModDestination dest) {
                 return getVel(dest)  + getMW(dest)   + getRand(dest) +
@@ -250,6 +250,11 @@ namespace Kaixo::Processing {
             oscillator[1].note<SimdType>(i, _note + _pitchBend + _mpePitchBend + fm2 * 24.f * getAllANoOp(ModDestination::Op2FM));
             oscillator[2].note<SimdType>(i, _note + _pitchBend + _mpePitchBend + fm3 * 24.f * getAllANoOp(ModDestination::Op3FM));
 
+            bool doOp1RM = params.oscillator[0].modType() == ModType::Volume;
+            bool doOp2RM = params.oscillator[1].modType() == ModType::Volume;
+            bool doOp3RM = params.oscillator[2].modType() == ModType::Volume;
+            bool doRingMod = doOp1RM || doOp2RM || doOp3RM;
+
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
                 op1fm = Kaixo::load<SimdType>(oscillator[0].fmOutput[j], i) * params.volume[0];
                 op2fm = Kaixo::load<SimdType>(oscillator[1].fmOutput[j], i) * params.volume[1];
@@ -258,17 +263,35 @@ namespace Kaixo::Processing {
                 oscillator[0].fm<SimdType>(i, 4.f * fm1 * getAllOpFM(ModDestination::Op1FM), j);
                 oscillator[1].fm<SimdType>(i, 4.f * fm2 * getAllOpFM(ModDestination::Op2FM), j);
                 oscillator[2].fm<SimdType>(i, 4.f * fm3 * getAllOpFM(ModDestination::Op3FM), j);
+            
+                if (doRingMod) {
+                    op1level = Kaixo::load<SimdType>(oscillator[0].output[j], i) * params.volume[0];
+                    op2level = Kaixo::load<SimdType>(oscillator[1].output[j], i) * params.volume[1];
+                    op3level = Kaixo::load<SimdType>(oscillator[2].output[j], i) * params.volume[2];
+
+                    if (doOp1RM) oscillator[0].ringMod<SimdType>(i, getAllM(ModDestination::Op1Mod), j);
+                    if (doOp2RM) oscillator[1].ringMod<SimdType>(i, getAllM(ModDestination::Op2Mod), j);
+                    if (doOp3RM) oscillator[2].ringMod<SimdType>(i, getAllM(ModDestination::Op3Mod), j);
+                }
             }
 
-            if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op1]) oscillator[0].hardSync<SimdType>(i, oscillator[0]);
-            if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op2]) oscillator[0].hardSync<SimdType>(i, oscillator[1]);
-            if (params.routing[(int)ModDestination::Op1Sync][(int)ModSource::Op3]) oscillator[0].hardSync<SimdType>(i, oscillator[2]);
-            if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op1]) oscillator[1].hardSync<SimdType>(i, oscillator[0]);
-            if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op2]) oscillator[1].hardSync<SimdType>(i, oscillator[1]);
-            if (params.routing[(int)ModDestination::Op2Sync][(int)ModSource::Op3]) oscillator[1].hardSync<SimdType>(i, oscillator[2]);
-            if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op1]) oscillator[2].hardSync<SimdType>(i, oscillator[0]);
-            if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op2]) oscillator[2].hardSync<SimdType>(i, oscillator[1]);
-            if (params.routing[(int)ModDestination::Op3Sync][(int)ModSource::Op3]) oscillator[2].hardSync<SimdType>(i, oscillator[2]);
+            if (params.oscillator[0].modType() == ModType::Sync) {
+                if (params.routing[(int)ModDestination::Op1Mod][(int)ModSource::Op1]) oscillator[0].hardSync<SimdType>(i, oscillator[0]);
+                if (params.routing[(int)ModDestination::Op1Mod][(int)ModSource::Op2]) oscillator[0].hardSync<SimdType>(i, oscillator[1]);
+                if (params.routing[(int)ModDestination::Op1Mod][(int)ModSource::Op3]) oscillator[0].hardSync<SimdType>(i, oscillator[2]);
+            }
+
+            if (params.oscillator[1].modType() == ModType::Sync) {
+                if (params.routing[(int)ModDestination::Op2Mod][(int)ModSource::Op1]) oscillator[1].hardSync<SimdType>(i, oscillator[0]);
+                if (params.routing[(int)ModDestination::Op2Mod][(int)ModSource::Op2]) oscillator[1].hardSync<SimdType>(i, oscillator[1]);
+                if (params.routing[(int)ModDestination::Op2Mod][(int)ModSource::Op3]) oscillator[1].hardSync<SimdType>(i, oscillator[2]);
+            }
+
+            if (params.oscillator[2].modType() == ModType::Sync) {
+                if (params.routing[(int)ModDestination::Op3Mod][(int)ModSource::Op1]) oscillator[2].hardSync<SimdType>(i, oscillator[0]);
+                if (params.routing[(int)ModDestination::Op3Mod][(int)ModSource::Op2]) oscillator[2].hardSync<SimdType>(i, oscillator[1]);
+                if (params.routing[(int)ModDestination::Op3Mod][(int)ModSource::Op3]) oscillator[2].hardSync<SimdType>(i, oscillator[2]);
+            }
 
             Kaixo::store<SimdType>(filter.frequencyModulation + i, getAllA(ModDestination::FilterFreq));
         }

@@ -85,7 +85,7 @@
       "output": "drawable",
       "fm": "drawable",
       "amount": "drawable",
-      "sync": "drawable"
+      "mod": "drawable"
     }
   },
   "midi": {
@@ -188,7 +188,10 @@
         "velocity-to-gain": "drawable",
         "monophonic": "drawable",
         "quality": "drawable",
-        "export-quality": "drawable"
+        "export-quality": "drawable",
+        "operator1-mod-type": "drawable",
+        "operator2-mod-type": "drawable",
+        "operator3-mod-type": "drawable"
       }
     },
     "save-preset": {

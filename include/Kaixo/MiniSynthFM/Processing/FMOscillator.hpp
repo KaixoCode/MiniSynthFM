@@ -18,6 +18,7 @@ namespace Kaixo::Processing {
     // ------------------------------------------------
 
     enum class Waveform { Sine, Triangle, Saw, Square, Amount };
+    enum class ModType { Sync, Volume, Amount };
 
     // ------------------------------------------------
     
@@ -42,6 +43,10 @@ namespace Kaixo::Processing {
 
         void waveform(Waveform wf);
         void waveform(float val);
+        
+        void modType(ModType wf);
+        void modType(float val);
+        ModType modType() const { return m_ModType; }
 
         // ------------------------------------------------
         
@@ -58,6 +63,7 @@ namespace Kaixo::Processing {
         float m_FrequencyMultiplier = 1;
         int m_Octave = 0;
         Waveform m_Waveform = Waveform::Sine;
+        ModType m_ModType = ModType::Sync;
         bool m_FrequencyDirty = true;
 
         // ------------------------------------------------
@@ -94,6 +100,9 @@ namespace Kaixo::Processing {
 
         template<class SimdType>
         KAIXO_INLINE void hardSync(std::size_t i, FMOscillator& osc);
+        
+        template<class SimdType>
+        KAIXO_INLINE void ringMod(std::size_t i, SimdType value, std::size_t os = 0);
 
         // ------------------------------------------------
 
@@ -118,6 +127,7 @@ namespace Kaixo::Processing {
         alignas(sizeof(float) * Voices) float m_NoteFrequency[Voices]{};
         alignas(sizeof(float) * Voices) float m_DidCycle[Voices]{};
         alignas(sizeof(float) * Voices) float m_Note[Voices]{};
+        alignas(sizeof(float) * Voices) float m_RingModulation[MaxOversample][Voices]{};
 
         // ------------------------------------------------
 
@@ -157,6 +167,11 @@ namespace Kaixo::Processing {
 
         Kaixo::store<SimdType>(m_Phase + i, _phase);
     }
+    
+    template<class SimdType>
+    KAIXO_INLINE void FMOscillator::ringMod(std::size_t i, SimdType value, std::size_t os) {
+        Kaixo::store<SimdType>(m_RingModulation[os] + i, value);
+    }
 
     // ------------------------------------------------
 
@@ -174,12 +189,13 @@ namespace Kaixo::Processing {
 
             for (std::size_t j = 0; j < oversampleAmount; ++j) {
                 SimdType _phaseMod = Math::Fast::fmod1(Kaixo::load<SimdType>(m_PhaseModulation[j], i));
+                SimdType _ringMod = Kaixo::load<SimdType>(m_RingModulation[j], i);
 
                 SimdType phase = Math::Fast::fmod1((static_cast<float>(j) * delta / static_cast<float>(oversampleAmount)) + (_phaseMod + _phase + 10.f));
                 auto [_output, _fmOutput] = this->at<SimdType>(phase, _frequency);
 
-                Kaixo::store<SimdType>(output[j] + i, _output);
-                Kaixo::store<SimdType>(fmOutput[j] + i, _fmOutput);
+                Kaixo::store<SimdType>(output[j] + i, _output * _ringMod);
+                Kaixo::store<SimdType>(fmOutput[j] + i, _fmOutput * _ringMod);
             }
             _phase = Math::Fast::fmod1(_phase + delta);
 
@@ -189,6 +205,7 @@ namespace Kaixo::Processing {
         }
 
         std::memset(m_PhaseModulation, 0, sizeof(m_PhaseModulation));
+        for (auto& v : m_RingModulation) for (auto& a : v) a = 1.f;
     }
 
     // ------------------------------------------------
