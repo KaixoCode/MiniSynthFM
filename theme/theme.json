@@ -10,8 +10,22 @@
     
     // ------------------------------------------------
     
+    $knob-img: knob.png
+    $knob-bg-img: knob-bg.png
+    $knob-bg-bi: knob-bg-bi.png
+    $basic-waveforms: basic-waveforms.png
+    $lfo-waveforms: lfo-waveforms.png
+    $slider-img: slider.png
+    $slider-bg-img: slider-bg.png
+    $jack-img: jack.png
+    $out-jack-bg: out-jack-text-background.png
+    $wheel-img: wheel.png
+
+    // ------------------------------------------------
+    
     $selection-color: [ 255, 255, 255, 50 ]
     $text-color: [ 156, 156, 154 ]
+    $text-color-inv: [ 37, 37, 37 ]
     $display-color: [150, 150, 148]
 
     // ------------------------------------------------
@@ -69,13 +83,13 @@
 
       layers: {
         background: {
-          image: knob-bg.png
+          image: $knob-bg-img
           frames: 22
           image-position: [ 8, 1 ]
           image-size: [ 47, 38 ]
         }
         main: {
-          image: knob.png
+          image: $knob-img
           frames: 46
           frames-per-row: 7
           image-size: [ 27, 27 ]
@@ -94,7 +108,7 @@
 
       layers: {
         background: {
-          image: knob-bg-bi.png
+          image: $knob-bg-bi
           frames: 21
         }
       }
@@ -105,7 +119,7 @@
 
       layers: {
         background: {
-          image: basic-waveforms.png
+          image: $basic-waveforms
           frames: 4
           image-size: [64, 64]
           image-position: [0, 0]
@@ -118,7 +132,7 @@
 
       layers: {
         background: {
-          image: lfo-waveforms.png
+          image: $lfo-waveforms
           frames: 6
         }
       }
@@ -131,11 +145,11 @@
       
       layers: {
         background: {
-          image: slider-bg.png
+          image: $slider-bg-img
           image-position: [ 17, 9 ]
         }
         main: {
-          image: slider.png
+          image: $slider-img
           frames: 90
           frames-per-row: 90
           image-size: [ 43, 107 ]
@@ -198,7 +212,7 @@
     // ------------------------------------------------
 
     $jack: {
-      image: jack.png
+      image: $jack-img
       image-position: [ 21, 4 ]
 
       layers: {
@@ -216,12 +230,12 @@
 
       layers: {
         background: {
-          image: out-jack-text-background.png
+          image: $out-jack-bg
           image-position: [12, 32]
           image-size: [40, 15]
         }
         name: {
-          text-color: [37, 37, 37]
+          text-color: $text-color-inv
         }
       }
     }
@@ -275,7 +289,7 @@
     // ------------------------------------------------
 
     $wheel: {
-      image: wheel.png
+      image: $wheel-img
       frames: 100
       frames-per-row: 100
       image-size: [35, 145]
