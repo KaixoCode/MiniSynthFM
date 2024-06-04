@@ -16,9 +16,21 @@
 
     // ------------------------------------------------
 
-    $display-text-area: {
+    $main-text: {
       font: $main-font
+      text-color: $text-color
+    }
+
+    $display-text: {
+      font: $main-font
+      text-position: [ 0, 1 ]
       text-color: $display-color
+    }
+    
+    // ------------------------------------------------
+
+    $display-text-area: {
+      extends: $display-text
       caret-color: $display-color
       selection-color: $selection-color
       placeholder-color: {
@@ -27,24 +39,24 @@
       }
 
       background: {
-        image-edges: [2, 2, 2, 2]
-
-        image: button-underline.png
-
-        focused: {
-          image: button-hover.png
+        image: {
+          source: button-underline.png
+          focused: button-hover.png
         }
+        image-edges: [2, 2, 2, 2]
       }
     }
     
     // ------------------------------------------------
     
-    $display-text: {
-      font: $main-font
-      text-position: [ 0, 1 ]
-      text-color: $display-color
+    $name-value: {
+      extends: $main-text
+      text: {
+        content: $short-name
+        hovering: $value
+      }
     }
-    
+
     // ------------------------------------------------
 
     // Little base class for easy modification of knobs
@@ -57,34 +69,22 @@
 
       layers: {
         background: {
-          image: {
-            source: knob-bg.png
-            position: [ 8, 1 ]
-            frames: 22
-            size: [ 47, 38 ]
-          }
+          image: knob-bg.png
+          frames: 22
+          image-position: [ 8, 1 ]
+          image-size: [ 47, 38 ]
         }
         main: {
-          image: {
-            source: knob.png
-            frames: 46
-            frames-per-row: 7
-            size: [ 27, 27 ]
-            position: [ 18, 11 ]
-          }
+          image: knob.png
+          frames: 46
+          frames-per-row: 7
+          image-size: [ 27, 27 ]
+          image-position: [ 18, 11 ]
         }
         name: {
-          text: {
-            font: $main-font
-            color: $text-color
-            content: "$short-name"
-            position: [ 0, 22 ]
-            align: center
-          }
-
-          hovering: {
-            text: "$value"
-          }
+          extends: $name-value
+          text-position: [ 0, 22 ]
+          text-align: center
         }
       }
     }
@@ -94,10 +94,8 @@
 
       layers: {
         background: {
-          image: {
-            source: knob-bg-bi.png
-            frames: 21
-          }
+          image: knob-bg-bi.png
+          frames: 21
         }
       }
     }
@@ -107,27 +105,21 @@
 
       layers: {
         background: {
-          image: { 
-            source: basic-waveforms.png
-            frames: 4
-            size: [ 64, 64 ]
-            position: [0, 0]
-          }
+          image: basic-waveforms.png
+          frames: 4
+          image-size: [64, 64]
+          image-position: [0, 0]
         }
       }
     }
 
     $lfo-waveform-knob: { 
-      extends: $main-knob
+      extends: $basic-waveform-knob
 
       layers: {
         background: {
-          image: { 
-            source: lfo-waveforms.png
-            frames: 6
-            size: [ 64, 64 ]
-            position: [0, 0]
-          }
+          image: lfo-waveforms.png
+          frames: 6
         }
       }
     }
@@ -139,94 +131,52 @@
       
       layers: {
         background: {
-          image: {
-            source: slider-bg.png
-            position: [ 17, 9 ]
-          }
+          image: slider-bg.png
+          image-position: [ 17, 9 ]
         }
         main: {
-          image: {
-            source: slider.png
-            frames: 90
-            frames-per-row: 90
-            size: [ 43, 107 ]
-            position: [ 9, 5 ]
-          }
+          image: slider.png
+          frames: 90
+          frames-per-row: 90
+          image-size: [ 43, 107 ]
+          image-position: [ 9, 5 ]
         }
         name: {
-          text: {
-            font: $main-font
-            color: $text-color
-            content: $short-name
-            position: [ 0, 60 ]
-            align: center 
-          }
-
-          hovering: {
-            text: $value
-          }
+          extends: $name-value
+          text-position: [ 0, 60 ]
+          text-align: center 
         }
       }
     }
 
     $toggle: {
-      extends: $knob
+      extends: ["$knob", "$main-text"]
 
-      layers: {
-        toggle: {
-          image: {
-            source: toggle.png
-            size: [ 29, 19 ]
-            position: [ 0, 2 ]
-          }
+      text: $short-name
+      text-position: [ 34, 6 ]
+      text-align: top-left
+      image: toggle.png
+      image-size: [ 29, 19 ]
+      image-position: [ 0, 2 ]
 
-          selected: {
-            image-offset: [0, 19]
-          }
-        }
-
-        name: {
-          text: {
-            font: $main-font
-            color: $text-color
-            content: "$short-name" 
-            position: [ 34, 6 ]
-            align: top-left
-          }
-        }
+      selected: {
+        image-offset: [0, 19]
       }
     }
 
     $vertical-toggle: {
       extends: $toggle
 
-      layers: {
-        toggle: {
-          image: {
-            position: [ 17, 3 ]
-          }
-        }
-
-        name: {
-          text: {
-            position: [ 0, 13 ]
-            align: center
-          }
-        }
-      }
+      text-position: [ 0, 13 ]
+      text-align: center
+      image-position: [ 17, 3 ]
     }
 
     $threeway-toggle: {
       extends: $toggle
 
-      layers: {
-        toggle: {
-          image: {
-            source: threeway-toggle.png
-            frames: 3
-          }
-        }
-      }
+      image: threeway-toggle.png
+      frames: 3
     }
 
     // ------------------------------------------------
@@ -239,51 +189,39 @@
     // ------------------------------------------------
 
     $led: {
-      image: {
-        source: led.png
-        frames: 100
-        frames-per-row: 10
-        size: [ 13, 13 ]
-      }
+      image: led.png
+      frames: 100
+      frames-per-row: 10
+      image-size: [ 13, 13 ]
     }
 
     // ------------------------------------------------
 
     $jack: {
-      layers: {
-        jack: {
-          image: {
-            source: jack.png
-            position: [ 21, 4 ]
-          }
-        }
+      image: jack.png
+      image-position: [ 21, 4 ]
 
+      layers: {
         name: {
-          text: {
-            content: $name
-            font: $main-font
-            color: $text-color
-            align: center
-            position: [0, 16]
-          }
+          extends: $main-text
+          text: $name
+          text-align: center
+          text-position: [0, 16]
         }
       }
     }
 
     $output-jack: {
       extends: $jack
-      
-      layers: {
-        name: {
-          text: {
-            color: [37, 37, 37]
-          }
 
-          image: {
-            source: out-jack-text-background.png
-            position: [12, 32]
-            size: [40, 15]
-          }
+      layers: {
+        background: {
+          image: out-jack-text-background.png
+          image-position: [12, 32]
+          image-size: [40, 15]
+        }
+        name: {
+          text-color: [37, 37, 37]
         }
       }
     }
@@ -336,6 +274,15 @@
 
     // ------------------------------------------------
 
+    $wheel: {
+      image: wheel.png
+      frames: 100
+      frames-per-row: 100
+      image-size: [35, 145]
+    }
+
+    // ------------------------------------------------
+
   }
 
   // ------------------------------------------------
@@ -381,40 +328,23 @@
     white-key: {
       background-color: {
         value: [211, 211, 211]
-        transition: 50
-        
         hovering: [180, 180, 180]
         pressed: [150, 150, 150]
+        transition: 50
       }
     }
 
     black-key: {
       background-color: {
         value: [22, 22, 22] 
-        transition: 50
-
         hovering: [40, 40, 40]
         pressed: [60, 60, 60]
+        transition: 50
       }
     }
 
-    mod-wheel: {
-      image: {
-        source: wheel.png
-        frames: 100
-        frames-per-row: 100
-        size: [35, 145]
-      }
-    }
-
-    pitch-wheel: {
-      image: {
-        source: wheel.png
-        frames: 100
-        frames-per-row: 100
-        size: [35, 145]
-      }
-    }
+    mod-wheel: $wheel
+    pitch-wheel: $wheel
   }
 
   // ------------------------------------------------
@@ -547,9 +477,7 @@
     // ------------------------------------------------
 
     popup: {
-      background: {
-        image: popup-background.png
-      }
+      background: popup-background.png
 
       back-button: {
         extends: $basic-button
