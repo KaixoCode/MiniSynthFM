@@ -432,7 +432,8 @@ namespace Kaixo::Gui {
         bank.foreach([&](const PresetDatabase::Bank::Preset& preset) {
             m_Presets->add<Preset>({ Width, 20 }, {
                 .self = *this,
-                .presetId = preset.id
+                .presetId = preset.id,
+                .isInit = preset.type == PresetDatabase::Bank::Preset::Type::Init
             });
         });
 
@@ -490,6 +491,8 @@ namespace Kaixo::Gui {
         std::ranges::sort(m_Presets->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
             Preset& f1 = dynamic_cast<Preset&>(*a);
             Preset& f2 = dynamic_cast<Preset&>(*b);
+            if (f1.settings.isInit) return true;
+            if (f2.settings.isInit) return false;
             return f1.displayName < f2.displayName;
         });
 

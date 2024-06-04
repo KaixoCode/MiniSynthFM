@@ -99,6 +99,7 @@ namespace Kaixo::Gui {
 
                 LoadPresetTab& self;
                 std::size_t presetId;
+                bool isInit = false;
 
                 // ------------------------------------------------
 

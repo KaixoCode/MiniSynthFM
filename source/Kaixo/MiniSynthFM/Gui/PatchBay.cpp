@@ -471,6 +471,13 @@ namespace Kaixo::Gui {
     
     void PatchBay::presetLoaded() {
         auto& data = context.data<ControllerData>().connections;
+
+        if (Storage::flag(CablePhysics)) {
+            for (auto& connection : m_Connections) {
+                m_FallingConnections.push_back(connection);
+            }
+        }
+
         m_Connections.clear();
         m_Changing = true;
 
