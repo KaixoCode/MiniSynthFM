@@ -67,18 +67,18 @@ namespace Kaixo::Processing {
         return (18ull << 7) + static_cast<int>(Math::clamp(note, 0, 127));
     }
 
-    NoteID PianoInterface::noteOn(Note note) {
+    NoteID PianoInterface::noteOn(Note note, float velocity) {
         NoteID id = generateNoteId(note);
-        addAsyncTask([this, note, id] {
-            self<MiniSynthFMProcessor>().noteOnMPE(id, note, 1, 0);
+        addAsyncTask([this, note, velocity, id] {
+            self<MiniSynthFMProcessor>().noteOnMPE(id, note, velocity, 0);
         });
         return id;
     }
 
-    void PianoInterface::noteOff(Note note) {
+    void PianoInterface::noteOff(Note note, float velocity) {
         NoteID id = generateNoteId(note);
-        addAsyncTask([this, note, id] {
-            self<MiniSynthFMProcessor>().noteOffMPE(id, note, 1, 0);
+        addAsyncTask([this, note, velocity, id] {
+            self<MiniSynthFMProcessor>().noteOffMPE(id, note, velocity, 0);
         });
     }
 

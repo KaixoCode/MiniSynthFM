@@ -18,8 +18,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        virtual NoteID noteOn(Note note) = 0;
-        virtual void noteOff(Note note) = 0;
+        virtual NoteID noteOn(Note note, float velocity) = 0;
+        virtual void noteOff(Note note, float velocity) = 0;
         virtual void pitchBend(NoteID id, float amt) = 0;
 
         // ------------------------------------------------

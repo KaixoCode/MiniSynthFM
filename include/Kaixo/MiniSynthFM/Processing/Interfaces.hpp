@@ -97,8 +97,8 @@ namespace Kaixo::Processing {
 
         // ------------------------------------------------
 
-        NoteID noteOn(Note note) override;
-        void noteOff(Note note) override;
+        NoteID noteOn(Note note, float velocity) override;
+        void noteOff(Note note, float velocity) override;
         void pitchBend(NoteID id, float amt) override;
 
         // ------------------------------------------------
