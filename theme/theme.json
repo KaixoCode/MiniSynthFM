@@ -30,6 +30,11 @@
 
     // ------------------------------------------------
 
+    $main-font: {
+      map: map.png
+      description: map.json
+    }
+
     $main-text: {
       font: $main-font
       text-color: $text-color
@@ -39,6 +44,7 @@
       font: $main-font
       text-position: [ 0, 1 ]
       text-color: $display-color
+      text: $text
     }
     
     $display-text-underline: {
@@ -77,7 +83,6 @@
 
     // ------------------------------------------------
 
-    // Little base class for easy modification of knobs
     $knob: {}
 
     // ------------------------------------------------
@@ -169,7 +174,6 @@
 
     $toggle: {
       extends: ["$knob", "$main-text"]
-
       text: $short-name
       text-position: [ 34, 6 ]
       text-align: top-left
@@ -184,7 +188,6 @@
 
     $vertical-toggle: {
       extends: $toggle
-
       text-position: [ 0, 13 ]
       text-align: center
       image-position: [ 17, 3 ]
@@ -192,16 +195,8 @@
 
     $threeway-toggle: {
       extends: $toggle
-
       image: threeway-toggle.png
       frames: 3
-    }
-
-    // ------------------------------------------------
-
-    $main-font: {
-      map: map.png
-      description: map.json
     }
 
     // ------------------------------------------------
@@ -251,19 +246,16 @@
 
       image-edges: [2, 2, 2, 2]
       hovering: button-hover.png
-
       text-align: center-left
     }
 
     $basic-button-select: {
       extends: $basic-button
-
       selected: button-hover.png
     }
 
     $basic-button-focus: {
       extends: $basic-button
-
       focused: button-hover.png
     }
 
@@ -271,11 +263,13 @@
 
     $settings-tab: {
       extends: $basic-button
+      text: $text
       text-position: [5, 1]
     }
 
     $settings-entry: {
       extends: $settings-tab
+      text: $short-identifier
       
       layers: {
         value: {
@@ -541,30 +535,17 @@
         }
       }
 
-      save-button: {
-        extends: $basic-button-select
-        layers: {
-          img: {
-            image: save-button.png
-          }
-        }
-      }
-
       next-preset: {
         extends: $basic-button
         layers: {
-          img: {
-            image: next-preset.png
-          }
+          img: next-preset.png
         }
       }
       
       previous-preset: {
         extends: $basic-button
         layers: {
-          img: {
-            image: previous-preset.png
-          }
+          img: previous-preset.png
         }
       }
       
@@ -733,7 +714,6 @@
         layers: {
           value: {
             text: $text
-            text-overflow: dots
           }
         }
       }
@@ -791,25 +771,10 @@
         }
       }
 
-      global-title: {      
-        extends: $display-text-underline
-        text: Global Settings
-      }
-      
-      preset-title: {      
-        extends: $display-text-underline
-        text: Preset Settings
-      }
-      
-      midi-title: {      
-        extends: $display-text-underline
-        text: MIDI Settings
-      }
-
-      info-title: {      
-        extends: $display-text-underline
-        text: General Info
-      }
+      global-title: $display-text-underline
+      preset-title: $display-text-underline
+      midi-title: $display-text-underline
+      info-title: $display-text-underline
       
       back-button: {
         extends: $basic-button
@@ -823,26 +788,11 @@
         }
       }
       
-      preset-settings: {
-        extends: $settings-tab
-        text: Preset Settings
-      }
-      
-      midi-settings: {
-        extends: $settings-tab
-        text: MIDI Settings
-      }
-      
-      global-settings: {
-        extends: $settings-tab
-        text: Global Settings
-      }
-      
-      general-info: {
-        extends: $settings-tab
-        text: General Information
-      }
-      
+      preset-settings: $settings-tab
+      midi-settings: $settings-tab
+      global-settings: $settings-tab
+      general-info: $settings-tab
+
       sample-rate: {
         extends: $info-entry
         text: Sample Rate
@@ -869,70 +819,19 @@
       }
 
       parameters: {
-        quality: {
-          extends: $settings-entry
-          text: Quality
-        }
-
-        noisy-filter: {
-          extends: $settings-entry
-          text: Noisy Filter
-        }
-
-        glide: {
-          extends: $settings-entry
-          text: Glide
-        }
-
-        always-glide: {
-          extends: $settings-entry-underline
-          text: Always Glide
-        }
-
-        monophonic: {
-          extends: $settings-entry
-          text: Monophonic
-        }
-
-        delay-algorithm: {
-          extends: $settings-entry-underline
-          text: Delay Alg
-        }
-        
-        velocity-to-gain: {
-          extends: $settings-entry-underline
-          text: Vel to Gain
-        }
-        
-        export-quality: {
-          extends: $settings-entry-underline
-          text: Export
-        }
-        
-        phase-mode: {
-          extends: $settings-entry-underline
-          text: Phase
-        }
-        
-        pitch-bend-range: {
-          extends: $settings-entry-underline
-          text: $short-name
-        }
-        
-        operator1-mod-type: {
-          extends: $settings-entry
-          text: $short-identifier
-        }
-        
-        operator2-mod-type: {
-          extends: $settings-entry
-          text: $short-identifier
-        }
-
-        operator3-mod-type: {
-          extends: $settings-entry-underline
-          text: $short-identifier
-        }
+        quality: $settings-entry
+        noisy-filter: $settings-entry
+        glide: $settings-entry
+        always-glide: $settings-entry-underline
+        monophonic: $settings-entry
+        delay-algorithm: $settings-entry-underline
+        velocity-to-gain: $settings-entry-underline
+        export-quality: $settings-entry-underline
+        phase-mode: $settings-entry-underline
+        pitch-bend-range: $settings-entry-underline
+        operator1-mod-type: $settings-entry
+        operator2-mod-type: $settings-entry
+        operator3-mod-type: $settings-entry-underline
       }
     }
     

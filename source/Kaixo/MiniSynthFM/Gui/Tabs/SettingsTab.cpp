@@ -86,18 +86,22 @@ namespace Kaixo::Gui {
 
         pages.addButton(1, scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.presetSettings,
+            .text = "Preset Settings"
         }));
         
         pages.addButton(2, scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.midiSettings,
+            .text = "MIDI Settings"
         }));
         
         pages.addButton(3, scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.globalSettings,
+            .text = "Global Settings"
         }));
         
         pages.addButton(4, scrollView.add<Button>({ Width, 20 }, {
             .graphics = T.display.settings.generalInfo,
+            .text = "General Info"
         }));
         
         pages.addButton(0, presetSettings.add<Button>({ Width, 20 }, {
@@ -395,7 +399,7 @@ namespace Kaixo::Gui {
         
         generalInfo.add<ImageView>({ Width, 20 }, {
             .image = T.display.settings.infoTitle,
-            .text = "Info",
+            .text = "General Information",
         });
 
         auto& cpuUsage = generalInfo.add<Button>({ Width, 20 }, {
