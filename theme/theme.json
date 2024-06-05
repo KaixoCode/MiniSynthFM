@@ -41,6 +41,12 @@
       text-color: $display-color
     }
     
+    $display-text-underline: {
+      extends: $display-text
+      image-edges: [2, 2, 2, 2]
+      image: button-underline.png
+    }
+    
     // ------------------------------------------------
 
     $display-text-area: {
@@ -53,10 +59,8 @@
       }
 
       background: {
-        image: {
-          source: button-underline.png
-          focused: button-hover.png
-        }
+        image: button-underline.png
+        focused: button-hover.png
         image-edges: [2, 2, 2, 2]
       }
     }
@@ -65,9 +69,9 @@
     
     $name-value: {
       extends: $main-text
-      text: {
-        content: $short-name
-        hovering: $value
+      text: $short-name
+      hovering: {
+        text: $value
       }
     }
 
@@ -246,10 +250,7 @@
       extends: $display-text
 
       image-edges: [2, 2, 2, 2]
-
-      hovering: {
-        image: button-hover.png
-      }
+      hovering: button-hover.png
 
       text-align: center-left
     }
@@ -257,31 +258,48 @@
     $basic-button-select: {
       extends: $basic-button
 
-      selected: {
-        image: button-hover.png
-      }
+      selected: button-hover.png
     }
 
     $basic-button-focus: {
       extends: $basic-button
 
-      focused: {
-        image: button-hover.png
-      }
+      focused: button-hover.png
     }
 
     // ------------------------------------------------
 
-    $settings-entry: {
+    $settings-tab: {
       extends: $basic-button
       text-position: [5, 1]
+    }
+
+    $settings-entry: {
+      extends: $settings-tab
       
       layers: {
         value: {
           extends: $display-text
           text: $value
+          text-overflow: dots
           text-align: center-left
           text-position: [90, 1]
+        }
+      }
+    }
+
+    $settings-entry-underline: {
+      extends: $settings-entry
+      image: button-underline.png
+    }
+
+    $info-entry: {
+      extends: $settings-entry
+
+      layers: {
+        value: {
+          text: $text
+          text-position: [95, 1]
         }
       }
     }
@@ -684,18 +702,12 @@
       }
 
       zoom-button: {
-        extends: $basic-button
-
-        image: button-underline.png
-        
+        extends: $settings-entry-underline
         text: Zoom
-        text-position: [5, 1]
+
         layers: {
-          level: {
-            extends: $display-text
+          value: {
             text: ["50%", "70%", "100%", "150%", "200%"]
-            text-align: center-left
-            text-position: [90, 1]
           }
         }
       }
@@ -715,54 +727,35 @@
       }
 
       theme-path: {
-        extends: $basic-button
+        extends: $settings-entry
         text: Theme
-        text-position: [5, 1]
 
         layers: {
-          path: {
-            extends: $display-text
+          value: {
             text: $text
             text-overflow: dots
-            text-align: center-left
-            text-position: [90, 1]
           }
         }
       }
 
       preset-path: {
-        extends: $basic-button
+        extends: $settings-entry-underline
         text: Preset Path
-        text-position: [5, 2]
-        
-        image: button-underline.png
         
         layers: {
-          path: {
-            extends: $display-text
+          value: {
             text: $text
-            text-overflow: dots
-            text-align: center-left
-            text-position: [90, 1]
           }
         }
       }
       
       touch-mode: {
-        extends: $basic-button
+        extends: $settings-entry-underline
         text: Touch Mode
-        text-position: [5, 1]
-        
-        image: button-underline.png
         
         layers: {
-          path: {
-            extends: $display-text
+          value: {
             text: Disabled
-            text-overflow: dots
-            text-align: center-left
-            text-position: [90, 1]
-
             selected: {
               text: Enabled
             }
@@ -771,20 +764,12 @@
       }
       
       show-piano: {
-        extends: $basic-button
+        extends: $settings-entry-underline
         text: Show Piano
-        text-position: [5, 1]
-        
-        image: button-underline.png
         
         layers: {
-          path: {
-            extends: $display-text
+          value: {
             text: Hide
-            text-overflow: dots
-            text-align: center-left
-            text-position: [90, 1]
-
             selected: {
               text: Show
             }
@@ -793,20 +778,12 @@
       }
 
       cable-physics: {
-        extends: $basic-button
+        extends: $settings-entry-underline
         text: Cable Physics
-        text-position: [5, 1]
-        
-        image: button-underline.png
         
         layers: {
-          path: {
-            extends: $display-text
+          value: {
             text: Disable
-            text-overflow: dots
-            text-align: center-left
-            text-position: [90, 1]
-
             selected: {
               text: Enable
             }
@@ -815,39 +792,23 @@
       }
 
       global-title: {      
-        extends: $display-text
-
+        extends: $display-text-underline
         text: Global Settings
-
-        image-edges: [2, 2, 2, 2]
-        image: button-underline.png
       }
       
       preset-title: {      
-        extends: $display-text
-
+        extends: $display-text-underline
         text: Preset Settings
-
-        image-edges: [2, 2, 2, 2]
-        image: button-underline.png
       }
       
       midi-title: {      
-        extends: $display-text
-
+        extends: $display-text-underline
         text: MIDI Settings
-
-        image-edges: [2, 2, 2, 2]
-        image: button-underline.png
       }
 
       info-title: {      
-        extends: $display-text
-
+        extends: $display-text-underline
         text: General Info
-
-        image-edges: [2, 2, 2, 2]
-        image: button-underline.png
       }
       
       back-button: {
@@ -863,107 +824,48 @@
       }
       
       preset-settings: {
-        extends: $basic-button
+        extends: $settings-tab
         text: Preset Settings
-        text-position: [5, 1]
       }
       
       midi-settings: {
-        extends: $basic-button
+        extends: $settings-tab
         text: MIDI Settings
-        text-position: [5, 1]
       }
       
       global-settings: {
-        extends: $basic-button
+        extends: $settings-tab
         text: Global Settings
-        text-position: [5, 1]
       }
       
       general-info: {
-        extends: $basic-button
+        extends: $settings-tab
         text: General Information
-        text-position: [5, 1]
       }
       
       sample-rate: {
-        extends: $basic-button
+        extends: $info-entry
         text: Sample Rate
-        text-position: [5, 1]
-
-        layers: {
-          path: {
-            extends: $display-text
-            text: $text
-            text-overflow: dots
-            text-align: center-left
-            text-position: [95, 1]
-          }
-        }
       }
 
       cpu-usage: {
-        extends: $basic-button
+        extends: $info-entry
         text: CPU Usage
-        text-position: [5, 1]
-
-        layers: {
-          path: {
-            extends: $display-text
-            text: $text
-            text-overflow: dots
-            text-align: center-left
-            text-position: [95, 1]
-          }
-        }
       }
 
       simd-optimizations: {
-        extends: $basic-button
+        extends: $info-entry
         text: Optimizations
-        text-position: [5, 1]
-
-        layers: {
-          path: {
-            extends: $display-text
-            text: $text
-            text-overflow: dots
-            text-align: center-left
-            text-position: [95, 1]
-          }
-        }
       }
 
       version: {
-        extends: $basic-button
+        extends: $info-entry
         text: Version
-        text-position: [5, 1]
-
-        layers: {
-          path: {
-            extends: $display-text
-            text: $text
-            text-overflow: dots
-            text-align: center-left
-            text-position: [95, 1]
-          }
-        }
       }
 
       active-voices: {
-        extends: $basic-button
+        extends: $info-entry
         text: Active Voices
-        text-position: [5, 1]
-
-        layers: {
-          path: {
-            extends: $display-text
-            text: $text
-            text-overflow: dots
-            text-align: center-left
-            text-position: [95, 1]
-          }
-        }
       }
 
       parameters: {
@@ -983,9 +885,8 @@
         }
 
         always-glide: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: Always Glide
-          image: button-underline.png
         }
 
         monophonic: {
@@ -994,33 +895,28 @@
         }
 
         delay-algorithm: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: Delay Alg
-          image: button-underline.png
         }
         
         velocity-to-gain: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: Vel to Gain
-          image: button-underline.png
         }
         
         export-quality: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: Export
-          image: button-underline.png
         }
         
         phase-mode: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: Phase
-          image: button-underline.png
         }
         
         pitch-bend-range: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: $short-name
-          image: button-underline.png
         }
         
         operator1-mod-type: {
@@ -1034,9 +930,8 @@
         }
 
         operator3-mod-type: {
-          extends: $settings-entry
+          extends: $settings-entry-underline
           text: $short-identifier
-          image: button-underline.png
         }
       }
     }
