@@ -278,7 +278,10 @@ namespace Kaixo::Gui {
                     auto file = choose.getResult();
                     auto filepath = file.getFullPathName().toStdString();
 
-                    if (!T.open(filepath)) return; // Try open theme
+                    if (!T.open(filepath)) {
+                        settings.popup.open([](bool) {}, T.lastError(), false);
+                        return; // Try open theme
+                    }
 
                     themePath->settings.text = T.name();
                     context.repaint();
