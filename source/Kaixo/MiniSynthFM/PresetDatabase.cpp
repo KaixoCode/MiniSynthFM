@@ -41,46 +41,89 @@ namespace Kaixo {
 
         static basic_json get(std::string_view search) {
             auto json = findPair(search);
-            if (auto result = basic_json::parse(json)) {
-                return result.value();
-            }
-
+            if (auto result = basic_json::parse(json)) return result.value();
             return {};
         }
     };
 
     // ------------------------------------------------
-    
-
-
+    //               Preset::Interface
     // ------------------------------------------------
 
-    PresetDatabase::PresetDatabase(Controller& c)
-        : controller(c)
-    {}
-
-    // ------------------------------------------------
-    
     bool PresetDatabase::Preset::Interface::exists() {
-        return m_Database.preset(m_Path, [](auto&) {});
+        return m_Database && m_Database->preset(m_Path, [](auto&) {});
     }
     
     bool PresetDatabase::Preset::Interface::metaDataHasLoaded() {
+        if (!m_Database) return false;
         bool hasLoaded = false;
-        m_Database.preset(m_Path, [&](Preset& preset) {
+        m_Database->preset(m_Path, [&](Preset& preset) {
             hasLoaded = preset.metaDataLoaded();
         });
         return hasLoaded;
     }
     
     bool PresetDatabase::Preset::Interface::changed() {
+        if (!m_Database) return false;
         bool changed = false;
-        m_Database.preset(m_Path, [&](Preset& preset) { 
+        m_Database->preset(m_Path, [&](Preset& preset) {
             changed = preset.m_ReloadIdentifier != m_LastReloadIdentifier;
         });
         return changed;
     }
 
+    // ------------------------------------------------
+
+    bool PresetDatabase::Preset::Interface::hasType(std::string_view view) {
+        if (!m_Database) return false;
+        bool match = false;
+        m_Database->preset(m_Path, [&](Preset& preset) {
+            if (!preset.metaDataLoaded()) return;
+            match = preset.type().contains(view);
+        });
+        return match;
+    }
+
+    bool PresetDatabase::Preset::Interface::hasAuthor(std::string_view view) {
+        if (!m_Database) return false;
+        bool match = false;
+        m_Database->preset(m_Path, [&](Preset& preset) {
+            if (!preset.metaDataLoaded()) return;
+            match = preset.author() == view;
+        });
+        return match;
+    }
+
+    PresetData PresetDatabase::Preset::Interface::presetData() {
+        PresetData result{};
+        result.name = m_Path.stem().string();
+
+        if (!metaDataHasLoaded()) return result;
+
+        m_Database->preset(m_Path, [&](Preset& preset) { result = preset.m_PresetData; });
+
+        return result;
+    }
+
+    void PresetDatabase::Preset::Interface::load() {
+        if (!m_Database) return;
+        m_Database->preset(m_Path, [&](Preset& preset) { preset.load(); });
+    }
+
+    // ------------------------------------------------
+
+    PresetDatabase::Preset::Interface PresetDatabase::Preset::interface() {
+        return { m_Database, m_Path };
+    }
+
+    // ------------------------------------------------
+
+    PresetDatabase::Preset::Interface::Interface(PresetDatabase& database, std::filesystem::path path) 
+        : m_Database(&database), m_Path(path)
+    {}
+
+    // ------------------------------------------------
+    //                     Preset
     // ------------------------------------------------
 
     PresetDatabase::Preset::Preset(PresetDatabase& database, Bank& bank)
@@ -97,7 +140,7 @@ namespace Kaixo {
     }
 
     PresetDatabase::Preset::Preset(PresetDatabase& database, Bank& bank, std::string_view name)
-        : m_Database(database), m_Bank(bank), m_Type(Factory), m_Path(std::format("{}{}", FactoryBankPath, name))
+        : m_Database(database), m_Bank(bank), m_Type(Factory), m_Path(std::format("{}/{}", FactoryBankPath, name))
     {
         reload();
     }
@@ -105,8 +148,8 @@ namespace Kaixo {
     void PresetDatabase::Preset::load() const {
         if (!metaDataLoaded()) return;
 
-        m_Database.m_LoadedPreset.bank = m_Bank.name();
-        m_Database.m_LoadedPreset.preset = name();
+        m_Database.m_LoadedPreset.bank = m_Bank.m_Name;
+        m_Database.m_LoadedPreset.preset = m_PresetData.name;
 
         switch (m_Type) {
         case Init:
@@ -131,7 +174,7 @@ namespace Kaixo {
         m_MetaDataLoaded = false;
 
         switch (m_Type) {
-        case Normal: {
+        case Normal:
             m_MetaDataLoading = std::async(std::launch::async, [this] {
                 std::ifstream file{ m_Path };
 
@@ -140,9 +183,7 @@ namespace Kaixo {
 
                     if (auto json = basic_json::parse(content)) {
                         auto key = typeid(PresetData).name();
-                        if (json->contains(key)) {
-                            m_PresetData.deserialize(json->at(key));
-                        }
+                        if (json->contains(key)) m_PresetData.deserialize(json->at(key));
                     }
                 }
 
@@ -150,31 +191,31 @@ namespace Kaixo {
                 m_MetaDataLoaded = true;
             });
             break;
-        }
-        case Factory: {
+        case Factory:
             m_MetaDataLoading = std::async(std::launch::async, [this, name = m_Path.stem().string()] {
                 m_PresetData = FactoryPresets::find(name);
                 m_ReloadIdentifier++;
                 m_MetaDataLoaded = true;
             });
             break;
-        }
-        case Init: {
+        case Init:
             m_MetaDataLoaded = true;
             break;
-        }
         }
     }
 
     // ------------------------------------------------
+    //               Bank::Interface
+    // ------------------------------------------------
 
     bool PresetDatabase::Bank::Interface::valid() {
-        return m_Database.bank(m_Path, [](auto&) {});
+        return m_Database && m_Database->bank(m_Path, [](auto&) {});
     }
 
     bool PresetDatabase::Bank::Interface::changed() {
+        if (!m_Database) return false;
         bool changed = false;
-        m_Database.bank(m_Path, [&](const Bank& bank) {
+        m_Database->bank(m_Path, [&](Bank& bank) { 
             changed = bank.m_ReloadIdentifier != m_LastReloadIdentifier;
         });
         return changed;
@@ -182,17 +223,36 @@ namespace Kaixo {
 
     // ------------------------------------------------
 
-    bool PresetDatabase::Bank::preset(std::filesystem::path path, std::function<void(Preset&)> callback) {
-        for (auto& preset : m_Presets) {
-            if (preset.m_Path == path) {
-                callback(preset);
-                return true;
-            }
-        }
+    void PresetDatabase::Bank::Interface::presets(std::function<void(Preset&)> callback) {
+        if (!m_Database) return;
+        m_Database->bank(m_Path, [&](Bank& bank) { bank.presets(std::move(callback)); });
+    }
 
+    // ------------------------------------------------
+    
+    PresetDatabase::Bank::Interface PresetDatabase::Bank::interface() {
+        return { m_Database, m_Path };
+    }
+
+    // ------------------------------------------------
+
+    bool PresetDatabase::Bank::preset(std::filesystem::path path, std::function<void(Preset&)> callback) {
+        for (auto& preset : m_Presets) if (preset.m_Path == path) return (callback(preset), true);
         return false;
     }
 
+    void PresetDatabase::Bank::presets(std::function<void(Preset&)> callback) {
+        for (auto& preset : m_Presets) callback(preset);
+    }
+
+    // ------------------------------------------------
+
+    PresetDatabase::Bank::Interface::Interface(PresetDatabase& database, std::filesystem::path path)
+        : m_Database(&database), m_Path(path)
+    {}
+
+    // ------------------------------------------------
+    //                      Bank
     // ------------------------------------------------
 
     PresetDatabase::Bank::Bank(PresetDatabase& database)
@@ -226,7 +286,7 @@ namespace Kaixo {
 
             // Reload or add all factory presets
             for (auto& [name, json] : Presets) {
-                if (!preset(std::format("{}{}", FactoryBankPath, name), [](Preset& preset) {
+                if (!preset(std::format("{}/{}", FactoryBankPath, name), [](Preset& preset) {
                     preset.reload();
                     preset.m_Exists = true;
                 })) {
@@ -269,6 +329,14 @@ namespace Kaixo {
     }
 
     // ------------------------------------------------
+    //                PresetDatabase
+    // ------------------------------------------------
+
+    PresetDatabase::PresetDatabase(Controller& c)
+        : controller(c)
+    {}
+
+    // ------------------------------------------------
 
     bool PresetDatabase::preset(std::filesystem::path path, std::function<void(Preset&)> callback) {
         bool found = false;
@@ -288,6 +356,18 @@ namespace Kaixo {
         }
 
         return false;
+    }
+
+    void PresetDatabase::banks(std::function<void(Bank&)> callback) {
+        for (auto& bank : m_PresetBanks) {
+            callback(bank);
+        }
+    }
+    
+    void PresetDatabase::presets(std::function<void(Preset&)> callback) {
+        banks([&](PresetDatabase::Bank& bank) {
+            bank.presets(callback);
+        });
     }
 
     // ------------------------------------------------

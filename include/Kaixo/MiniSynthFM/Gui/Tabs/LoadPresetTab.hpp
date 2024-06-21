@@ -29,12 +29,9 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
+        class Preset;
         class Filter : public View {
         public:
-
-            // ------------------------------------------------
-            
-            enum class Type { Bank, Type, Author };
 
             // ------------------------------------------------
 
@@ -43,15 +40,8 @@ namespace Kaixo::Gui {
                 // ------------------------------------------------
 
                 LoadPresetTab& self;
-                Type type;
-
-                // ------------------------------------------------
-
-                std::size_t bankId; // Only set when type == Bank
-
-                // ------------------------------------------------
-                
-                std::string value; // Type,Author,or Bank
+                std::function<bool(Preset&)> match;
+                std::string name;
 
                 // ------------------------------------------------
 
@@ -74,14 +64,6 @@ namespace Kaixo::Gui {
             void paint(juce::Graphics& g) override;
 
             // ------------------------------------------------
-            
-            void foreach(std::function<void(const PresetDatabase::Bank::Preset&)> callback);
-
-            // ------------------------------------------------
-            
-            std::string identifier();
-
-            // ------------------------------------------------
 
         };
 
@@ -97,7 +79,7 @@ namespace Kaixo::Gui {
                 // ------------------------------------------------
 
                 LoadPresetTab& self;
-                std::size_t presetId;
+                PresetDatabase::Preset::Interface preset{};
                 bool isInit = false;
 
                 // ------------------------------------------------
@@ -115,16 +97,11 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            void mouseDown(const juce::MouseEvent& e) override;
+            void mouseDown(const juce::MouseEvent& e) override { settings.preset.load(); }
 
             // ------------------------------------------------
 
             void paint(juce::Graphics& g) override;
-
-            // ------------------------------------------------
-
-            PresetData presetData();
-            void load();
 
             // ------------------------------------------------
 
@@ -156,12 +133,11 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        void reloadFilters(Filter::Type type);
         void reload();
 
         // ------------------------------------------------
 
-        void select(Filter& bank);
+        void select(Filter& filter);
 
         // ------------------------------------------------
         
@@ -177,7 +153,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        Filter::Type m_CurrentType;
+        enum class FilterType { Bank, Type, Author } m_CurrentType;
 
         // ------------------------------------------------
 
@@ -185,7 +161,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            Filter::Type type;
+            FilterType type;
             std::string value; // Bank,Type,or Author
             float scrolled;
             std::string search;
@@ -194,6 +170,13 @@ namespace Kaixo::Gui {
 
         } m_State;
 
+        std::function<bool(Preset&)> m_CurrentFilter{};
+
+        // ------------------------------------------------
+
+        void reloadFilters(FilterType type);
+        void reloadPresets();
+
         // ------------------------------------------------
 
         void saveState();
@@ -201,8 +184,8 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        void applySearch();
-        void sortPresets(bool reverse);
+        void sortPresets();
+        void showFilteredPresets();
 
         // ------------------------------------------------
 

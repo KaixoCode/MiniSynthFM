@@ -29,17 +29,9 @@ namespace Kaixo {
         // ------------------------------------------------
         
         constexpr static std::string_view FactoryBank = "Factory";
-        constexpr static std::string_view FactoryBankPath = "Factory:/";
+        constexpr static std::string_view FactoryBankPath = "Factory:";
         constexpr static std::string_view InitPreset = "Init";
         constexpr static std::string_view InitPresetPath = "Factory:/Init";
-
-        // ------------------------------------------------
-
-        Controller& controller;
-
-        // ------------------------------------------------
-
-        PresetDatabase(Controller& controller);
 
         // ------------------------------------------------
 
@@ -54,16 +46,39 @@ namespace Kaixo {
 
                 // ------------------------------------------------
 
+                Interface() = default;
+
+                // ------------------------------------------------
+
                 bool exists();
                 bool metaDataHasLoaded();
                 bool changed();
 
                 // ------------------------------------------------
+                
+                bool hasType(std::string_view view);
+                bool hasAuthor(std::string_view view);
+                PresetData presetData();
+                void load();
+
+                // ------------------------------------------------
+
+                std::filesystem::path path() const { return m_Path; }
+
+                // ------------------------------------------------
 
             private:
-                PresetDatabase& m_Database;
+                PresetDatabase* m_Database;
                 std::filesystem::path m_Path;
                 std::size_t m_LastReloadIdentifier = 0;
+
+                // ------------------------------------------------
+                
+                Interface(PresetDatabase& database, std::filesystem::path path);
+
+                // ------------------------------------------------
+
+                friend class Preset;
 
                 // ------------------------------------------------
 
@@ -77,18 +92,24 @@ namespace Kaixo {
 
             // ------------------------------------------------
 
-            // It is undefined behaviour to call any of these functions while metaDataLoaded() == false
-            std::string_view name() const { return m_PresetData.name; }
-            std::string_view author() const { return m_PresetData.author; }
-            std::string_view description() const { return m_PresetData.description; }
             std::string_view type() const { return m_PresetData.type; }
+            std::string_view author() const { return m_PresetData.author; }
+            std::string_view name() const { return m_PresetData.name; }
+            std::string_view description() const { return m_PresetData.description; }
+
+            std::filesystem::path path() const { return m_Path; }
 
             bool metaDataLoaded() const { return m_MetaDataLoaded; }
             bool exists() const { return m_Exists; }
+            bool isInit() const { return m_Type == Init; }
 
             // ------------------------------------------------
 
             void load() const;
+
+            // ------------------------------------------------
+
+            Interface interface();
 
             // ------------------------------------------------
 
@@ -127,15 +148,31 @@ namespace Kaixo {
 
                 // ------------------------------------------------
 
+                Interface() = default;
+
+                // ------------------------------------------------
+
                 bool valid();
                 bool changed();
 
                 // ------------------------------------------------
 
+                void presets(std::function<void(Preset&)> callback);
+
+                // ------------------------------------------------
+
             private:
-                PresetDatabase& m_Database;
-                std::filesystem::path m_Path;
+                PresetDatabase* m_Database = nullptr;
+                std::filesystem::path m_Path{};
                 std::size_t m_LastReloadIdentifier = 0;
+
+                // ------------------------------------------------
+                
+                Interface(PresetDatabase& database, std::filesystem::path path);
+
+                // ------------------------------------------------
+                
+                friend class Bank;
 
                 // ------------------------------------------------
 
@@ -147,14 +184,22 @@ namespace Kaixo {
             Bank(PresetDatabase& database, std::filesystem::path folder);
 
             // ------------------------------------------------
+            
+            std::string name() const { return m_Name; }
 
-            std::string_view name() const { return m_Name; }
-            std::size_t nofPresets() const { return m_Presets.size(); }
+            // ------------------------------------------------
+
             bool exists() const { return m_Exists; }
+
+            // ------------------------------------------------
+            
+            Interface interface();
 
             // ------------------------------------------------
 
             bool preset(std::filesystem::path path, std::function<void(Preset&)> callback);
+
+            void presets(std::function<void(Preset&)> callback);
 
             // ------------------------------------------------
 
@@ -181,8 +226,19 @@ namespace Kaixo {
 
         // ------------------------------------------------
 
+        Controller& controller;
+
+        // ------------------------------------------------
+
+        PresetDatabase(Controller& controller);
+
+        // ------------------------------------------------
+
         bool preset(std::filesystem::path path, std::function<void(Preset&)> callback);
         bool bank(std::filesystem::path path, std::function<void(Bank&)> callback);
+
+        void banks(std::function<void(Bank&)> callback);
+        void presets(std::function<void(Preset&)> callback);
 
         // ------------------------------------------------
         
