@@ -50,243 +50,335 @@ namespace Kaixo {
     };
 
     // ------------------------------------------------
+    
+
+
+    // ------------------------------------------------
 
     PresetDatabase::PresetDatabase(Controller& c)
         : controller(c)
-    {
-        loadedPreset.bank = "Factory";
-        loadedPreset.name = "Init";
-        reloadInformation();
-    }
+    {}
 
-    PresetDatabase::~PresetDatabase() {
-        if (m_LoadBanksThread.joinable())
-            m_LoadBanksThread.join();
+    // ------------------------------------------------
+    
+    bool PresetDatabase::Preset::Interface::exists() {
+        return m_Database.preset(m_Path, [](auto&) {});
+    }
+    
+    bool PresetDatabase::Preset::Interface::metaDataHasLoaded() {
+        bool hasLoaded = false;
+        m_Database.preset(m_Path, [&](Preset& preset) {
+            hasLoaded = preset.metaDataLoaded();
+        });
+        return hasLoaded;
+    }
+    
+    bool PresetDatabase::Preset::Interface::changed() {
+        bool changed = false;
+        m_Database.preset(m_Path, [&](Preset& preset) { 
+            changed = preset.m_ReloadIdentifier != m_LastReloadIdentifier;
+        });
+        return changed;
     }
 
     // ------------------------------------------------
 
-    void PresetDatabase::reloadInformation() {
-        if (m_LoadBanksThread.joinable())
-            m_LoadBanksThread.join(); // Wait for previous reload if exists
+    PresetDatabase::Preset::Preset(PresetDatabase& database, Bank& bank)
+        : m_Database(database), m_Bank(bank), m_Type(Init), m_Path(InitPresetPath)
+    {
+        m_PresetData.name = InitPreset;
+        reload();
+    }
 
-        banks.clear();
+    PresetDatabase::Preset::Preset(PresetDatabase& database, Bank& bank, std::filesystem::path path)
+        : m_Database(database), m_Bank(bank), m_Type(Normal), m_Path(path)
+    {
+        reload();
+    }
 
-        banks.emplace_back(*this, Bank::Type::Factory, m_BankIdCounter++, "Factory");
-        banks[0].reloadInformation();
+    PresetDatabase::Preset::Preset(PresetDatabase& database, Bank& bank, std::string_view name)
+        : m_Database(database), m_Bank(bank), m_Type(Factory), m_Path(std::format("{}{}", FactoryBankPath, name))
+    {
+        reload();
+    }
 
-        if (auto optPath = Storage::get<std::string>(PresetPath)) {
-            std::filesystem::path path = optPath.value();
+    void PresetDatabase::Preset::load() const {
+        if (!metaDataLoaded()) return;
 
-            if (!std::filesystem::exists(path)) return;
+        m_Database.m_LoadedPreset.bank = m_Bank.name();
+        m_Database.m_LoadedPreset.preset = name();
 
-            banks.emplace_back(*this, Bank::Type::Bank, m_BankIdCounter++, "User", path);
+        switch (m_Type) {
+        case Init:
+            m_Database.controller.initPreset();
+            break;
+        case Factory: {
+            auto json = FactoryPresets::get(m_Path.filename().string());
+            m_Database.controller.loadPresetFromJson(json);
+            break;
+        }
+        case Normal:
+            m_Database.controller.loadPreset(m_Path);
+            break;
+        }
+    }
 
-            for (auto& entry : std::filesystem::directory_iterator(path)) {
-                if (entry.is_directory() && entry.exists()) {
-                    banks.emplace_back(*this, Bank::Type::Bank, m_BankIdCounter++, entry.path().stem().string(), entry);
+    // ------------------------------------------------
+    
+    void PresetDatabase::Preset::reload() {
+        if (!metaDataLoaded()) return; // Already reloading
+
+        m_MetaDataLoaded = false;
+
+        switch (m_Type) {
+        case Normal: {
+            m_MetaDataLoading = std::async(std::launch::async, [this] {
+                std::ifstream file{ m_Path };
+
+                if (file.is_open()) {
+                    std::string content = file_to_string(file);
+
+                    if (auto json = basic_json::parse(content)) {
+                        auto key = typeid(PresetData).name();
+                        if (json->contains(key)) {
+                            m_PresetData.deserialize(json->at(key));
+                        }
+                    }
                 }
+
+                m_ReloadIdentifier++;
+                m_MetaDataLoaded = true;
+            });
+            break;
+        }
+        case Factory: {
+            m_MetaDataLoading = std::async(std::launch::async, [this, name = m_Path.stem().string()] {
+                m_PresetData = FactoryPresets::find(name);
+                m_ReloadIdentifier++;
+                m_MetaDataLoaded = true;
+            });
+            break;
+        }
+        case Init: {
+            m_MetaDataLoaded = true;
+            break;
+        }
+        }
+    }
+
+    // ------------------------------------------------
+
+    bool PresetDatabase::Bank::Interface::valid() {
+        return m_Database.bank(m_Path, [](auto&) {});
+    }
+
+    bool PresetDatabase::Bank::Interface::changed() {
+        bool changed = false;
+        m_Database.bank(m_Path, [&](const Bank& bank) {
+            changed = bank.m_ReloadIdentifier != m_LastReloadIdentifier;
+        });
+        return changed;
+    }
+
+    // ------------------------------------------------
+
+    bool PresetDatabase::Bank::preset(std::filesystem::path path, std::function<void(Preset&)> callback) {
+        for (auto& preset : m_Presets) {
+            if (preset.m_Path == path) {
+                callback(preset);
+                return true;
             }
         }
 
-        m_LoadBanksThread = std::thread([this]() {
-            for (std::size_t i = 1; i < banks.size(); ++i) {
-                auto& bank = banks[i];
-                bank.reloadInformation();
+        return false;
+    }
+
+    // ------------------------------------------------
+
+    PresetDatabase::Bank::Bank(PresetDatabase& database)
+        : m_Database(database), m_Type(Factory), 
+          m_Name(FactoryBank), m_Path(FactoryBankPath)
+    {
+        reload();
+    }
+
+    PresetDatabase::Bank::Bank(PresetDatabase& database, std::filesystem::path folder)
+        : m_Database(database), m_Type(Folder), 
+          m_Name(folder.stem().string()), m_Path(folder)
+    {
+        reload();
+    }
+
+    // ------------------------------------------------
+
+    void PresetDatabase::Bank::reload() {
+        for (auto& preset : m_Presets) preset.m_Exists = false; 
+
+        switch (m_Type) {
+        case Factory: {
+            // Reload or add init preset
+            if (!preset(InitPresetPath, [](Preset& preset) {
+                preset.reload();
+                preset.m_Exists = true;
+            })) {
+                m_Presets.emplace_back(m_Database, *this);
             }
+
+            // Reload or add all factory presets
+            for (auto& [name, json] : Presets) {
+                if (!preset(std::format("{}{}", FactoryBankPath, name), [](Preset& preset) {
+                    preset.reload();
+                    preset.m_Exists = true;
+                })) {
+                    m_Presets.emplace_back(m_Database, *this, name);
+                }
+            }
+            break;
+        }
+        case Folder: {
+            std::vector<std::filesystem::path> files;
+            for (auto& file : std::filesystem::directory_iterator(m_Path)) {
+                if (file.exists() && file.is_regular_file() &&
+                    file.path().extension() == ".minifm") 
+                {
+                    files.push_back(file.path());
+                }
+            }
+            std::ranges::sort(files);
+
+            // Reload or add all presets in the folder
+            for (auto& path : files) {
+                if (!preset(path, [](Preset& preset) {
+                    preset.reload();
+                    preset.m_Exists = true;
+                })) {
+                    m_Presets.emplace_back(m_Database, *this, path);
+                }
+            }
+            break;
+        }
+        }
+
+        // Erase all nonvalid presets
+        for (auto it = m_Presets.begin(); it != m_Presets.end();) {
+            if (!it->exists()) it = m_Presets.erase(it);
+            else ++it;
+        }
+
+        m_ReloadIdentifier++;
+    }
+
+    // ------------------------------------------------
+
+    bool PresetDatabase::preset(std::filesystem::path path, std::function<void(Preset&)> callback) {
+        bool found = false;
+        bank(path.parent_path(), [&](Bank& bank) {
+            found = bank.preset(path, std::move(callback));
+        });
+
+        return found;
+    }
+    
+    bool PresetDatabase::bank(std::filesystem::path path, std::function<void(Bank&)> callback) {
+        for (auto& bank : m_PresetBanks) {
+            if (bank.m_Path == path) {
+                callback(bank);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------
+    
+    void PresetDatabase::load(std::filesystem::path path) {
+        bank(path.parent_path(), [&](Bank& bank) {
+            bank.preset(path, [](Preset& preset) {
+                preset.load();
+            });
         });
     }
 
     // ------------------------------------------------
+    
+    void PresetDatabase::reload() {
+        auto presetPathFromStorage = Storage::get<std::string>(PresetPath);
+        if (!presetPathFromStorage) return;
+        
+        std::filesystem::path presetPath = presetPathFromStorage.value();
+        if (!std::filesystem::exists(presetPath)) return;
 
-    void PresetDatabase::Bank::Preset::reloadInformation() {
-        if (type == Type::Init) {
-            name = "Init";
-            presetData.name = name;
-        } else if (type == Type::Factory) {
-            presetData = FactoryPresets::find(name);
-        } else {
-            if (auto json = basic_json::parse(file_to_string(path))) {
-                auto pdata = typeid(PresetData).name();
-                if (json->contains(pdata)) {
-                    presetData.deserialize(json.value()[pdata]);
+        for (auto& bank : m_PresetBanks) bank.m_Exists = false;
+
+        // Reload or add factory bank
+        if (!bank(FactoryBankPath, [](Bank& bank) {
+            bank.reload();
+            bank.m_Exists = true;
+        })) {
+            m_PresetBanks.emplace_back(*this);
+        }
+        
+        // Reload or add User bank (root path of preset directory)
+        if (!bank(presetPath, [](Bank& bank) {
+            bank.reload();
+            bank.m_Exists = true;
+        })) {
+            m_PresetBanks.emplace_back(*this, presetPath);
+        }
+
+        // Reload or add all banks in presetPath
+        for (auto& entry : std::filesystem::directory_iterator(presetPath)) {
+            if (entry.is_directory() && entry.exists()) {
+                if (!bank(entry.path(), [](Bank& bank) {
+                    bank.reload();
+                    bank.m_Exists = true;
+                })) {
+                    m_PresetBanks.emplace_back(*this, entry.path());
                 }
             }
-            name = presetData.name;
         }
-    }
 
-    // ------------------------------------------------
-
-    void PresetDatabase::Bank::Preset::load() const {
-        database.loadedPreset.bank = bank.name;
-        database.loadedPreset.name = name;
-
-        if (type == Type::Init) {
-            database.controller.initPreset();
-        } else if (type == Type::Factory) {
-            auto json = FactoryPresets::get(name);
-            database.controller.loadPresetFromJson(json);
-        } else {
-            database.controller.loadPreset(path);
+        // Erase all nonvalid banks
+        for (auto it = m_PresetBanks.begin(); it != m_PresetBanks.end();) {
+            if (!it->exists()) it = m_PresetBanks.erase(it);
+            else ++it;
         }
-    }
-
-    // ------------------------------------------------
-
-    PresetDatabase::Bank::Bank(PresetDatabase& d, PresetDatabase::Bank::Type t, std::size_t id, std::string n, std::filesystem::path f)
-        : database(d), type(t), name(n), folder(f), id(id)
-    {}
-
-    // ------------------------------------------------
-
-    void PresetDatabase::Bank::reloadInformation() {
-        std::lock_guard _{ m_Mutex };
-        m_Presets.clear();
-        if (type == Type::Factory) {
-            m_Presets.emplace_back(Preset{
-                .database = database,
-                .bank = *this,
-                .id = database.m_PresetIdCounter++,
-                .type = Preset::Type::Init,
-                .name = "Init"
-            }).reloadInformation();
-
-            for (auto& [name, json] : Presets) {
-                m_Presets.emplace_back(Preset{
-                    .database = database,
-                    .bank = *this,
-                    .id = database.m_PresetIdCounter++,
-                    .type = Preset::Type::Factory,
-                    .name = std::string{ name }
-                }).reloadInformation();
-            }
-        } else {
-            std::vector<std::filesystem::path> files;
-            for (auto& file : std::filesystem::directory_iterator(folder)) {
-                if (file.is_regular_file() && file.path().extension() == ".minifm") 
-                    files.push_back(file.path());
-            }
-            std::ranges::sort(files);
-            for (auto& path : files) {
-                m_Presets.emplace_back(Preset{
-                    .database = database,
-                    .bank = *this,
-                    .id = database.m_PresetIdCounter++,
-                    .type = Preset::Type::Normal,
-                    .path = path
-                }).reloadInformation();
-            }
-        }
-        m_Loaded = true;
-    }
-
-    // ------------------------------------------------
-
-    const std::vector<PresetDatabase::Bank::Preset>& PresetDatabase::Bank::presets() const {
-        while (!m_Loaded) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        }
-        std::lock_guard _{ m_Mutex };
-        return m_Presets;
     }
 
     // ------------------------------------------------
 
     void PresetDatabase::loadNextPreset() {
-        for (std::size_t j = 0; j < banks.size(); ++j) {
-            auto& bank = banks[j];
-            if (bank.name != loadedPreset.bank) continue;
+        for (auto bank = m_PresetBanks.begin(); bank != m_PresetBanks.end(); ++bank) {
+            if (bank->m_Path != m_LoadedPreset.bank) continue;
 
-            auto& presets = bank.presets();
-            for (std::size_t i = 0; i < presets.size(); ++i) {
-                auto& preset = presets[i];
-                if (preset.name != loadedPreset.name) continue;
-
-                if (i != presets.size() - 1) { // Not final preset in bank, just load
-                    auto& next = presets[i + 1];
-                    next.load();
-                    return; // Done
-                } else while (true) { // Otherwise go to next bank
-                    if (j == banks.size() - 1) { // Final bank, Wrap around to first = init preset
-                        controller.initPreset();
-                        loadedPreset.name = "Init";
-                        loadedPreset.bank = "Factory";
-                        return; // Done
-                    }
-
-                    auto& nextBankPresets = banks[j + 1].presets();
-
-                    // Next bank has no presets -> try next bank
-                    if (nextBankPresets.size() == 0) {
-                        j++;
-                        continue; // while (true)
-                    } else {
-                        auto& next = nextBankPresets.front();
-                        next.load();
-                        return; // Done
-                    }
+            for (auto preset = bank->m_Presets.begin(); preset != bank->m_Presets.end(); ++preset) {
+                if (preset->m_Path != m_LoadedPreset.preset) continue;
+                if (++preset != bank->m_Presets.end()) return preset->load();
+                
+                while (true) {
+                    if (++bank == m_PresetBanks.end()) return load(InitPresetPath);
+                    if (!bank->m_Presets.empty()) return bank->m_Presets.front().load();
                 }
             }
         }
     }
 
     void PresetDatabase::loadPreviousPreset() {
-        for (std::size_t j = 0; j < banks.size(); ++j) {
-            auto& bank = banks[j];
-            if (bank.name != loadedPreset.bank) continue;
+        for (auto bank = m_PresetBanks.begin(); bank != m_PresetBanks.end(); ++bank) {
+            if (bank->m_Path != m_LoadedPreset.bank) continue;
 
-            auto& presets = bank.presets();
-            for (std::size_t i = 0; i < presets.size(); ++i) {
-                auto& preset = presets[i];
-                if (preset.name != loadedPreset.name) continue;
+            for (auto preset = bank->m_Presets.begin(); preset != bank->m_Presets.end(); ++preset) {
+                if (preset->m_Path != m_LoadedPreset.preset) continue;
+                if (preset != bank->m_Presets.begin()) return (--preset)->load();
 
-                if (i != 0) { // Not first preset in bank, just load
-                    auto& previous = presets[i - 1];
-                    previous.load();
-                    return; // Done
-                } else while (true) { // Otherwise go to next bank
-                    if (j == 0) { // First bank, Wrap around to last
-                        j = banks.size();
-                        continue; // Done
-                    }
-
-                    auto& previousBankPresets = banks[j - 1].presets();
-
-                    // Next bank has no presets -> try previous bank
-                    if (previousBankPresets.size() == 0) {
-                        j--;
-                        continue; // while (true)
-                    } else {
-                        auto& previous = previousBankPresets.back();
-                        previous.load();
-                        return; // Done
-                    }
+                while (true) {
+                    if (bank == m_PresetBanks.begin()) bank = --m_PresetBanks.end();
+                    else --bank;
+                    if (!bank->m_Presets.empty()) return bank->m_Presets.back().load();
                 }
             }
         }
-    }
-
-    // ------------------------------------------------
-
-    const PresetDatabase::Bank::Preset* PresetDatabase::preset(std::size_t id) {
-        for (auto& bank : banks) {
-            for (auto& preset : bank.presets()) {
-                if (preset.id == id) {
-                    return &preset;
-                }
-            }
-        }
-
-        return nullptr;
-    }
-    
-    const PresetDatabase::Bank* PresetDatabase::bank(std::size_t id) {
-        for (auto& bank : banks) {
-            if (bank.id == id) return &bank;
-        }
-
-        return nullptr;
     }
 
     // ------------------------------------------------
