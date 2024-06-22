@@ -61,7 +61,9 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            void mouseDown(const juce::MouseEvent& e) override { settings.self.select(*this); }
+            void mouseDown(const juce::MouseEvent& e) override;
+            void mouseDrag(const juce::MouseEvent& e) override;
+            void mouseUp(const juce::MouseEvent& e) override;
 
             // ------------------------------------------------
 
@@ -102,7 +104,9 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            void mouseDown(const juce::MouseEvent& e) override { settings.preset.load(); }
+            void mouseDown(const juce::MouseEvent& e) override;
+            void mouseDrag(const juce::MouseEvent& e) override;
+            void mouseUp(const juce::MouseEvent& e) override;
 
             // ------------------------------------------------
 

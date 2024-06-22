@@ -46,6 +46,24 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
+    void LoadPresetTab::Filter::mouseDown(const juce::MouseEvent& e) {
+        if (auto parent = getParentComponent()) {
+            parent->mouseDown(e.getEventRelativeTo(parent));
+        }
+    }
+
+    void LoadPresetTab::Filter::mouseDrag(const juce::MouseEvent& e) {
+        if (auto parent = getParentComponent()) {
+            parent->mouseDrag(e.getEventRelativeTo(parent));
+        }
+    }
+
+    void LoadPresetTab::Filter::mouseUp(const juce::MouseEvent& e) {
+        if (e.mouseDownPosition == e.position) settings.self.select(*this);
+    }
+
+    // ------------------------------------------------
+
     void LoadPresetTab::Filter::paint(juce::Graphics& g) {
         auto& database = context.controller<MiniSynthFMController>().presetDatabase;
         auto name = settings.name;
@@ -71,6 +89,24 @@ namespace Kaixo::Gui {
         wantsIdle(true);
         animation(graphics);
         reloadDisplayName();
+    }
+
+    // ------------------------------------------------
+
+    void LoadPresetTab::Preset::mouseDown(const juce::MouseEvent& e) {
+        if (auto parent = getParentComponent()) {
+            parent->mouseDown(e.getEventRelativeTo(parent));
+        }
+    }
+
+    void LoadPresetTab::Preset::mouseDrag(const juce::MouseEvent& e) {
+        if (auto parent = getParentComponent()) {
+            parent->mouseDrag(e.getEventRelativeTo(parent));
+        }
+    }
+
+    void LoadPresetTab::Preset::mouseUp(const juce::MouseEvent& e) {
+        if (e.mouseDownPosition == e.position) settings.preset.load();
     }
 
     // ------------------------------------------------
