@@ -633,6 +633,16 @@
           }
         }
       }
+
+      reload-button: {
+        extends: $basic-button
+
+        image: button-underline.png
+
+        layers: {
+          icon: reload.png
+        }
+      }
     }
 
     // ------------------------------------------------

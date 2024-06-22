@@ -54,16 +54,17 @@ namespace Kaixo {
                 bool metaDataHasLoaded();
                 bool changed();
 
+                bool onChanged(std::function<void(Preset&)> callback);
+                bool access(std::function<void(Preset&)> callback);
+
                 // ------------------------------------------------
                 
-                bool hasType(std::string_view view);
-                bool hasAuthor(std::string_view view);
-                PresetData presetData();
                 void load();
 
                 // ------------------------------------------------
 
                 std::filesystem::path path() const { return m_Path; }
+                std::filesystem::path bankPath() const { return m_Path.parent_path(); }
 
                 // ------------------------------------------------
 
@@ -143,62 +144,21 @@ namespace Kaixo {
 
             // ------------------------------------------------
             
-            class Interface {
-            public:
-
-                // ------------------------------------------------
-
-                Interface() = default;
-
-                // ------------------------------------------------
-
-                bool valid();
-                bool changed();
-
-                // ------------------------------------------------
-
-                void presets(std::function<void(Preset&)> callback);
-
-                // ------------------------------------------------
-
-            private:
-                PresetDatabase* m_Database = nullptr;
-                std::filesystem::path m_Path{};
-                std::size_t m_LastReloadIdentifier = 0;
-
-                // ------------------------------------------------
-                
-                Interface(PresetDatabase& database, std::filesystem::path path);
-
-                // ------------------------------------------------
-                
-                friend class Bank;
-
-                // ------------------------------------------------
-
-            };
-
-            // ------------------------------------------------
-            
             Bank(PresetDatabase& database);
-            Bank(PresetDatabase& database, std::filesystem::path folder);
+            Bank(PresetDatabase& database, std::filesystem::path folder, bool user = false);
 
             // ------------------------------------------------
-            
+
             std::string name() const { return m_Name; }
-
-            // ------------------------------------------------
+            std::filesystem::path path() const { return m_Path; }
 
             bool exists() const { return m_Exists; }
-
-            // ------------------------------------------------
-            
-            Interface interface();
+            bool isFactory() const { return m_Type == Factory; }
+            bool isUser() const { return m_Type == User; }
 
             // ------------------------------------------------
 
             bool preset(std::filesystem::path path, std::function<void(Preset&)> callback);
-
             void presets(std::function<void(Preset&)> callback);
 
             // ------------------------------------------------
@@ -210,7 +170,7 @@ namespace Kaixo {
             std::list<Preset> m_Presets{};
             std::size_t m_ReloadIdentifier = 0;
             bool m_Exists = true; // When false, bank no longer exists on disk. Set during reload.
-            enum { Factory, Folder } m_Type = Factory;
+            enum { Factory, User, Folder } m_Type = Factory;
 
             // ------------------------------------------------
             
@@ -234,10 +194,9 @@ namespace Kaixo {
 
         // ------------------------------------------------
 
-        bool preset(std::filesystem::path path, std::function<void(Preset&)> callback);
         bool bank(std::filesystem::path path, std::function<void(Bank&)> callback);
-
         void banks(std::function<void(Bank&)> callback);
+        bool preset(std::filesystem::path path, std::function<void(Preset&)> callback);
         void presets(std::function<void(Preset&)> callback);
 
         // ------------------------------------------------
@@ -252,6 +211,8 @@ namespace Kaixo {
         // ------------------------------------------------
         
         void reload();
+
+        bool allLoaded();
 
         // ------------------------------------------------
 

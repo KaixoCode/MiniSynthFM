@@ -211,6 +211,7 @@
       "button": "drawable",
       "sort-button": "drawable",
       "search": "text-area",
+      "reload-button": "drawable",
       "bank": "drawable",
       "preset": "drawable",
       "scrollbar": "drawable",

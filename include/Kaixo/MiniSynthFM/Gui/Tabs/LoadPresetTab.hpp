@@ -57,7 +57,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
-            void mouseDown(const juce::MouseEvent& e) override;
+            void mouseDown(const juce::MouseEvent& e) override { settings.self.select(*this); }
 
             // ------------------------------------------------
 
@@ -102,13 +102,11 @@ namespace Kaixo::Gui {
             // ------------------------------------------------
 
             void paint(juce::Graphics& g) override;
+            void onIdle() override;
 
             // ------------------------------------------------
 
             void reloadDisplayName();
-
-            // ------------------------------------------------
-
             bool matchesSearch(std::string_view search);
 
             // ------------------------------------------------
@@ -132,12 +130,16 @@ namespace Kaixo::Gui {
         LoadPresetTab(Context c, Settings s);
 
         // ------------------------------------------------
-
-        void reload();
+        
+        void onIdle() override;
 
         // ------------------------------------------------
 
         void select(Filter& filter);
+
+        // ------------------------------------------------
+
+        void reload();
 
         // ------------------------------------------------
         
@@ -146,6 +148,11 @@ namespace Kaixo::Gui {
         ScrollView* m_Presets;
         TextView* m_Search;
         Button* m_SortButton;
+        Button* m_ReloadButton;
+
+        // ------------------------------------------------
+        
+        bool m_Reloaded = false;
 
         // ------------------------------------------------
 
@@ -174,8 +181,9 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        void reloadFilters(FilterType type);
-        void reloadPresets();
+        void createAll();
+        void createFilters(FilterType type);
+        void createPresets();
 
         // ------------------------------------------------
 
@@ -184,7 +192,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
         
-        void sortPresets();
+        void sortPresets(bool reverse = false);
         void showFilteredPresets();
 
         // ------------------------------------------------

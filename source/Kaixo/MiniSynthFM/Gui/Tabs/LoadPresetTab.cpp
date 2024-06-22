@@ -34,6 +34,8 @@ namespace Kaixo::Gui {
     }
 
     // ------------------------------------------------
+    //                    Filter
+    // ------------------------------------------------
 
     LoadPresetTab::Filter::Filter(Context c, Settings s)
         : View(c), settings(std::move(s))
@@ -42,12 +44,6 @@ namespace Kaixo::Gui {
         animation(graphics);
     }
 
-    // ------------------------------------------------
-
-    void LoadPresetTab::Filter::mouseDown(const juce::MouseEvent& e) {
-        settings.self.select(*this);
-    }
-    
     // ------------------------------------------------
 
     void LoadPresetTab::Filter::paint(juce::Graphics& g) {
@@ -64,20 +60,22 @@ namespace Kaixo::Gui {
     }
 
     // ------------------------------------------------
+    //                    Preset
+    // ------------------------------------------------
 
     LoadPresetTab::Preset::Preset(Context c, Settings s)
         : View(c), settings(std::move(s))
     {
         setWantsKeyboardFocus(true);
         graphics = T.display.loadPreset.preset;
-        reloadDisplayName();
+        wantsIdle(true);
         animation(graphics);
+        reloadDisplayName();
     }
 
     // ------------------------------------------------
 
     void LoadPresetTab::Preset::paint(juce::Graphics& g) {
-        reloadDisplayName();
         graphics.draw({
             .graphics = g,
             .bounds = localDimensions(),
@@ -88,24 +86,41 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
 
-    void LoadPresetTab::Preset::reloadDisplayName() {
-        auto pdata = settings.preset.presetData();
-        displayName = pdata.name;
-        if (!pdata.type.empty()) displayName += " (" + pdata.type + ")";
+    void LoadPresetTab::Preset::onIdle() {
+        settings.preset.onChanged([&](PresetDatabase::Preset&) {
+            reloadDisplayName();
+        });
     }
 
     // ------------------------------------------------
 
-    bool LoadPresetTab::Preset::matchesSearch(std::string_view search) {
-        auto pdata = settings.preset.presetData();
-        return matches_search(pdata.type + " " + pdata.name + " " + pdata.author, search);
+    void LoadPresetTab::Preset::reloadDisplayName() {
+        settings.preset.access([&](PresetDatabase::Preset& preset) {
+            displayName = preset.name();
+            if (!preset.type().empty()) displayName += std::format(" ({})", preset.type());
+            repaint();
+        });
     }
 
+    bool LoadPresetTab::Preset::matchesSearch(std::string_view search) {
+        bool matches = false;
+        settings.preset.access([&](PresetDatabase::Preset& preset) {
+            matches = matches_search(std::format("{} {} {}", preset.type(), preset.name(), preset.author()), search);
+        });
+        return matches;
+    }
+
+    // ------------------------------------------------
+    //                 LoadPresetTab
     // ------------------------------------------------
 
     LoadPresetTab::LoadPresetTab(Context c, Settings s)
         : View(c), settings(s)
     {
+        // ------------------------------------------------
+        
+        wantsIdle(true);
+
         // ------------------------------------------------
 
         add<ImageView>({ .image = T.display.loadPreset.background });
@@ -122,7 +137,7 @@ namespace Kaixo::Gui {
             .alignChildren = Theme::Align::Left
         });
 
-        m_Search = &add<TextView>({ 113, 6, 159, 20 }, {
+        m_Search = &add<TextView>({ 113, 6, 137, 20 }, {
             .graphics = T.display.loadPreset.search,
             .padding = { 4, 3 },
             .multiline = false,
@@ -156,14 +171,20 @@ namespace Kaixo::Gui {
             .graphics = T.display.loadPreset.authorTab
         }));
 
-        m_FilterTabs.tab(0).addCallback([&](bool v) { if (v) reloadFilters(FilterType::Bank); });
-        m_FilterTabs.tab(1).addCallback([&](bool v) { if (v) reloadFilters(FilterType::Type); });
-        m_FilterTabs.tab(2).addCallback([&](bool v) { if (v) reloadFilters(FilterType::Author); });
+        m_FilterTabs.tab(0).addCallback([&](bool v) { if (v) createFilters(FilterType::Bank); });
+        m_FilterTabs.tab(1).addCallback([&](bool v) { if (v) createFilters(FilterType::Type); });
+        m_FilterTabs.tab(2).addCallback([&](bool v) { if (v) createFilters(FilterType::Author); });
 
-        m_SortButton = &add<Button>({ 274, 6, 32, 20 }, {
-            .callback = [&](bool) { sortPresets(); },
+        m_SortButton = &add<Button>({ 252, 6, 32, 20 }, {
+            .callback = [&](bool v) { sortPresets(v); },
             .graphics = T.display.loadPreset.sortButton,
             .behaviour = Button::Behaviour::Toggle
+        });
+        
+        m_ReloadButton = &add<Button>({ 286, 6, 20, 20 }, {
+            .callback = [&](bool v) { reload(); },
+            .graphics = T.display.loadPreset.reloadButton,
+            .behaviour = Button::Behaviour::Click
         });
 
         m_FilterTabs.select(0);
@@ -173,7 +194,7 @@ namespace Kaixo::Gui {
         add<ImageView>({ .image = T.display.loadPreset.foreground, .enableMouse = false });
 
         // ------------------------------------------------
-
+        
         reload();
 
         // ------------------------------------------------
@@ -181,112 +202,15 @@ namespace Kaixo::Gui {
     }
 
     // ------------------------------------------------
-
-    void LoadPresetTab::reloadFilters(FilterType type) {
-        bool loadingSameType = m_CurrentType == type;
-        m_CurrentType = type;
-        if (loadingSameType) saveState(); // Save current state
-
-        m_Search->settings.text = "";
-        m_Search->repaint();
-        m_Filters->clear();
-
-        auto& database = context.controller<MiniSynthFMController>().presetDatabase;
-
-        switch (type) {
-        case FilterType::Bank: {
-            database.banks([&](PresetDatabase::Bank& bank) {
-                m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
-                    .self = *this,
-                    .match = [interface = bank.interface()](Preset& preset) mutable -> bool {
-                        bool match = false;
-                        interface.presets([&](PresetDatabase::Preset& other) {
-                            match = other.path() == preset.settings.preset.path();
-                        });
-                        return match;
-                    },
-                    .name = bank.name()
-                });
-            });
-            break;
-        }
-        case FilterType::Type: {
-            std::set<std::string_view> types;
-            database.presets([&](PresetDatabase::Preset& preset) {
-                if (!preset.metaDataLoaded()) return; // Not yet loaded!
-
-                auto presetTypes = split_types(preset.type());
-                for (auto& type : presetTypes) types.insert(type);
-            });
-
-            std::vector<std::string_view> sortedTypes{ types.begin(), types.end() };
-            std::ranges::sort(sortedTypes);
-
-            for (auto& type : sortedTypes) {
-                m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
-                    .self = *this,
-                    .match = [type = std::string(type)](Preset& preset) -> bool { 
-                        return preset.settings.preset.hasType(type); 
-                    },
-                    .name = std::string{ type }
-                });
+    
+    void LoadPresetTab::onIdle() {
+        if (m_Reloaded) {
+            if (context.controller<MiniSynthFMController>().presetDatabase.allLoaded()) {
+                createAll();
+                m_Reloaded = false;
+                loadState();
             }
-
-            break;
-        }       
-        case FilterType::Author: {
-            std::set<std::string_view> authors;
-            
-            database.banks([&](PresetDatabase::Bank& bank) {
-                bank.presets([&](PresetDatabase::Preset& preset) {
-                    if (!preset.metaDataLoaded()) return; // Not yet loaded!
-
-                    authors.insert(preset.author());
-                });
-            });
-
-            std::vector<std::string_view> sortedAuthors{ authors.begin(), authors.end() };
-            std::ranges::sort(sortedAuthors);
-
-            for (auto& author : sortedAuthors) {
-                m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
-                    .self = *this,
-                    .match = [author = std::string(author)](Preset& preset) -> bool {
-                        return preset.settings.preset.hasAuthor(author);
-                    },
-                    .name = std::string{ author }
-                });
-            }
-
-            break;
         }
-        }
-
-        database.reload();
-
-        if (!m_Filters->views().empty()) {
-            select((Filter&)*m_Filters->views().front());
-        }
-
-        m_Filters->updateDimensions();
-        if (loadingSameType) loadState(); // Load back state
-    }
-
-    void LoadPresetTab::reloadPresets() {
-        m_Presets->clear();
-        context.controller<MiniSynthFMController>().presetDatabase.presets([&](PresetDatabase::Preset& preset) {
-            m_Presets->add<Preset>({ Width, 20 }, {
-                .self = *this,
-                .preset = preset.interface(),
-                .isInit = preset.isInit()
-            });
-        });
-        m_Presets->updateDimensions();
-    }
-
-    void LoadPresetTab::reload() {
-        reloadFilters(m_CurrentType);
-        reloadPresets();
     }
 
     // ------------------------------------------------
@@ -306,6 +230,114 @@ namespace Kaixo::Gui {
         m_CurrentFilter = filter.settings.match;
 
         showFilteredPresets();
+    }
+
+    // ------------------------------------------------
+
+    void LoadPresetTab::reload() {
+        if (m_Reloaded) return; // Already reloading
+        saveState();
+        m_Reloaded = true;
+        context.controller<MiniSynthFMController>().presetDatabase.reload();
+        m_Filters->clear();
+        m_Presets->clear();
+    }
+
+    // ------------------------------------------------
+
+    void LoadPresetTab::createAll() {
+        createFilters(m_CurrentType);
+        createPresets();
+
+        showFilteredPresets();
+    }
+
+    void LoadPresetTab::createFilters(FilterType type) {
+        m_CurrentType = type;
+        m_Filters->clear();
+
+        auto& database = context.controller<MiniSynthFMController>().presetDatabase;
+
+        auto basicFilter = [&](auto addEntries, auto match) {
+            std::set<std::string_view> entries{};
+            database.presets([&](PresetDatabase::Preset& preset) {
+                if (!preset.metaDataLoaded()) return; // Not yet loaded!
+                addEntries(entries, preset);
+            });
+
+            std::vector<std::string_view> sortedEntries{ entries.begin(), entries.end() };
+            std::ranges::sort(sortedEntries);
+
+            for (auto& entry : sortedEntries) {
+                m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
+                    .self = *this,
+                    .match = [entry = std::string(entry), match](Preset& preset) -> bool {
+                        bool matches = false;
+                        preset.settings.preset.access([&](PresetDatabase::Preset& preset) {
+                            matches = match(entry, preset);
+                        });
+                        return matches;
+                    },
+                    .name = std::string{ entry }
+                });
+            }
+        };
+
+        switch (type) {
+        case FilterType::Bank: {
+            m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
+                .self = *this,
+                .match = [](Preset& preset) -> bool { return true; },
+                .name = "All"
+            });
+
+            database.banks([&](PresetDatabase::Bank& bank) {
+                m_Filters->add<Filter>({ Width, 20 }, Filter::Settings{
+                    .self = *this,
+                    .match = [path = bank.path()](Preset& preset) -> bool {
+                        return path == preset.settings.preset.bankPath();
+                    },
+                    .name = bank.name()
+                });
+            });
+            break;
+        }
+        case FilterType::Type: {
+            basicFilter([&](std::set<std::string_view>& entries, PresetDatabase::Preset& preset) {
+                auto presetTypes = split_types(preset.type());
+                for (auto& type : presetTypes) entries.insert(type);
+            }, [&](std::string_view entry, PresetDatabase::Preset& preset) {
+                return preset.type().contains(entry);
+            });
+            break;
+        }       
+        case FilterType::Author: {
+            basicFilter([&](std::set<std::string_view>& entries, PresetDatabase::Preset& preset) {
+                entries.insert(preset.author());
+            }, [&](std::string_view entry, PresetDatabase::Preset& preset) {
+                    return preset.author() == entry;
+            });
+            break;
+        }
+        }
+
+        if (!m_Filters->views().empty()) {
+            select((Filter&)*m_Filters->views().front());
+        }
+
+        m_Filters->updateDimensions();
+    }
+
+    void LoadPresetTab::createPresets() {
+        m_Presets->clear();
+        context.controller<MiniSynthFMController>().presetDatabase.presets([&](PresetDatabase::Preset& preset) {
+            m_Presets->add<Preset>({ Width, 20 }, {
+                .self = *this,
+                .preset = preset.interface(),
+                .isInit = preset.isInit()
+            });
+        });
+        m_Presets->updateDimensions();
     }
 
     // ------------------------------------------------
@@ -346,7 +378,7 @@ namespace Kaixo::Gui {
 
     // ------------------------------------------------
     
-    void LoadPresetTab::sortPresets() {
+    void LoadPresetTab::sortPresets(bool reverse) {
         std::ranges::sort(m_Presets->views(), [](std::unique_ptr<View>& a, std::unique_ptr<View>& b) {
             Preset& f1 = dynamic_cast<Preset&>(*a);
             Preset& f2 = dynamic_cast<Preset&>(*b);
@@ -355,7 +387,9 @@ namespace Kaixo::Gui {
             return f1.displayName < f2.displayName;
         });
 
-        if (m_SortButton->selected()) std::ranges::reverse(m_Presets->views());
+        if (reverse) std::ranges::reverse(m_Presets->views());
+
+        m_Presets->updateDimensions();
     }
 
     void LoadPresetTab::showFilteredPresets() {
@@ -367,9 +401,9 @@ namespace Kaixo::Gui {
             preset.setVisible(matchesFilter && matchesSearch);
         }
 
-        sortPresets();
+        sortPresets(m_SortButton->selected());
 
-        m_Presets->updateDimensions();
+        m_Presets->scrollTo(0);
     }
 
     // ------------------------------------------------
