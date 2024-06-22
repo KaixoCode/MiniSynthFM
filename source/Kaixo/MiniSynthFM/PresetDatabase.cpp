@@ -126,8 +126,8 @@ namespace Kaixo {
     void PresetDatabase::Preset::load() const {
         if (!metaDataLoaded()) return;
 
-        m_Database.m_LoadedPreset.bank = m_Bank.m_Name;
-        m_Database.m_LoadedPreset.preset = m_PresetData.name;
+        m_Database.m_LoadedPreset.bank = m_Bank.m_Path;
+        m_Database.m_LoadedPreset.preset = m_Path;
 
         switch (m_Type) {
         case Init:
