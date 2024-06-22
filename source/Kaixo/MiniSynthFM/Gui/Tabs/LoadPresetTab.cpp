@@ -97,7 +97,21 @@ namespace Kaixo::Gui {
     void LoadPresetTab::Preset::reloadDisplayName() {
         settings.preset.access([&](PresetDatabase::Preset& preset) {
             displayName = preset.name();
-            if (!preset.type().empty()) displayName += std::format(" ({})", preset.type());
+            switch (displayNameType) {
+            case FilterType::Bank:
+                if (!preset.type().empty()) {
+                    displayName += std::format(" ({})", preset.type());
+                }
+                break;
+            case FilterType::Author:
+                if (!preset.type().empty()) {
+                    displayName += std::format(" ({})", preset.type());
+                }
+                [[fallthrough]];
+            case FilterType::Type:
+                displayName += std::format(" - {}", preset.bank().name());
+                break;
+            }
             repaint();
         });
     }
@@ -399,6 +413,8 @@ namespace Kaixo::Gui {
             bool matchesFilter = !m_CurrentFilter || m_CurrentFilter(preset);
             bool matchesSearch = preset.matchesSearch(m_Search->content());
             preset.setVisible(matchesFilter && matchesSearch);
+            preset.displayNameType = m_CurrentType;
+            preset.reloadDisplayName();
         }
 
         sortPresets(m_SortButton->selected());

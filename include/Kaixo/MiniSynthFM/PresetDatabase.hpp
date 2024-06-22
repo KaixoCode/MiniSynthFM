@@ -111,6 +111,7 @@ namespace Kaixo {
             // ------------------------------------------------
 
             Interface interface();
+            Bank& bank() const { return m_Bank; }
 
             // ------------------------------------------------
 

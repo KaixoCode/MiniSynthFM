@@ -28,6 +28,10 @@ namespace Kaixo::Gui {
     public:
 
         // ------------------------------------------------
+        
+        enum class FilterType { Bank, Type, Author };
+
+        // ------------------------------------------------
 
         class Preset;
         class Filter : public View {
@@ -88,6 +92,7 @@ namespace Kaixo::Gui {
 
             // ------------------------------------------------
 
+            FilterType displayNameType = FilterType::Bank;
             Theme::Drawable graphics;
             std::string displayName;
 
@@ -160,7 +165,7 @@ namespace Kaixo::Gui {
 
         // ------------------------------------------------
 
-        enum class FilterType { Bank, Type, Author } m_CurrentType;
+        FilterType m_CurrentType;
 
         // ------------------------------------------------
 
